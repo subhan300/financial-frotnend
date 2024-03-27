@@ -6,11 +6,10 @@ import {
 } from 'react-router-dom';
 
 import './css/style.css';
-
 import './charts/ChartjsConfig';
 
 // Import pages
-import Dashboard from './pages/Dashboard';
+import { Dashboard, Login, Register } from './pages/index';
 
 function App() {
 
@@ -26,6 +25,8 @@ function App() {
     <>
       <Routes>
         <Route exact path="/" element={<Dashboard />} />
+        <Route exact path="/login" element={<Login />} />
+        <Route exact path="/register" element={<Register />} />
       </Routes>
     </>
   );
