@@ -9,7 +9,7 @@ import './css/style.css';
 import './charts/ChartjsConfig';
 
 // Import pages
-import { Dashboard, Expenses, Goals, Income, Login, Register } from './pages/index';
+import AppRoutes from './routes/index';
 
 function App() {
 
@@ -23,14 +23,7 @@ function App() {
 
   return (
     <>
-      <Routes>
-        <Route exact path="/login" element={<Login />} />
-        <Route exact path="/register" element={<Register />} />
-        <Route exact path="/" element={<Dashboard />} />
-        <Route exact path="/income" element={<Income />} />
-        <Route exact path="/expenses" element={<Expenses />} />
-        <Route exact path="/goals" element={<Goals />} />
-      </Routes>
+      <AppRoutes/>
     </>
   );
 }
