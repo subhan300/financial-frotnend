@@ -10,7 +10,7 @@ function Register() {
                     <img src="/logo.png" className="w-[140px]" alt="" />
                 </div>
                 <div className="flex items-center">
-                    <p className="hidden md:flex font-medium text-sm mr-5">Already a member of Stride?</p>
+                    <p className="hidden md:flex font-medium text-sm mr-5">Already a member of Brand?</p>
                     <Link to={'/login'} className="text-white bg-[#4F46E5] hover:bg-[#433BCB] focus:ring-4 focus:ring-primary rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none font-bold shade">Sign in</Link>
                 </div>
             </div>
@@ -41,8 +41,7 @@ function Register() {
                             <svg className="w-4 h-4 absolute text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 16 20">
                                 <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.5 8V4.5a3.5 3.5 0 1 0-7 0V8M8 12v3M2 8h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z" />
                             </svg>
-                            <input type="password" placeholder="Minimum 8 characters" className="w-full py-2 ml-4 text-sm pl-2 !bg-white focus:outline-none" />
-                                <a href="" className="hover:underline text-primary-hover text-xs whitespace-nowrap font-medium ml-2">Show</a>
+                            <input type="password" placeholder="Minimum 8 characters" className="w-full py-2 ml-4 text-sm pl-2 !bg-white focus:outline-none border-none" />
                         </div>
                     </div>
                 </form>
