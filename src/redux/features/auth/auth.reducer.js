@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { makeRequest } from '../../../utils/makeRequest';
-export const userlogin = createAsyncThunk('auth/login', async (data, thunkAPI) => {
+export const userlogin = createAsyncThunk('auth/userlogin', async (data, thunkAPI) => {
   try {
     let response = await makeRequest(`/api/v1/users/login/`, 'POST', data);
     if (response) {
@@ -10,7 +10,32 @@ export const userlogin = createAsyncThunk('auth/login', async (data, thunkAPI) =
     return thunkAPI.rejectWithValue(error.response);
   }
 });
-export const logout = createAsyncThunk('/auth/logout', async (data, thunkAPI) => {
+export const userRegister = createAsyncThunk('/auth/userRegister', async (data, thunkAPI) => {
+  try {
+    let response = await makeRequest(`/api/v1/users/register`, 'POST', data);
+    if (response) {
+      console.log(response, 'RESOPONSE============>');
+      return response;
+    }
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response);
+  }
+});
+export const emailVerification = createAsyncThunk(
+  '/auth/emailVerification',
+  async (token, thunkAPI) => {
+    try {
+      let response = await makeRequest(`/api/v1/users/email-verify/${token}`, 'GET', null);
+      if (response) {
+        console.log(response, 'RESOPONSE============>');
+        return response;
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response);
+    }
+  }
+);
+export const logout = createAsyncThunk('/auth/logout', async (thunkAPI) => {
   try {
     let response = await makeRequest(`/api/v1/users/logout`, 'POST', {}, null);
     if (response) {

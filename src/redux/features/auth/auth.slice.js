@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { logout, userlogin } from './auth.reducer';
+import { logout, userRegister, userlogin } from './auth.reducer';
 const initialState = {
   auth: [],
   isLoading: false,
@@ -32,6 +32,24 @@ export const authSlice = createSlice({
     });
     builder.addCase(userlogin.rejected, (state, action) => {
       console.log('userlogin.rejected', action);
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+      state.error = action.error;
+    });
+    builder.addCase(userRegister.pending, (state) => {
+      console.log('userRegister.rejected', state);
+      state.isLoading = true;
+      state.isError = false;
+      state.isSuccess = false;
+    });
+    builder.addCase(userRegister.fulfilled, (state, action) => {
+      console.log('userRegister.fulfilled', action);
+      state.isLoading = false;
+      state.isError = false;
+    });
+    builder.addCase(userRegister.rejected, (state, action) => {
+      console.log('userRegister.rejected', action);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

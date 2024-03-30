@@ -1,7 +1,13 @@
-import Dashboard from '../pages/Dashboard';
+import React from 'react';
+import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
-const ProtectedRoutes = ({ user }) => {
-  console.log(user, 'users');
-  return <>{Object.keys(user).length ? <Dashboard /> : <Navigate to="/login" replace />}</>;
+
+const ProtectedRoute = ({ children }) => {
+  const { auth } = useSelector((state) => state.auth);
+  if (Object.keys(auth).length == 0) {
+    return <Navigate to="/login" />;
+  }
+  return children;
 };
-export default ProtectedRoutes;
+
+export default ProtectedRoute;

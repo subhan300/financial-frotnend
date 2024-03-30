@@ -1,22 +1,13 @@
 import React, { useEffect } from 'react';
-import { Link, useNavigate, useRoutes } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Form, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { userlogin } from '../redux/features/auth/auth.reducer';
 import { clearState, clearSuccess } from '../redux/features/auth/auth.slice';
-import { makeRequest } from '../utils/makeRequest';
-function Login() {
+function ForgetPassword() {
   const navigate = useNavigate();
   const { isSuccess, isError, isLoading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
-  useEffect(() => {
-    if (isSuccess) {
-      navigate('/');
-    }
-    if (isError) {
-      dispatch(clearState());
-    }
-  }, [isError, isSuccess]);
   return (
     <Formik
       initialValues={{ email: '', password: '' }}
@@ -171,7 +162,7 @@ function Login() {
                         <span class="font-medium"> Loading... </span>
                       </>
                     ) : (
-                      <p>Login</p>
+                      <p>1234455</p>
                     )}
                   </button>
                 </div>
@@ -191,4 +182,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgetPassword;
