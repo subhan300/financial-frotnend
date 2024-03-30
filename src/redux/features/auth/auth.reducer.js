@@ -14,7 +14,6 @@ export const userRegister = createAsyncThunk('/auth/userRegister', async (data, 
   try {
     let response = await makeRequest(`/api/v1/users/register`, 'POST', data);
     if (response) {
-      console.log(response, 'RESOPONSE============>');
       return response;
     }
   } catch (error) {
@@ -27,7 +26,6 @@ export const emailVerification = createAsyncThunk(
     try {
       let response = await makeRequest(`/api/v1/users/email-verify/${token}`, 'GET', null);
       if (response) {
-        console.log(response, 'RESOPONSE============>');
         return response;
       }
     } catch (error) {
@@ -41,7 +39,6 @@ export const forgetPasswordEmail = createAsyncThunk(
     try {
       let response = await makeRequest(`/api/v1/users/forget-password`, 'POST', email, null);
       if (response) {
-        console.log(response, 'RESOPONSE============>');
         return response;
       }
     } catch (error) {
@@ -50,9 +47,10 @@ export const forgetPasswordEmail = createAsyncThunk(
   }
 );
 export const resetPassword = createAsyncThunk('/auth/resetPassword', async (data, thunkAPI) => {
-  const { id, password } = data;
+  const { token } = data;
+  console.log(data, 'Data=====');
   try {
-    let response = await makeRequest(`/api/v1/users/change-password/${id}`, 'POST', password, null);
+    let response = await makeRequest(`/api/v1/users/change-password/${token}`, 'POST', data, null);
     if (response) {
       console.log(response, 'RESOPONSE============>');
       return response;

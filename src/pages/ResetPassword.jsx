@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Formik, Form, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { resetPassword, userlogin } from '../redux/features/auth/auth.reducer';
-import { getUserID } from '../utils/Utils';
+import { resetPassword } from '../redux/features/auth/auth.reducer';
 
 function ResetPassword() {
+  const navigate = useNavigate();
+  const { token } = useParams();
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   return (
@@ -21,12 +22,28 @@ function ResetPassword() {
         }
         return errors;
       }}
-      onSubmit={(values, { setSubmitting }) => {
-        if (values.password != values.confirmPassowrd) {
-          alert('Password not matched');
-        } else {
-          dispatch(resetPassword(values.password));
-        }
+      onSubmit={(values, actions) => {
+        setTimeout(() => {
+          setIsLoading(true);
+          let data = {
+            token: token,
+            password: values.password,
+          };
+          if (values.password != values.confirmPassowrd) {
+            alert('Password not matched');
+            setIsLoading(false);
+          } else {
+            dispatch(resetPassword(data));
+            setIsLoading(false);
+            actions.resetForm({
+              values: {
+                password: '',
+                confirmPassowrd: '',
+              },
+            });
+            navigate('/login');
+          }
+        }, 500);
       }}
     >
       {({ values, touched, errors, isSubmitting, handleBlur, handleChange }) => {
