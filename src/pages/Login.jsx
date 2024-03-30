@@ -17,6 +17,7 @@ function Login() {
       dispatch(clearState());
     }
   }, [isError, isSuccess]);
+  console.log(isSuccess);
   return (
     <Formik
       initialValues={{ email: '', password: '' }}
@@ -125,13 +126,7 @@ function Login() {
                         />
 
                         <a
-                          href=""
-                          className="hidden md:flex hover:underline text-primary-hover text-xs whitespace-nowrap font-medium ml-2"
-                        >
-                          Forget Password?
-                        </a>
-                        <a
-                          href=""
+                          href="/forgetpassword"
                           className="flex md:hidden hover:underline text-primary-hover text-xs whitespace-nowrap font-medium ml-2"
                         >
                           Forget?

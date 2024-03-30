@@ -35,6 +35,32 @@ export const emailVerification = createAsyncThunk(
     }
   }
 );
+export const forgetPasswordEmail = createAsyncThunk(
+  '/auth/forgetPasswordEmail',
+  async (email, thunkAPI) => {
+    try {
+      let response = await makeRequest(`/api/v1/users/forget-password`, 'POST', email, null);
+      if (response) {
+        console.log(response, 'RESOPONSE============>');
+        return response;
+      }
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response);
+    }
+  }
+);
+export const resetPassword = createAsyncThunk('/auth/resetPassword', async (data, thunkAPI) => {
+  const { id, password } = data;
+  try {
+    let response = await makeRequest(`/api/v1/users/change-password/${id}`, 'POST', password, null);
+    if (response) {
+      console.log(response, 'RESOPONSE============>');
+      return response;
+    }
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response);
+  }
+});
 export const logout = createAsyncThunk('/auth/logout', async (thunkAPI) => {
   try {
     let response = await makeRequest(`/api/v1/users/logout`, 'POST', {}, null);

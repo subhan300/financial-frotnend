@@ -3,6 +3,7 @@ export { default as Login } from './Login';
 export { default as Register } from './Register';
 export { default as VerifyEmailPage } from './VerifyEmail';
 export { default as VerificationMessage } from './VerificationMessage';
+export { default as ResetPassword } from './ResetPassword';
 export { default as Income } from './Income';
 export { default as Expenses } from './Expenses';
 export { default as Goals } from './Goals';

@@ -1,33 +1,31 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Formik, Form } from 'formik';
-import { useDispatch } from 'react-redux';
-import { forgetPasswordEmail } from '../redux/features/auth/auth.reducer';
-function ForgetPassword() {
+import { Formik, Form, ErrorMessage } from 'formik';
+import { useDispatch, useSelector } from 'react-redux';
+import { resetPassword, userlogin } from '../redux/features/auth/auth.reducer';
+import { getUserID } from '../utils/Utils';
+
+function ResetPassword() {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   return (
     <Formik
-      initialValues={{ email: '' }}
+      initialValues={{ password: '', confirmPassowrd: '' }}
       validate={(values) => {
         const errors = {};
-        if (!values.email) {
-          errors.email = 'Required';
-        } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
-          errors.email = 'Invalid email address';
+        if (!values.password) {
+          errors.password = 'Required';
+        }
+        if (!values.confirmPassowrd) {
+          errors.confirmPassowrd = 'Required';
         }
         return errors;
       }}
-      onSubmit={async (values, actions) => {
-        setIsLoading(true);
-        const res = await dispatch(forgetPasswordEmail(values));
-        if (res) {
-          setIsLoading(false);
-          actions.resetForm({
-            values: {
-              email: '',
-            },
-          });
+      onSubmit={(values, { setSubmitting }) => {
+        if (values.password != values.confirmPassowrd) {
+          alert('Password not matched');
+        } else {
+          dispatch(resetPassword(values.password));
         }
       }}
     >
@@ -40,54 +38,79 @@ function ForgetPassword() {
                 <div>
                   <img src="/logo.png" className="w-[140px]" alt="" />
                 </div>
-                <div className="flex items-center">
-                  <Link
-                    to={'/register'}
-                    className="text-white bg-[#4F46E5] hover:bg-[#433BCB] focus:ring-4 focus:ring-primary rounded-lg text-sm px-4 lg:px-5 py-2 lg:py-2.5 mr-2 focus:outline-none font-bold shade"
-                  >
-                    Sign up
-                  </Link>
-                </div>
               </div>
               <div className="w-[480px] bg-transparent z-50 flex flex-col justify-center items-center">
                 <div className="bg-white py-10 px-16 rounded-2xl shade">
                   <h1 className="text-2xl md:text-3xl text-center font-semibold mb-3">
-                    Welcome back!
+                    Reset Password
                   </h1>
                   <form>
-                    <div className="w-full mt-6 mb-3">
-                      <label for="" className="text-[11px] font-medium">
-                        Email
-                      </label>
-                      <div className="mt-0.5 flex items-center w-full px-3 border-2 border-gray-300 rounded-lg">
+                    <div className="w-full my-3">
+                      <label className="text-[11px] font-medium">Password</label>
+                      <div className="mt-0.5 relative flex items-center w-full px-3 border-2 border-gray-300 rounded-lg">
                         <svg
-                          className="w-4 h-4 text-gray-400"
+                          className="w-4 h-4 absolute text-gray-400"
                           aria-hidden="true"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
-                          viewBox="0 0 20 16"
+                          viewBox="0 0 16 20"
                         >
                           <path
                             stroke="currentColor"
                             stroke-linecap="round"
                             stroke-linejoin="round"
                             stroke-width="2"
-                            d="m19 2-8.4 7.05a1 1 0 0 1-1.2 0L1 2m18 0a1 1 0 0 0-1-1H2a1 1 0 0 0-1 1m18 0v12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2"
+                            d="M11.5 8V4.5a3.5 3.5 0 1 0-7 0V8M8 12v3M2 8h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
                           />
                         </svg>
                         <input
-                          name="email"
-                          value={values.email}
-                          type="text"
-                          autocomplete="off"
-                          placeholder="Enter your email"
-                          className="w-full py-2 text-sm pl-2 !bg-white focus:outline-none border-none focus:!shadow-none"
+                          name="password"
+                          value={values.password}
                           onChange={handleChange}
                           onBlur={handleBlur}
+                          type="password"
+                          autocomplete="off"
+                          placeholder="Enter password"
+                          className="w-full py-2 ml-4 text-sm pl-2 !bg-white focus:outline-none border-none"
                         />
                       </div>
                       <lable className="text-[11px] font-medium text-rose-600">
-                        {errors.email && touched.email && errors.email}
+                        {errors.password && touched.password && errors.password}
+                      </lable>
+                    </div>
+                    <div className="w-full my-3">
+                      <label className="text-[11px] font-medium">Confirm Password</label>
+                      <div className="mt-0.5 relative flex items-center w-full px-3 border-2 border-gray-300 rounded-lg">
+                        <svg
+                          className="w-4 h-4 absolute text-gray-400"
+                          aria-hidden="true"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 16 20"
+                        >
+                          <path
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11.5 8V4.5a3.5 3.5 0 1 0-7 0V8M8 12v3M2 8h12a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"
+                          />
+                        </svg>
+                        <input
+                          name="confirmPassowrd"
+                          value={values.confirmPassowrd}
+                          onChange={handleChange}
+                          onBlur={handleBlur}
+                          type="password"
+                          autocomplete="off"
+                          placeholder="Enter confirm password"
+                          className="w-full py-2 ml-4 text-sm pl-2 !bg-white focus:outline-none border-none"
+                        />
+                      </div>
+                      <lable className="text-[11px] font-medium text-rose-600">
+                        {errors.confirmPassowrd &&
+                          touched.confirmPassowrd &&
+                          errors.confirmPassowrd}
                       </lable>
                     </div>
                   </form>
@@ -120,16 +143,10 @@ function ForgetPassword() {
                         <span class="font-medium"> Loading... </span>
                       </>
                     ) : (
-                      <p>Send</p>
+                      <p>Reset Passwrod</p>
                     )}
                   </button>
                 </div>
-                <p className="mt-8 text-white">
-                  Already have an account?{' '}
-                  <Link to={'/login'} className="underline">
-                    Sign In
-                  </Link>
-                </p>
               </div>
               <div className="bg__img"></div>
             </div>
@@ -140,4 +157,4 @@ function ForgetPassword() {
   );
 }
 
-export default ForgetPassword;
+export default ResetPassword;
