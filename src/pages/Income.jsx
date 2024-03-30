@@ -39,39 +39,43 @@ function Income() {
 
                 <main>
                     <div className="px-4 sm:px-6 lg:px-8 py-8 w-full max-w-9xl mx-auto">
-                        <h1 className='text-xl md:text-2xl font-bold'>Add Monthly Income</h1>
-                        <Formik
-                            initialValues={{
-                                monthlyIncome: '',
-                                date: '',
-                                extra: '',
-                            }}
-                            validationSchema={validationSchema}
-                            onSubmit={handleSubmit}
-                        >
-                            {({ isSubmitting }) => (
-                                <Form className='mt-5'>
-                                    <div className='mb-5'>
-                                        <label className='block text-sm font-bold mb-1' htmlFor="monthlyIncome">Monthly Income</label>
-                                        <Field type="number" name="monthlyIncome" className='rounded w-full md:w-[400px]' />
-                                        <ErrorMessage name="monthlyIncome" component="div" className='text-sm font-medium text-red-600' />
-                                    </div>
-                                    <div className='mb-5'>
-                                        <label className='block text-sm font-bold mb-1' htmlFor="date">Date</label>
-                                        <Field type="date" name="date" className='rounded w-full md:w-[400px]' />
-                                        <ErrorMessage name="date" component="div" className='text-sm font-medium text-red-600' />
-                                    </div>
-                                    <div className='mb-5'>
-                                        <label className='block text-sm font-bold mb-1' htmlFor="extra">Extra</label>
-                                        <Field type="text" name="extra" className='rounded w-full md:w-[400px]' />
-                                        <ErrorMessage name="extra" component="div" className='text-sm font-medium text-red-600' />
-                                    </div>
-                                    <button type="submit" className='bg-[#4F46E5] hover:bg-[#433BCB] text-white px-4 py-2 text-sm font-medium rounded-md' disabled={isSubmitting}>
-                                        Submit
-                                    </button>
-                                </Form>
-                            )}
-                        </Formik>
+                        <div className='flex items-center justify-center gap-6'>
+                            <div className='flex flex-col w-full lg:w-[60%] bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-700 p-5'>
+                                <h1 className='text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100'>Add Monthly Income</h1>
+                                <Formik
+                                    initialValues={{
+                                        monthlyIncome: '',
+                                        date: '',
+                                        extra: '',
+                                    }}
+                                    validationSchema={validationSchema}
+                                    onSubmit={handleSubmit}
+                                >
+                                    {({ isSubmitting }) => (
+                                        <Form className='mt-5'>
+                                            <div className='mb-5'>
+                                                <label className='block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100' htmlFor="monthlyIncome">Monthly Income</label>
+                                                <Field type="number" name="monthlyIncome" className='rounded w-full text-slate-800 dark:text-slate-100 bg-transparent' />
+                                                <ErrorMessage name="monthlyIncome" component="div" className='text-sm font-medium text-red-600' />
+                                            </div>
+                                            <div className='mb-5'>
+                                                <label className='block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100' htmlFor="date">Date</label>
+                                                <Field type="date" name="date" className='rounded w-full text-slate-800 dark:text-slate-100 bg-transparent' />
+                                                <ErrorMessage name="date" component="div" className='text-sm font-medium text-red-600' />
+                                            </div>
+                                            <div className='mb-5'>
+                                                <label className='block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100' htmlFor="extra">Extra</label>
+                                                <Field type="text" name="extra" className='rounded w-full text-slate-800 dark:text-slate-100 bg-transparent' />
+                                                <ErrorMessage name="extra" component="div" className='text-sm font-medium text-red-600' />
+                                            </div>
+                                            <button type="submit" className='bg-[#4F46E5] hover:bg-[#433BCB] text-white px-4 py-2 text-sm font-medium rounded-md' disabled={isSubmitting}>
+                                                Submit
+                                            </button>
+                                        </Form>
+                                    )}
+                                </Formik>
+                            </div>
+                        </div>
                     </div>
                 </main>
             </div>
