@@ -1,12 +1,28 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Transition from '../utils/Transition';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
+
+const validationSchema = Yup.object().shape({
+  expenseName: Yup.string()
+    .required('Expense title is required'),
+  expenseValue: Yup.number()
+    .required('Expense value is required')
+    .min(0, 'Monthly debts must be a positive number'),
+});
 
 function ExpenseModal({
   modalOpen,
   setModalOpen
 }) {
+
+  const [formData, setFormData] = useState(null);
+
+  const handleSubmit = (values, { setSubmitting }) => {
+    setFormData(values);
+    setSubmitting(false);
+  };
 
   const modalContent = useRef(null);
 
@@ -20,15 +36,15 @@ function ExpenseModal({
     return () => document.removeEventListener('click', clickHandler);
   });
 
-  // close if the esc key is pressed
-  useEffect(() => {
-    const keyHandler = ({ keyCode }) => {
-      if (!modalOpen || keyCode !== 27) return;
-      setModalOpen(false);
-    };
-    document.addEventListener('keydown', keyHandler);
-    return () => document.removeEventListener('keydown', keyHandler);
-  });
+  // // close if the esc key is pressed
+  // useEffect(() => {
+  //   const keyHandler = ({ keyCode }) => {
+  //     if (!modalOpen || keyCode !== 27) return;
+  //     setModalOpen(false);
+  //   };
+  //   document.addEventListener('keydown', keyHandler);
+  //   return () => document.removeEventListener('keydown', keyHandler);
+  // });
 
   return (
     <>
@@ -62,20 +78,61 @@ function ExpenseModal({
           className="bg-white dark:bg-slate-800 border border-transparent dark:border-slate-700 overflow-auto max-w-2xl w-full max-h-full rounded shadow-lg p-5"
         >
           <h1 className='text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100'>Add Expense</h1>
-          <Formik>
-            <Form className='mt-5'>
-              <div className='mb-5'>
-                <label className='block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100' htmlFor="periodOfDebt">Expense Name</label>
-                <Field type="text" name="expenseName" className='rounded w-full text-slate-800 dark:text-slate-100 bg-transparent' />
-              </div>
-              <div className='mb-5'>
-                <label className='block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100' htmlFor="periodOfDebt">Expense Value</label>
-                <Field type="number" name="expenseValue" className='rounded w-full text-slate-800 dark:text-slate-100 bg-transparent' />
-              </div>
-              <button type="submit" className='bg-[#4F46E5] hover:bg-[#433BCB] text-white px-4 py-2 text-sm font-medium rounded-md'>
-                Add Expense
-              </button>
-            </Form>
+          <Formik
+                  initialValues={{
+                    expenseName: '',
+                    expenseValue: '',
+                  }}
+                  validationSchema={validationSchema}
+                  onSubmit={handleSubmit}
+                >
+                  {({ isSubmitting }) => (
+                    <Form className="mt-5">
+                      <div className="mb-5">
+                        <label
+                          className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                          htmlFor="expenseName"
+                        >
+                          Expense Name
+                        </label>
+                        <Field
+                          type="text"
+                          name="expenseName"
+                          className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                        />
+                        <ErrorMessage
+                          name="expenseName"
+                          component="div"
+                          className="text-sm font-medium text-red-600"
+                        />
+                      </div>
+                      <div className="mb-5">
+                        <label
+                          className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                          htmlFor="expenseValue"
+                        >
+                          Expense Value
+                        </label>
+                        <Field
+                          type="number"
+                          name="expenseValue"
+                          className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                        />
+                        <ErrorMessage
+                          name="expenseValue"
+                          component="div"
+                          className="text-sm font-medium text-red-600"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
+                        disabled={isSubmitting}
+                      >
+                        Submit
+                      </button>
+                    </Form>
+                  )}
           </Formik>
         </div>
       </Transition>
