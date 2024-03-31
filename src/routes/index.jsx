@@ -9,6 +9,8 @@ import {
   VerifyEmailPage,
   VerificationMessage,
   ResetPassword,
+  Income,
+  Expenses,
 } from '../pages/';
 import ProtectedRoute from './ProtectedRoutes'; // Import the ProtectedRoute component
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -25,6 +27,22 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/income"
+          element={
+            <ProtectedRoute>
+              <Income />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/expenses"
+          element={
+            <ProtectedRoute>
+              <Expenses />
             </ProtectedRoute>
           }
         />
