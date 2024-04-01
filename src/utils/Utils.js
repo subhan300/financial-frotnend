@@ -28,7 +28,20 @@ export const formatValue = (value) =>
     maximumSignificantDigits: 3,
     notation: 'compact',
   }).format(value);
-export const getUserID = () => {
-  const res = JSON.parse(localStorage.getItem('auth'));
-  return res;
+export const getUserToken = () => {
+  try {
+    // Retrieve the token data from localStorage using the key "persist:root"
+    const tokenDataString = localStorage.getItem('persist:root');
+
+    // Parse the token data JSON string to an object
+    const tokenData = JSON.parse(tokenDataString);
+    const auth = JSON.parse(tokenData.auth);
+
+    // Return the accessToken
+    return auth.auth.data.accessToken;
+  } catch (error) {
+    console.error('Error retrieving access token from localStorage:', error);
+    // Handle missing or invalid token gracefully (e.g., redirect to login)
+    return null; // Or throw an appropriate error
+  }
 };
