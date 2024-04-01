@@ -11,6 +11,7 @@ import {
   ResetPassword,
   Income,
   Expenses,
+  Goals,
 } from '../pages/';
 import ProtectedRoute from './ProtectedRoutes'; // Import the ProtectedRoute component
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
@@ -25,9 +26,9 @@ const AppRoutes = () => {
         <Route
           path="/"
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <Dashboard />
-            // </ProtectedRoute>
+            </ProtectedRoute>
           }
         />
         <Route
@@ -41,9 +42,17 @@ const AppRoutes = () => {
         <Route
           path="/expenses"
           element={
-            // <ProtectedRoute>
+            <ProtectedRoute>
               <Expenses />
-            // </ProtectedRoute>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/goals"
+          element={
+            <ProtectedRoute>
+              <Goals />
+            </ProtectedRoute>
           }
         />
         <Route path="/login" element={<Login />} />

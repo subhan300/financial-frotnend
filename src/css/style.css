@@ -9,9 +9,22 @@
 
 @import 'tailwindcss/utilities';
 
+
+::-webkit-scrollbar {
+    background: white;
+    width: 4px;
+    height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #1E293B;
+    @apply rounded-full
+}
+
 .shade {
     box-shadow: 0 10px 25px #7b68ee80;
 }
+
 .bg__img {
     position: absolute;
     z-index: 1;
@@ -24,6 +37,7 @@
     background: url('../images/loginbg.svg') center 10px no-repeat;
     background-size: cover;
 }
+
 .bg__img::after {
     content: "";
     display: block;
