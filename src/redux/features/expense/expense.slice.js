@@ -44,7 +44,7 @@ export const authSlice = createSlice({
       console.log(action?.payload, 'createExpense.fulfilled');
       state.isLoading = false;
       state.isError = false;
-      state.expenses = action.payload;
+      state.expenses.unshift(action.payload);
     });
     builder.addCase(createExpense.rejected, (state, action) => {
       console.log('createExpense.rejected', action);

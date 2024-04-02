@@ -23,7 +23,7 @@ const validationSchema = Yup.object().shape({
 function Expenses() {
   const userId = getUserId();
   const dispatch = useDispatch();
-  const [total_expense, setTotalExpense] = useState('');
+  const [total_expense, setTotalExpense] = useState(0);
   const [expense, setAddExpense] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);

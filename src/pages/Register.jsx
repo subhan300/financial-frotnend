@@ -16,8 +16,6 @@ function Register() {
       dispatch(clearState());
     }
   }, [isError, isSuccess]);
-  console.log(isLoading, 'isloading');
-  console.log(isSuccess, 'isSuccess');
   return (
     <Formik
       initialValues={{ username: '', email: '', password: '' }}

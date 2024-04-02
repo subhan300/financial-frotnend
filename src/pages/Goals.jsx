@@ -1,29 +1,65 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { useDispatch, useSelector } from 'react-redux';
+import { getExpense } from '../redux/features/expense/expense.reducer';
+import { getUserId } from '../utils/Utils';
+import { getIncome } from '../redux/features/income/income.reducer';
+import { createGoal } from '../redux/features/goal.reducer';
+import { data } from 'autoprefixer';
 
 const validationSchema = Yup.object().shape({
-  name: Yup.string()
-    .required('Name is required'),
-  price: Yup.number()
-    .required('Price is required')
-    .min(0, 'Price must be a positive number'),
+  name: Yup.string().required('Name is required'),
+  price: Yup.number().required('Price is required').min(0, 'Price must be a positive number'),
   percentage: Yup.number()
     .required('Percentage is required')
     .min(0, 'Percentage must be a positive number'),
 });
 
 function Goals() {
+  const userId = getUserId();
+  const dispatch = useDispatch();
+  const { incomes, isLoading, isSucess } = useSelector((state) => state.income);
+  const { expenses } = useSelector((state) => state.expense);
+  useEffect(() => {
+    dispatch(getIncome(String(userId)));
+    dispatch(getExpense(String(userId)));
+  }, []);
+  const [monthlySaving, setMonthlySaving] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [formData, setFormData] = useState(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  function calculateMonthsToGoal(monthlyIncome, monthlyExpenses, carPrice, savingsPercentage) {
+    // Calculate monthly savings based on percentage
+    const monthlySavingsPercentage = monthlyIncome * (savingsPercentage / 100);
 
-  const handleSubmit = (values, { setSubmitting }) => {
-    setFormData(values);
-    setSubmitting(false);
-  };
+    // Add monthly savings from percentage to existing savings
+    const totalMonthlySavings = monthlySavingsPercentage + (monthlyIncome - monthlyExpenses);
 
+    console.log(totalMonthlySavings, 'totalMonthlySavings====');
+    setMonthlySaving(totalMonthlySavings);
+    // Check if savings percentage is valid (0 to 100)
+    if (savingsPercentage < 0 || savingsPercentage > 100) {
+      setErrorMessage('Invalid savings percentage. Must be between 0 and 100.');
+    } else if (totalMonthlySavings > monthlyIncome) {
+      setErrorMessage('Monthly savings exceed monthly income. Please review your finances.');
+    } else if (totalMonthlySavings > 1.3 * monthlyIncome) {
+      setErrorMessage('Monthly savings exceed monthly income by 30%. Please review your finances.');
+    } else {
+      setErrorMessage('');
+      // Calculate total savings needed
+      const totalSavingsNeeded = carPrice;
+      // Calculate months needed
+      const monthsNeeded = Math.ceil(totalSavingsNeeded / totalMonthlySavings);
+
+      return monthsNeeded;
+    }
+  }
+
+  // Example usage
+  const [monthsToGoal, setMonthsToGoal] = useState('');
+  console.log(monthlySaving, 'monthlySaving');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -59,9 +95,8 @@ function Goals() {
                   </div>
 
                   <div class="flex flex-col flex-grow ml-4">
-                    <div class="text-sm text-gray-500">Your Goals</div>
-                    <div class="font-bold text-lg">
-                      $<span id="yearly-cost-result">0.00</span>
+                    <div class="font-bold text-lg mt-2">
+                      <span id="yearly-cost-result">{`It will take ${monthsToGoal} month to reach your goal`}</span>
                     </div>
                   </div>
                 </div>
@@ -74,79 +109,143 @@ function Goals() {
                   initialValues={{
                     name: '',
                     price: '',
-                    percentage: '',
+                    percentage: 0,
                   }}
                   validationSchema={validationSchema}
-                  onSubmit={handleSubmit}
+                  onSubmit={(values) => {
+                    let data = {
+                      userId: userId,
+                      name: values.name,
+                      price: values.price,
+                      percentage: values.percentage,
+                      timeto_take: monthsToGoal,
+                      monthly_saving: monthlySaving,
+                    };
+                    dispatch(createGoal(data));
+                  }}
                 >
-                  {({ isSubmitting }) => (
-                    <>
-                      <Form className="mt-5">
-                        <div className="mb-5">
-                          <label
-                            className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                            htmlFor="name"
+                  {({ values }) => {
+                    console.log(values, 'values');
+                    const monthsToGoal = calculateMonthsToGoal(
+                      Number(incomes?.total_income),
+                      Number(expenses?.total_expense),
+                      Number(values?.price),
+                      Number(values?.percentage)
+                    );
+                    setMonthsToGoal(monthsToGoal);
+                    return (
+                      <>
+                        <Form className="mt-5">
+                          <div className="mb-5">
+                            <label
+                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                              htmlFor="name"
+                            >
+                              Total Income
+                            </label>
+                            <input
+                              name="username"
+                              value={incomes.total_income}
+                              type="text"
+                              disabled={true}
+                              autocomplete="off"
+                              placeholder="Enter your Username"
+                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                            />
+                          </div>
+                          <div className="mb-5">
+                            <label
+                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                              htmlFor="name"
+                            >
+                              Total Expense
+                            </label>
+                            <input
+                              name="username"
+                              value={expenses.total_expense}
+                              type="text"
+                              disabled={true}
+                              autocomplete="off"
+                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                            />
+                          </div>
+                          <div className="mb-5">
+                            <label
+                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                              htmlFor="name"
+                            >
+                              Name
+                            </label>
+                            <Field
+                              type="text"
+                              name="name"
+                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                            />
+                            <ErrorMessage
+                              name="name"
+                              component="div"
+                              className="text-sm font-medium text-red-600"
+                            />
+                          </div>
+                          <div className="mb-5">
+                            <label
+                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                              htmlFor="price"
+                            >
+                              Price
+                            </label>
+                            <Field
+                              type="number"
+                              name="price"
+                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                            />
+                            <ErrorMessage
+                              name="price"
+                              component="div"
+                              className="text-sm font-medium text-red-600"
+                            />
+                          </div>
+                          <div className="mb-5">
+                            <label
+                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                              htmlFor="percentage"
+                            >
+                              Percentage
+                            </label>
+                            <Field
+                              type="number"
+                              name="percentage"
+                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                            />
+                            <ErrorMessage
+                              name="percentage"
+                              component="div"
+                              className="text-sm font-medium text-red-600"
+                            />
+                            {errorMessage && (
+                              <label
+                                className="block text-sm font-bold mb-1 text-red-600"
+                                htmlFor="errorMessage"
+                              >
+                                {errorMessage}
+                              </label>
+                            )}
+                          </div>
+                          <button
+                            type="submit"
+                            className={`${
+                              errorMessage || values.percentage < 0 || values.percentage > 100
+                                ? 'bg-[#cac7ff] text-white px-6 py-2 text-sm font-medium rounded-md cursor-not-allowed'
+                                : 'bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md'
+                            }`}
+                            disabled={errorMessage != ''}
                           >
-                            Name
-                          </label>
-                          <Field
-                            type="text"
-                            name="name"
-                            className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                          />
-                          <ErrorMessage
-                            name="name"
-                            component="div"
-                            className="text-sm font-medium text-red-600"
-                          />
-                        </div>
-                        <div className="mb-5">
-                          <label
-                            className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                            htmlFor="price"
-                          >
-                            Price
-                          </label>
-                          <Field
-                            type="number"
-                            name="price"
-                            className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                          />
-                          <ErrorMessage
-                            name="price"
-                            component="div"
-                            className="text-sm font-medium text-red-600"
-                          />
-                        </div>
-                        <div className="mb-5">
-                          <label
-                            className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                            htmlFor="percentage"
-                          >
-                            Percentage
-                          </label>
-                          <Field
-                            type="number"
-                            name="percentage"
-                            className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                          />
-                          <ErrorMessage
-                            name="percentage"
-                            component="div"
-                            className="text-sm font-medium text-red-600"
-                          />
-                        </div>
-                        <button
-                          type="submit"
-                          className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
-                          disabled={isSubmitting}
-                        >
-                          Submit
-                        </button>
-
-                      </Form>
-                    </>
-                  )}
+                            Submit
+                          </button>
+                        </Form>
+                      </>
+                    );
+                  }}
                 </Formik>
               </div>
             </div>

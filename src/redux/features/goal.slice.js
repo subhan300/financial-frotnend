@@ -1,14 +1,14 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createIncome, getIncome } from './income.reducer';
+import { createGoal, getGoal } from './goal.reducer';
 const initialState = {
-  incomes: [],
+  goal: [],
   isLoading: false,
   isSuccess: false,
   isError: false,
   error: null,
 };
 export const authSlice = createSlice({
-  name: 'income',
+  name: 'goal',
   initialState,
   reducers: {
     clearState: () => initialState,
@@ -17,39 +17,41 @@ export const authSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(getIncome.pending, (state) => {
-      console.log('getIncome.rejected', state);
+    builder.addCase(getGoal.pending, (state) => {
+      console.log('getGoal.pending', state);
       state.isLoading = true;
       state.isError = false;
       state.isSuccess = false;
     });
-    builder.addCase(getIncome.fulfilled, (state, action) => {
-      const { data } = action?.payload;
+    builder.addCase(getGoal.fulfilled, (state, action) => {
+      console.log('getGoal.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
-      state.incomes = data;
+      state.isSuccess = true;
+      state.goal = action?.payload;
     });
-    builder.addCase(getIncome.rejected, (state, action) => {
-      console.log('getIncome.rejected', action);
+    builder.addCase(getGoal.rejected, (state, action) => {
+      console.log('getGoal.rejected', action);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
     });
-    builder.addCase(createIncome.pending, (state) => {
-      console.log('createIncome.pending', state);
+    builder.addCase(createGoal.pending, (state) => {
+      console.log('createGoal.pending', state);
       state.isLoading = true;
       state.isError = false;
       state.isSuccess = false;
     });
-    builder.addCase(createIncome.fulfilled, (state, action) => {
-      console.log('createIncome.fulfilled', action);
+    builder.addCase(createGoal.fulfilled, (state, action) => {
+      console.log('createGoal.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
-      state.incomes.unshift(action?.payload?.data);
+      state.isSuccess = true;
+      state.goal.unshift(action?.payload?.data);
     });
-    builder.addCase(createIncome.rejected, (state, action) => {
-      console.log('createIncome.rejected', action);
+    builder.addCase(createGoal.rejected, (state, action) => {
+      console.log('createGoal.rejected', action);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
