@@ -25,7 +25,6 @@ export const authSlice = createSlice({
     });
     builder.addCase(getIncome.fulfilled, (state, action) => {
       const { data } = action?.payload;
-      console.log(action?.payload, 'action?.payload');
       state.isLoading = false;
       state.isError = false;
       state.incomes = data;

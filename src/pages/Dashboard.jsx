@@ -20,17 +20,19 @@ import FinanceGrid from '../partials/dashboard/FinanceGrid';
 import Banner from '../partials/Banner';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIncome } from '../redux/features/income/income.reducer';
-import { getUserToken } from '../utils/Utils';
+import { getUserId, getUserToken } from '../utils/Utils';
 import { getExpense } from '../redux/features/expense/expense.reducer';
+import ExpenseGrid from '../partials/dashboard/ExpenseGrid';
 
 function Dashboard() {
+  const userId = getUserId();
   const dispatch = useDispatch();
   const { incomes, isLoading, isSucess } = useSelector((state) => state.income);
   const { expenses } = useSelector((state) => state.expense);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
-    dispatch(getIncome('66098cbee88dfcb4dfb78056'));
-    dispatch(getExpense('66098cbee88dfcb4dfb78056'));
+    dispatch(getIncome(String(userId)));
+    dispatch(getExpense(String(userId)));
   }, []);
   console.log(expenses, 'expenses===');
   return (
@@ -51,17 +53,18 @@ function Dashboard() {
               <FinancialCard
                 title="Total Income"
                 subTitle="Insights"
-                value={incomes?.total_income}
+                value={incomes?.total_income || 0}
               />
 
               {/* Expense Card */}
               <FinancialCard
                 title="Total Expense"
                 subTitle="Insights"
-                value={expenses?.total_expense}
+                value={expenses?.total_expense || 0}
               />
               {/* Card (Income/Expenses) */}
               <FinanceGrid />
+              <ExpenseGrid />
             </div>
           </div>
         </main>

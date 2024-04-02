@@ -4,7 +4,7 @@ function FinanceGrid() {
   return (
     <div className="col-span-full bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
       <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
-        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Income/Expenses</h2>
+        <h2 className="font-semibold text-slate-800 dark:text-slate-100">Income</h2>
       </header>
       <div className="p-3">
         {/* Card content */}
@@ -24,7 +24,10 @@ function FinanceGrid() {
               <div className="grow flex items-center border-b border-slate-100 dark:border-slate-700 text-sm py-2">
                 <div className="grow flex justify-between">
                   <div className="self-center">
-                    <a className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white" href="#0">
+                    <a
+                      className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                      href="#0"
+                    >
                       Qonto
                     </a>{' '}
                     billing
@@ -45,7 +48,10 @@ function FinanceGrid() {
               <div className="grow flex items-center border-b border-slate-100 dark:border-slate-700 text-sm py-2">
                 <div className="grow flex justify-between">
                   <div className="self-center">
-                    <a className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white" href="#0">
+                    <a
+                      className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                      href="#0"
+                    >
                       Cruip.com
                     </a>{' '}
                     Market Ltd 70 Wilson St London
@@ -66,7 +72,10 @@ function FinanceGrid() {
               <div className="grow flex items-center border-b border-slate-100 dark:border-slate-700 text-sm py-2">
                 <div className="grow flex justify-between">
                   <div className="self-center">
-                    <a className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white" href="#0">
+                    <a
+                      className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                      href="#0"
+                    >
                       Notion Labs Inc
                     </a>
                   </div>
@@ -86,7 +95,10 @@ function FinanceGrid() {
               <div className="grow flex items-center border-b border-slate-100 dark:border-slate-700 text-sm py-2">
                 <div className="grow flex justify-between">
                   <div className="self-center">
-                    <a className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white" href="#0">
+                    <a
+                      className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                      href="#0"
+                    >
                       Market Cap Ltd
                     </a>
                   </div>
@@ -106,13 +118,18 @@ function FinanceGrid() {
               <div className="grow flex items-center border-b border-slate-100 dark:border-slate-700 text-sm py-2">
                 <div className="grow flex justify-between">
                   <div className="self-center">
-                    <a className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white" href="#0">
+                    <a
+                      className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                      href="#0"
+                    >
                       App.com
                     </a>{' '}
                     Market Ltd 70 Wilson St London
                   </div>
                   <div className="shrink-0 self-start ml-2">
-                    <span className="font-medium text-slate-800 dark:text-slate-100 line-through">+$99.99</span>
+                    <span className="font-medium text-slate-800 dark:text-slate-100 line-through">
+                      +$99.99
+                    </span>
                   </div>
                 </div>
               </div>
@@ -127,7 +144,10 @@ function FinanceGrid() {
               <div className="grow flex items-center text-sm py-2">
                 <div className="grow flex justify-between">
                   <div className="self-center">
-                    <a className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white" href="#0">
+                    <a
+                      className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                      href="#0"
+                    >
                       App.com
                     </a>{' '}
                     Market Ltd 70 Wilson St London

@@ -5,31 +5,32 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 
 const validationSchema = Yup.object().shape({
-  expenseName: Yup.string()
-    .required('Expense title is required'),
-  expenseValue: Yup.number()
+  expense_name: Yup.string().required('Expense title is required'),
+  price: Yup.number()
     .required('Expense value is required')
     .min(0, 'Monthly debts must be a positive number'),
 });
 
-function ExpenseModal({
-  modalOpen,
-  setModalOpen
-}) {
-
+function ExpenseModal({ modalOpen, setModalOpen, setAddExpense }) {
   const [formData, setFormData] = useState(null);
 
   const handleSubmit = (values, { setSubmitting }) => {
-    setFormData(values);
+    // Create a new expense object
+    const newExpense = {
+      expense_name: values.expense_name,
+      price: values.price,
+    };
+    // Append the new expense object to the expenses array
+    setAddExpense((prevExpenses) => [...prevExpenses, newExpense]);
+    // Reset form submission state
     setSubmitting(false);
+    setModalOpen(false);
   };
-
   const modalContent = useRef(null);
-
   // close on click outside
   useEffect(() => {
     const clickHandler = ({ target }) => {
-      if (!modalOpen || modalContent.current.contains(target)) return
+      if (!modalOpen || modalContent.current.contains(target)) return;
       setModalOpen(false);
     };
     document.addEventListener('click', clickHandler);
@@ -77,62 +78,64 @@ function ExpenseModal({
           ref={modalContent}
           className="bg-white dark:bg-slate-800 border border-transparent dark:border-slate-700 overflow-auto max-w-2xl w-full max-h-full rounded shadow-lg p-5"
         >
-          <h1 className='text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100'>Add Expense</h1>
+          <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">
+            Add Expense
+          </h1>
           <Formik
-                  initialValues={{
-                    expenseName: '',
-                    expenseValue: '',
-                  }}
-                  validationSchema={validationSchema}
-                  onSubmit={handleSubmit}
+            initialValues={{
+              expense_name: '',
+              price: '',
+            }}
+            validationSchema={validationSchema}
+            onSubmit={handleSubmit}
+          >
+            {({ isSubmitting }) => (
+              <Form className="mt-5">
+                <div className="mb-5">
+                  <label
+                    className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                    htmlFor="expenseName"
+                  >
+                    Expense Name
+                  </label>
+                  <Field
+                    type="text"
+                    name="expense_name"
+                    className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                  />
+                  <ErrorMessage
+                    name="expense_name"
+                    component="div"
+                    className="text-sm font-medium text-red-600"
+                  />
+                </div>
+                <div className="mb-5">
+                  <label
+                    className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                    htmlFor="expenseValue"
+                  >
+                    Expense Value
+                  </label>
+                  <Field
+                    type="number"
+                    name="price"
+                    className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                  />
+                  <ErrorMessage
+                    name="price"
+                    component="div"
+                    className="text-sm font-medium text-red-600"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
+                  disabled={isSubmitting}
                 >
-                  {({ isSubmitting }) => (
-                    <Form className="mt-5">
-                      <div className="mb-5">
-                        <label
-                          className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                          htmlFor="expenseName"
-                        >
-                          Expense Name
-                        </label>
-                        <Field
-                          type="text"
-                          name="expenseName"
-                          className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                        />
-                        <ErrorMessage
-                          name="expenseName"
-                          component="div"
-                          className="text-sm font-medium text-red-600"
-                        />
-                      </div>
-                      <div className="mb-5">
-                        <label
-                          className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                          htmlFor="expenseValue"
-                        >
-                          Expense Value
-                        </label>
-                        <Field
-                          type="number"
-                          name="expenseValue"
-                          className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                        />
-                        <ErrorMessage
-                          name="expenseValue"
-                          component="div"
-                          className="text-sm font-medium text-red-600"
-                        />
-                      </div>
-                      <button
-                        type="submit"
-                        className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
-                        disabled={isSubmitting}
-                      >
-                        Submit
-                      </button>
-                    </Form>
-                  )}
+                  Submit
+                </button>
+              </Form>
+            )}
           </Formik>
         </div>
       </Transition>

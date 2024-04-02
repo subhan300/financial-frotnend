@@ -45,3 +45,21 @@ export const getUserToken = () => {
     return null; // Or throw an appropriate error
   }
 };
+export const getUserId = () => {
+  try {
+    // Retrieve the token data from localStorage using the key "persist:root"
+    const tokenDataString = localStorage.getItem('persist:root');
+
+    // Parse the token data JSON string to an object
+    const tokenData = JSON.parse(tokenDataString);
+    const auth = JSON.parse(tokenData.auth);
+
+    // Return the accessToken
+    const { _id } = auth.auth.data.user;
+    return _id;
+  } catch (error) {
+    console.error('Error retrieving access token from localStorage:', error);
+    // Handle missing or invalid token gracefully (e.g., redirect to login)
+    return null; // Or throw an appropriate error
+  }
+};

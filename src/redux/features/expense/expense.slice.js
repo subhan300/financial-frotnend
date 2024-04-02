@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getExpense } from './expense.reducer';
+import { createExpense, getExpense } from './expense.reducer';
 const initialState = {
   expenses: [],
   isLoading: false,
@@ -18,20 +18,36 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(getExpense.pending, (state) => {
-      console.log('getExpense.rejected', state);
       state.isLoading = true;
       state.isError = false;
       state.isSuccess = false;
     });
     builder.addCase(getExpense.fulfilled, (state, action) => {
       const { data } = action?.payload;
-      console.log(action?.payload, 'action?.payload');
       state.isLoading = false;
       state.isError = false;
       state.expenses = data;
     });
     builder.addCase(getExpense.rejected, (state, action) => {
-      console.log('getExpense.rejected', action);
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+      state.error = action.error;
+    });
+    builder.addCase(createExpense.pending, (state) => {
+      console.log('createExpense.pending', state);
+      state.isLoading = true;
+      state.isError = false;
+      state.isSuccess = false;
+    });
+    builder.addCase(createExpense.fulfilled, (state, action) => {
+      console.log(action?.payload, 'createExpense.fulfilled');
+      state.isLoading = false;
+      state.isError = false;
+      state.expenses = action.payload;
+    });
+    builder.addCase(createExpense.rejected, (state, action) => {
+      console.log('createExpense.rejected', action);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
