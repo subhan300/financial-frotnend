@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
 import { getIncome } from '../redux/features/income/income.reducer';
-import { createGoal } from '../redux/features/goal.reducer';
+import { createGoal, getGoal } from '../redux/features/goal.reducer';
 import { data } from 'autoprefixer';
 
 const validationSchema = Yup.object().shape({
@@ -19,14 +19,14 @@ const validationSchema = Yup.object().shape({
 });
 
 function Goals() {
-  const userId = getUserId();
+  const UserId = getUserId();
   const dispatch = useDispatch();
   const { incomes, isLoading, isSucess } = useSelector((state) => state.income);
   const { expenses } = useSelector((state) => state.expense);
   useEffect(() => {
-    dispatch(getIncome(String(userId)));
-    dispatch(getExpense(String(userId)));
-  }, []);
+    dispatch(getIncome(UserId));
+    dispatch(getExpense(UserId));
+  }, [dispatch]);
   const [monthlySaving, setMonthlySaving] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -38,16 +38,16 @@ function Goals() {
     const totalMonthlySavings = monthlySavingsPercentage + (monthlyIncome - monthlyExpenses);
 
     console.log(totalMonthlySavings, 'totalMonthlySavings====');
-    setMonthlySaving(totalMonthlySavings);
+    // setMonthlySaving(totalMonthlySavings);
     // Check if savings percentage is valid (0 to 100)
     if (savingsPercentage < 0 || savingsPercentage > 100) {
-      setErrorMessage('Invalid savings percentage. Must be between 0 and 100.');
+      console.log('Invalid savings percentage. Must be between 0 and 100.');
     } else if (totalMonthlySavings > monthlyIncome) {
-      setErrorMessage('Monthly savings exceed monthly income. Please review your finances.');
+      console.log('Monthly savings exceed monthly income. Please review your finances.');
     } else if (totalMonthlySavings > 1.3 * monthlyIncome) {
-      setErrorMessage('Monthly savings exceed monthly income by 30%. Please review your finances.');
+      console.log('Monthly savings exceed monthly income by 30%. Please review your finances.');
     } else {
-      setErrorMessage('');
+      console.log('');
       // Calculate total savings needed
       const totalSavingsNeeded = carPrice;
       // Calculate months needed
@@ -59,7 +59,6 @@ function Goals() {
 
   // Example usage
   const [monthsToGoal, setMonthsToGoal] = useState('');
-  console.log(monthlySaving, 'monthlySaving');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -114,7 +113,7 @@ function Goals() {
                   validationSchema={validationSchema}
                   onSubmit={(values) => {
                     let data = {
-                      userId: userId,
+                      UserId: UserId,
                       name: values.name,
                       price: values.price,
                       percentage: values.percentage,

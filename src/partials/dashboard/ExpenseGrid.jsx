@@ -3,7 +3,12 @@ import { useSelector } from 'react-redux';
 
 function ExpenseGrid() {
   const { expenses } = useSelector((state) => state.expense);
-  console.log(expenses, 'expenses');
+  console.log(
+    expenses.map((item) => {
+      item.other_expense?.map((item) => item?.expense_name);
+    }),
+    'expenses'
+  );
   return (
     <div className="col-span-full bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
       <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
@@ -18,7 +23,7 @@ function ExpenseGrid() {
           </header>
           <ul className="my-1">
             {/* Item */}
-            {expenses?.other_expense?.map((item, index) => {
+            {expenses?.map((item, index) => {
               return (
                 <li className="flex px-2">
                   <div className="w-9 h-9 rounded-full shrink-0 bg-rose-500 my-2 mr-3">
@@ -33,11 +38,11 @@ function ExpenseGrid() {
                           className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                           href="#0"
                         ></a>
-                        {item?.expense_name}
+                        {item?.other_expense[index].expense_name}
                       </div>
                       <div className="shrink-0 self-start ml-2">
                         <span className="font-medium text-slate-800 dark:text-slate-100">
-                          {`-$${item?.price}`}
+                          {`-$${item?.other_expense[index].price}`}
                         </span>
                       </div>
                     </div>

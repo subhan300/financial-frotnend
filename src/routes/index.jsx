@@ -16,6 +16,8 @@ import {
 import ProtectedRoute from './ProtectedRoutes'; // Import the ProtectedRoute component
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import ForgetPassword from '../pages/ForgetPassword';
+import EditIncome from '../pages/EditIncome';
+import EditExpenses from '../pages/EditExpense';
 
 const AppRoutes = () => {
   const { auth } = useSelector((state) => state.auth);
@@ -52,6 +54,22 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <Goals />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/income/:id"
+          element={
+            <ProtectedRoute>
+              <EditIncome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/expenses/:id"
+          element={
+            <ProtectedRoute>
+              <EditExpenses />
             </ProtectedRoute>
           }
         />

@@ -1,36 +1,46 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
-import { useDispatch } from 'react-redux';
-import { createExpense } from '../redux/features/expense/expense.reducer';
+import IncomeModal from '../components/IncomeModal';
+import { useDispatch, useSelector } from 'react-redux';
+import { createIncome } from '../redux/features/income/income.reducer';
 import { getUserId } from '../utils/Utils';
+import { clearSuccess } from '../redux/features/income/income.slice';
+import { useParams } from 'react-router-dom';
+import moment from 'moment';
 
 const validationSchema = Yup.object().shape({
-  monthly_rent: Yup.number()
-    .required('Monthly rent is required')
-    .min(0, 'Monthly rent must be a positive number'),
-  monthly_debts: Yup.number()
-    .required('Monthly debts are required')
-    .min(0, 'Monthly debts must be a positive number'),
-  debts_period: Yup.date()
-    .required('Period of debt is required')
-    .min(0, 'Period of debt must be a positive number'),
+  monthly_income: Yup.number()
+    .required('Monthly income is required')
+    .min(0, 'Monthly income must be a positive number'),
+  date: Yup.date().required('Date is required'),
 });
 
-function Expenses() {
+function EditIncome() {
+  const [initialValues, setInitialValues] = useState('');
+  const { incomes, isSucess, isLoading } = useSelector((state) => state.income);
+  const router = useParams();
+  console.log(router);
+  console.log(incomes);
+  useEffect(() => {
+    const res = incomes?.filter((item) => item?._id === router.id);
+    setInitialValues(res);
+  }, [router.id]);
   const userId = getUserId();
   const dispatch = useDispatch();
-  const [total_expense, setTotalExpense] = useState(0);
-  const [expense, setAddExpense] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [income, setIncome] = useState([]);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   // Reducer function to calculate the total price
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
-  let totalPrice = expense.reduce(totalPriceReducer, 0);
+  let totalPrice = income.reduce(totalPriceReducer, 0);
+  console.log(initialValues, 'initialValues');
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -64,64 +74,69 @@ function Expenses() {
                   </div>
 
                   <div class="flex flex-col flex-grow ml-4">
-                    <div class="text-sm text-gray-500">Monthly Expenses</div>
+                    <div class="text-sm text-gray-500">Monthly Income</div>
                     <div class="font-bold text-lg">
-                      $<span id="yearly-cost-result">{total_expense}</span>
+                      $<span id="yearly-cost-result">{totalIncome}</span>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col w-full lg:w-[60%] bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-700 p-5">
                 <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">
-                  Add Monthly Expenses
+                  Add Monthly Income
                 </h1>
                 <Formik
+                  enableReinitialize
                   initialValues={{
-                    monthly_rent: '',
-                    monthly_debts: '',
-                    debts_period: '',
-                    other_expense: '',
-                    fixed_expense: '',
+                    monthly_income: initialValues[0]?.monthly_income,
+                    date: moment(initialValues[0]?.date).format('YYYY-DD-MM'),
+                    extra_income: initialValues[0]?.extra_income,
                   }}
                   validationSchema={validationSchema}
-                  onSubmit={(values, { setSubmitting }) => {
-                    const { monthly_rent, monthly_debts, debts_period, fixed_expense } = values;
-                    let data = {
-                      UserId: String(userId),
-                      monthly_rent: monthly_rent,
-                      monthly_debts: monthly_debts,
-                      debts_period: debts_period,
-                      other_expense: expense,
-                      total_expense: total_expense,
-                      fixed_expense: Number(monthly_rent) + Number(monthly_debts),
-                    };
-                    dispatch(createExpense(data));
-                    setSubmitting(false);
+                  onSubmit={(values, actions) => {
+                    setTimeout(() => {
+                      let data = {
+                        UserId: String(userId),
+                        monthly_income: values.monthly_income,
+                        date: values.date,
+                        total_income: totalIncome,
+                        extra_income: income,
+                      };
+                      console.log(values, 'values');
+                      dispatch(createIncome(data));
+                      actions.resetForm({
+                        values: {
+                          // the type of `values` inferred to be Blog
+                          monthly_income: '',
+                          date: '',
+                          extra_income: {},
+                        },
+                        // you can also set the other form states here
+                      });
+                      dispatch(clearSuccess());
+                    }, 500);
                   }}
                 >
                   {({ values, isSubmitting }) => {
-                    setTotalExpense(
-                      Number(values.monthly_rent) +
-                        Number(values.monthly_debts) +
-                        Number(totalPrice)
-                    );
+                    console.log(values, 'values=========');
+                    setTotalIncome(Number(values.monthly_income) + Number(totalPrice));
                     return (
                       <>
                         <Form className="mt-5">
                           <div className="mb-5">
                             <label
                               className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                              htmlFor="monthlyRent"
+                              htmlFor="monthlyIncome"
                             >
-                              Monthly Rent
+                              Monthly Income
                             </label>
                             <Field
                               type="number"
-                              name="monthly_rent"
+                              name="monthly_income"
                               className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
                             />
                             <ErrorMessage
-                              name="monthly_rent"
+                              name="monthly_income"
                               component="div"
                               className="text-sm font-medium text-red-600"
                             />
@@ -129,35 +144,17 @@ function Expenses() {
                           <div className="mb-5">
                             <label
                               className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                              htmlFor="monthlyDebts"
+                              htmlFor="date"
                             >
-                              Monthly Debts
+                              Date
                             </label>
                             <Field
-                              type="number"
-                              name="monthly_debts"
+                              type="date"
+                              name="date"
                               className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
                             />
                             <ErrorMessage
-                              name="monthly_debts"
-                              component="div"
-                              className="text-sm font-medium text-red-600"
-                            />
-                          </div>
-                          <div className="mb-5">
-                            <label
-                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                              htmlFor="periodOfDebt"
-                            >
-                              Period of Debt (in time)
-                            </label>
-                            <Field
-                              type="number"
-                              name="debts_period"
-                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                            />
-                            <ErrorMessage
-                              name="debts_period"
+                              name="date"
                               component="div"
                               className="text-sm font-medium text-red-600"
                             />
@@ -187,7 +184,6 @@ function Expenses() {
                               </svg>
                             </div>
                           </div>
-
                           <div className="max-w-2xl mx-auto mb-5">
                             <div className="flex flex-col">
                               <div className="overflow-x-auto shadow-md sm:rounded-lg">
@@ -215,27 +211,25 @@ function Expenses() {
                                         </tr>
                                       </thead>
                                       <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                        {expense?.map((item, index) => {
+                                        {values?.extra_income?.map((item, index) => {
                                           return (
-                                            <>
-                                              <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                <td className="py-4 px-6 text-sm font-medium capitalize text-gray-900 whitespace-nowrap dark:text-white">
-                                                  {item?.expense_name}
-                                                </td>
+                                            <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                              <td className="py-4 px-6 text-sm font-medium capitalize text-gray-900 whitespace-nowrap dark:text-white">
+                                                {item?.income_name}
+                                              </td>
 
-                                                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                  {`${item?.price}$`}
-                                                </td>
-                                                <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                                  <a
-                                                    href="#"
-                                                    className="text-blue-600 dark:text-blue-500 hover:underline"
-                                                  >
-                                                    Edit
-                                                  </a>
-                                                </td>
-                                              </tr>
-                                            </>
+                                              <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                {item?.price}
+                                              </td>
+                                              <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
+                                                <a
+                                                  onClick={handle}
+                                                  className="text-blue-600 dark:text-blue-500 hover:underline"
+                                                >
+                                                  Edit
+                                                </a>
+                                              </td>
+                                            </tr>
                                           );
                                         })}
                                       </tbody>
@@ -247,14 +241,39 @@ function Expenses() {
                           </div>
                           <button
                             type="submit"
-                            className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
-                            disabled={isSubmitting}
+                            className="text-white bg-[#4F46E5] hover:bg-[#433BCB] rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-3.5 focus:outline-none font-extrabold w-full mt-3 shade mb-3 flex items-center justify-center"
                           >
-                            Submit
+                            {isLoading && !isSuccess ? (
+                              <>
+                                <svg
+                                  class="mr-3 h-5 w-5 animate-spin text-white"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                  ></circle>
+                                  <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  ></path>
+                                </svg>
+                                <span class="font-medium"> Loading... </span>
+                              </>
+                            ) : (
+                              <p>Submit</p>
+                            )}
                           </button>
                         </Form>
-                        <ExpenseModal
-                          setAddExpense={setAddExpense}
+                        <IncomeModal
+                          setIncome={setIncome}
                           modalOpen={expenseModalOpen}
                           setModalOpen={setExpenseModalOpen}
                         />
@@ -271,4 +290,4 @@ function Expenses() {
   );
 }
 
-export default Expenses;
+export default EditIncome;

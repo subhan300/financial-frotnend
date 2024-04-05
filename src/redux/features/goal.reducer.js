@@ -12,9 +12,9 @@ export const createGoal = createAsyncThunk('goal/createGoal', async (data, thunk
     return thunkAPI.rejectWithValue(error.response);
   }
 });
-export const getGoal = createAsyncThunk('goal/getGoal', async (userId, thunkAPI) => {
+export const getGoal = createAsyncThunk('goal/getGoal', async (UserId, thunkAPI) => {
   try {
-    let response = await makeRequest(`api/v1/goal/add-goal/${userId}`, 'GET', {});
+    let response = await makeRequest(`api/v1/goal/get-goal/${UserId}`, 'GET', '');
     if (response) {
       return response;
     }

@@ -16,25 +16,28 @@ import DashboardCard09 from '../partials/dashboard/DashboardCard09';
 import DashboardCard10 from '../partials/dashboard/DashboardCard10';
 import DashboardCard11 from '../partials/dashboard/DashboardCard11';
 import DashboardCard12 from '../partials/dashboard/DashboardCard12';
-import FinanceGrid from '../partials/dashboard/FinanceGrid';
+import FinanceGrid from '../partials/dashboard/IncomeGrid';
 import Banner from '../partials/Banner';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIncome } from '../redux/features/income/income.reducer';
 import { getUserId, getUserToken } from '../utils/Utils';
 import { getExpense } from '../redux/features/expense/expense.reducer';
 import ExpenseGrid from '../partials/dashboard/ExpenseGrid';
+import { getGoal } from '../redux/features/goal.reducer';
 
 function Dashboard() {
   const userId = getUserId();
   const dispatch = useDispatch();
+  const { goal } = useSelector((state) => state.goal);
   const { incomes, isLoading, isSucess } = useSelector((state) => state.income);
   const { expenses } = useSelector((state) => state.expense);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
     dispatch(getIncome(String(userId)));
     dispatch(getExpense(String(userId)));
+    dispatch(getGoal(String(userId)));
   }, []);
-  console.log(expenses, 'expenses===');
+  console.log(goal, 'fixed_expense===');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -51,14 +54,20 @@ function Dashboard() {
             <div className="grid grid-cols-12 gap-6">
               {/* Income Card */}
               <FinancialCard
-                title="Total Income"
+                name="Saving"
+                monthly_saving={goal[0].monthly_saving}
+                fixed_expense={expenses?.fixed_expense}
+                title="Monthly Planing"
                 subTitle="Insights"
                 value={incomes?.total_income || 0}
               />
 
               {/* Expense Card */}
               <FinancialCard
-                title="Total Expense"
+                name="Saving"
+                monthly_saving={goal[0]?.monthly_saving}
+                fixed_expense={expenses?.fixed_expense}
+                title="Actual Transactions"
                 subTitle="Insights"
                 value={expenses?.total_expense || 0}
               />

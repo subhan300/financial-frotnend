@@ -28,7 +28,7 @@ export const authSlice = createSlice({
       state.isLoading = false;
       state.isError = false;
       state.isSuccess = true;
-      state.goal = action?.payload;
+      state.goal = action?.payload?.data;
     });
     builder.addCase(getGoal.rejected, (state, action) => {
       console.log('getGoal.rejected', action);
@@ -47,7 +47,6 @@ export const authSlice = createSlice({
       console.log('createGoal.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
-      state.isSuccess = true;
       state.goal.unshift(action?.payload?.data);
     });
     builder.addCase(createGoal.rejected, (state, action) => {
