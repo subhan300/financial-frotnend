@@ -55,8 +55,8 @@ function Dashboard() {
               {/* Income Card */}
               <FinancialCard
                 name="Saving"
-                monthly_saving={goal[0].monthly_saving}
-                fixed_expense={expenses?.fixed_expense}
+                monthly_saving={goal[0].monthly_saving || 0}
+                fixed_expense={expenses?.fixed_expense || 0}
                 title="Monthly Planing"
                 subTitle="Insights"
                 value={incomes?.total_income || 0}
