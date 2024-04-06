@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createIncome, getIncome } from './income.reducer';
+import { createIncome, deleteIncome, getIncome } from './income.reducer';
 const initialState = {
   incomes: [],
   isLoading: false,
@@ -55,6 +55,12 @@ export const authSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
+    });
+    builder.addCase(deleteIncome.fulfilled, (state, action) => {
+      console.log('deleteIncome.fulfilled', action);
+      state.isLoading = false;
+      state.isError = false;
+      state.incomes = action.payload;
     });
   },
 });

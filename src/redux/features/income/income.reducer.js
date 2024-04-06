@@ -21,3 +21,14 @@ export const createIncome = createAsyncThunk('income/createIncome', async (data,
     return thunkAPI.rejectWithValue(error.response);
   }
 });
+export const deleteIncome = createAsyncThunk('income/deleteIncome', async (id, thunkAPI) => {
+  try {
+    let response = await makeRequest(`api/v1/income/delete-income/${id}`, 'DELETE', {});
+    if (response) {
+      console.log(response, 'response');
+      return response;
+    }
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response);
+  }
+});

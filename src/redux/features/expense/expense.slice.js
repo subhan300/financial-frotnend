@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createExpense, getExpense } from './expense.reducer';
+import { createExpense, deleteExpense, getExpense } from './expense.reducer';
 const initialState = {
   expenses: [],
   isLoading: false,
@@ -55,6 +55,12 @@ export const authSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
+    });
+    builder.addCase(deleteExpense.fulfilled, (state, action) => {
+      console.log(action?.payload, 'deleteExpense.fulfilled');
+      state.isLoading = false;
+      state.isError = false;
+      state.expenses = action?.payload;
     });
   },
 });

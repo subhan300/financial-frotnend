@@ -20,3 +20,14 @@ export const createExpense = createAsyncThunk('expense/createExpense', async (da
     return thunkAPI.rejectWithValue(error.response);
   }
 });
+export const deleteExpense = createAsyncThunk('expense/deleteExpense', async (id, thunkAPI) => {
+  try {
+    let response = await makeRequest(`api/v1/expense/delete-expense/${id}`, 'DELETE', {});
+    if (response) {
+      console.log(response, 'response=====');
+      return response;
+    }
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response);
+  }
+});
