@@ -18,12 +18,13 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(getIncome.pending, (state) => {
-      console.log('getIncome.rejected', state);
+      console.log('getIncome.pending', state);
       state.isLoading = true;
       state.isError = false;
       state.isSuccess = false;
     });
     builder.addCase(getIncome.fulfilled, (state, action) => {
+      console.log('getIncome.fulfilled', action);
       const { data } = action?.payload;
       state.isLoading = false;
       state.isError = false;

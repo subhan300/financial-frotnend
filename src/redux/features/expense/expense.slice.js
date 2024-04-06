@@ -18,17 +18,20 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(getExpense.pending, (state) => {
+      console.log(state, 'getExpense.pending');
       state.isLoading = true;
       state.isError = false;
       state.isSuccess = false;
     });
     builder.addCase(getExpense.fulfilled, (state, action) => {
+      console.log(action, 'getExpense.fulfilled');
       const { data } = action?.payload;
       state.isLoading = false;
       state.isError = false;
       state.expenses = data;
     });
     builder.addCase(getExpense.rejected, (state, action) => {
+      console.log(action, 'getExpense.rejected');
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
@@ -44,7 +47,7 @@ export const authSlice = createSlice({
       console.log(action?.payload, 'createExpense.fulfilled');
       state.isLoading = false;
       state.isError = false;
-      state.expenses.unshift(action.payload);
+      state.expenses.unshift(action.payload.data);
     });
     builder.addCase(createExpense.rejected, (state, action) => {
       console.log('createExpense.rejected', action);

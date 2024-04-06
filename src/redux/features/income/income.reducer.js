@@ -1,9 +1,10 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { makeRequest } from '../../../utils/makeRequest';
-export const getIncome = createAsyncThunk('income/getIncome', async (id, thunkAPI) => {
+export const getIncome = createAsyncThunk('income/getIncome', async (UserId, thunkAPI) => {
   try {
-    let response = await makeRequest(`api/v1/income/get-income/${id}`, 'GET', '');
+    let response = await makeRequest(`api/v1/income/get-income/${UserId}`, 'GET', {});
     if (response) {
+      console.log(response, 'response=====');
       return response;
     }
   } catch (error) {
@@ -11,7 +12,6 @@ export const getIncome = createAsyncThunk('income/getIncome', async (id, thunkAP
   }
 });
 export const createIncome = createAsyncThunk('income/createIncome', async (data, thunkAPI) => {
-  console.log(data, 'Data');
   try {
     let response = await makeRequest(`api/v1/income/add-income/`, 'POST', data);
     if (response) {

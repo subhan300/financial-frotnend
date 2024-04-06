@@ -23,10 +23,6 @@ function Goals() {
   const dispatch = useDispatch();
   const { incomes, isLoading, isSucess } = useSelector((state) => state.income);
   const { expenses } = useSelector((state) => state.expense);
-  useEffect(() => {
-    dispatch(getIncome(UserId));
-    dispatch(getExpense(UserId));
-  }, [dispatch]);
   const [monthlySaving, setMonthlySaving] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
@@ -36,7 +32,7 @@ function Goals() {
 
     // Add monthly savings from percentage to existing savings
     const totalMonthlySavings = monthlySavingsPercentage + (monthlyIncome - monthlyExpenses);
-
+    setMonthlySaving(totalMonthlySavings);
     console.log(totalMonthlySavings, 'totalMonthlySavings====');
     // setMonthlySaving(totalMonthlySavings);
     // Check if savings percentage is valid (0 to 100)
@@ -56,9 +52,12 @@ function Goals() {
       return monthsNeeded;
     }
   }
-
-  // Example usage
   const [monthsToGoal, setMonthsToGoal] = useState('');
+  useEffect(() => {
+    dispatch(getIncome(UserId));
+    dispatch(getExpense(UserId));
+  }, []);
+  console.log(incomes, 'incomes=====');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -126,10 +125,10 @@ function Goals() {
                   {({ values }) => {
                     console.log(values, 'values');
                     const monthsToGoal = calculateMonthsToGoal(
-                      Number(incomes?.total_income),
-                      Number(expenses?.total_expense),
-                      Number(values?.price),
-                      Number(values?.percentage)
+                      Number(incomes[0]?.total_income),
+                      Number(expenses[0]?.total_expense),
+                      values?.price,
+                      values?.percentage
                     );
                     setMonthsToGoal(monthsToGoal);
                     return (
@@ -144,7 +143,7 @@ function Goals() {
                             </label>
                             <input
                               name="username"
-                              value={incomes.total_income}
+                              value={incomes[0]?.total_income}
                               type="text"
                               disabled={true}
                               autocomplete="off"
@@ -161,7 +160,7 @@ function Goals() {
                             </label>
                             <input
                               name="username"
-                              value={expenses.total_expense}
+                              value={expenses[0]?.total_expense}
                               type="text"
                               disabled={true}
                               autocomplete="off"

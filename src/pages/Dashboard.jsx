@@ -37,7 +37,7 @@ function Dashboard() {
     dispatch(getExpense(String(userId)));
     dispatch(getGoal(String(userId)));
   }, []);
-  console.log(goal, 'fixed_expense===');
+  console.log(expenses[0]?.total_expense, 'expenses===');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -55,21 +55,17 @@ function Dashboard() {
               {/* Income Card */}
               <FinancialCard
                 name="Saving"
-                monthly_saving={goal[0].monthly_saving || 0}
-                fixed_expense={expenses?.fixed_expense || 0}
+                monthly_saving={goal.length > 0 ? goal[0].monthly_saving || 0 : 0}
+                fixed_expense={expenses.length > 0 ? expenses[0]?.total_expense || 0 : 0}
                 title="Monthly Planing"
-                subTitle="Insights"
-                value={incomes?.total_income || 0}
               />
 
               {/* Expense Card */}
               <FinancialCard
                 name="Saving"
-                monthly_saving={goal[0]?.monthly_saving}
-                fixed_expense={expenses?.fixed_expense}
+                monthly_saving={goal.length > 0 ? goal[0]?.monthly_saving || 0 : 0}
+                fixed_expense={expenses.length > 0 ? expenses[0]?.total_expense || 0 : 0}
                 title="Actual Transactions"
-                subTitle="Insights"
-                value={expenses?.total_expense || 0}
               />
               {/* Card (Income/Expenses) */}
               <FinanceGrid />
