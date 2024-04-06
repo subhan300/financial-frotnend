@@ -3,10 +3,12 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { deleteIncome } from '../../redux/features/income/income.reducer';
 import ConfirmModal from '../../components/ConfirmModal';
+import ExtraFinanceModal from '../../components/ExtraFinanceModal';
 
 function FinanceGrid() {
   
   const [modalOpen, setModalOpen] = useState(false);
+  const [extraIncomeModalOpen, setExtraIncomeModalOpen] = useState(false);
 
   
   const navigation = useNavigate();
@@ -24,8 +26,12 @@ function FinanceGrid() {
         {/* Card content */}
         {/* "Today" group */}
         <div>
-          <header className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm font-semibold p-2">
-            Today
+          <header className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm font-semibold p-2 flex items-center">
+            <div className="w-full">Name</div>
+            <div className="w-full">Monthly Income</div>
+            <div className="w-full">Date</div>
+            <div className="w-full cursor-pointer" onClick={() => setExtraIncomeModalOpen(true)}>Extra Income ...</div>
+            <ExtraFinanceModal modalOpen={extraIncomeModalOpen} setModalOpen={setExtraIncomeModalOpen} value={incomes} />
           </header>
           <ul className="my-1">
             {/* Item */}
@@ -57,7 +63,7 @@ function FinanceGrid() {
                               onClick={() => {
                                 navigation(`income/${incomeItem._id}`);
                               }}
-                              className="w-6 h-6 text-gray-800 dark:text-white ml-2" // Added ml-2 for margin
+                              className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
                               aria-hidden="true"
                               xmlns="http://www.w3.org/2000/svg"
                               width="24"
@@ -75,7 +81,7 @@ function FinanceGrid() {
                             </svg>
                             <svg
                               onClick={() => setModalOpen(true)}
-                              class="w-6 h-6 text-gray-800 dark:text-white"
+                              class="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
                               aria-hidden="true"
                               xmlns="http://www.w3.org/2000/svg"
                               width="24"

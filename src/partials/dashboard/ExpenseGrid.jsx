@@ -2,10 +2,13 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteExpense } from '../../redux/features/expense/expense.reducer';
 import ConfirmModal from '../../components/ConfirmModal';
+import ExtraExpenseModal from '../../components/ExtraExpenseModal';
 
 function ExpenseGrid() {
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [extraIncomeModalOpen, setExtraIncomeModalOpen] = useState(false);
+
 
   const { expenses } = useSelector((state) => state.expense);
   const dispatch = useDispatch();
@@ -22,8 +25,13 @@ function ExpenseGrid() {
           {/* Card content */}
           {/* "Today" group */}
           <div>
-            <header className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm font-semibold p-2">
-              Today
+            <header className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm font-semibold p-2 flex items-center">
+              <div className='w-full'>Name</div>
+              <div className='w-full'>Monthly Rent</div>
+              <div className='w-full'>Monthly Debts</div>
+              <div className='w-full'>Period</div>
+              <div className='w-full cursor-pointer' onClick={() => setExtraIncomeModalOpen(true)}>Extra Expense ...</div>
+              <ExtraExpenseModal modalOpen={extraIncomeModalOpen} setModalOpen={setExtraIncomeModalOpen} value={expenses} />
             </header>
             <ul className="my-1">
               {/* Item */}
@@ -50,7 +58,7 @@ function ExpenseGrid() {
                               -{`${item?.other_expense[index].price}`}
                             </span>
                             <svg
-                              className="w-6 h-6 text-gray-800 dark:text-white ml-2" // Added ml-2 for margin
+                              className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
                               aria-hidden="true"
                               xmlns="http://www.w3.org/2000/svg"
                               width="24"
@@ -68,7 +76,7 @@ function ExpenseGrid() {
                             </svg>
                             <svg
                               onClick={() => setModalOpen(true)}
-                              class="w-6 h-6 text-gray-800 dark:text-white"
+                              class="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
                               aria-hidden="true"
                               xmlns="http://www.w3.org/2000/svg"
                               width="24"
