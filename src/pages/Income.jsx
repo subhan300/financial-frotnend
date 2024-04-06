@@ -29,6 +29,9 @@ function Income() {
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
   let totalPrice = income.reduce(totalPriceReducer, 0);
+
+
+  
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}

@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { deleteIncome } from '../../redux/features/income/income.reducer';
+import ConfirmModal from '../../components/ConfirmModal';
 
 function FinanceGrid() {
+  
+  const [modalOpen, setModalOpen] = useState(false);
+
+  
   const navigation = useNavigate();
   const { incomes } = useSelector((state) => state.income);
   const dispatch = useDispatch();
@@ -69,9 +74,7 @@ function FinanceGrid() {
                               />
                             </svg>
                             <svg
-                              onClick={() => {
-                                handleDeleteIncome(incomes[0]._id);
-                              }}
+                              onClick={() => setModalOpen(true)}
                               class="w-6 h-6 text-gray-800 dark:text-white"
                               aria-hidden="true"
                               xmlns="http://www.w3.org/2000/svg"
@@ -86,6 +89,7 @@ function FinanceGrid() {
                                 clip-rule="evenodd"
                               />
                             </svg>
+                            <ConfirmModal modalOpen={modalOpen} setModalOpen={setModalOpen} value={incomes[0]._id} valueType={"income"} />
                           </div>
                         </div>
                       </div>
