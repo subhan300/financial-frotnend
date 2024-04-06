@@ -222,10 +222,7 @@ function EditIncome() {
                                                 {item?.price}
                                               </td>
                                               <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                                <a
-                                                  onClick={handle}
-                                                  className="text-blue-600 dark:text-blue-500 hover:underline"
-                                                >
+                                                <a className="text-blue-600 dark:text-blue-500 hover:underline">
                                                   Edit
                                                 </a>
                                               </td>

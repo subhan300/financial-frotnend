@@ -4,9 +4,10 @@ import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { createExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
+import { clearSuccess } from '../redux/features/expense/expense.slice';
 
 const validationSchema = Yup.object().shape({
   monthly_rent: Yup.number()
@@ -21,6 +22,7 @@ const validationSchema = Yup.object().shape({
 });
 
 function Expenses() {
+  const { isLoading, isSuccess } = useSelector((state) => state.expense);
   const userId = getUserId();
   const dispatch = useDispatch();
   const [total_expense, setTotalExpense] = useState(0);
@@ -84,19 +86,31 @@ function Expenses() {
                     fixed_expense: '',
                   }}
                   validationSchema={validationSchema}
-                  onSubmit={(values, { setSubmitting }) => {
-                    const { monthly_rent, monthly_debts, debts_period, fixed_expense } = values;
-                    let data = {
-                      UserId: String(userId),
-                      monthly_rent: monthly_rent,
-                      monthly_debts: monthly_debts,
-                      debts_period: debts_period,
-                      other_expense: expense,
-                      total_expense: total_expense,
-                      fixed_expense: Number(monthly_rent) + Number(monthly_debts),
-                    };
-                    dispatch(createExpense(data));
-                    setSubmitting(false);
+                  onSubmit={(values, actions) => {
+                    setTimeout(() => {
+                      const { monthly_rent, monthly_debts, debts_period } = values;
+                      let data = {
+                        UserId: String(userId),
+                        monthly_rent: monthly_rent,
+                        monthly_debts: monthly_debts,
+                        debts_period: debts_period,
+                        other_expense: expense,
+                        total_expense: total_expense,
+                        //fixed_expense: Number(monthly_rent) + Number(monthly_debts),
+                      };
+                      dispatch(createExpense(data));
+                      actions.resetForm({
+                        values: {
+                          // the type of `values` inferred to be Blog
+                          monthly_rent: '',
+                          monthly_debts: '',
+                          debts_period: '',
+                          other_expense: '',
+                        },
+                        // you can also set the other form states here
+                      });
+                      dispatch(clearSuccess());
+                    }, 500);
                   }}
                 >
                   {({ values, isSubmitting }) => {
@@ -247,10 +261,35 @@ function Expenses() {
                           </div>
                           <button
                             type="submit"
-                            className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
-                            disabled={isSubmitting}
+                            className="text-white bg-[#4F46E5] hover:bg-[#433BCB] rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-3.5 focus:outline-none font-extrabold w-full mt-3 shade mb-3 flex items-center justify-center"
                           >
-                            Submit
+                            {isLoading && !isSuccess ? (
+                              <>
+                                <svg
+                                  class="mr-3 h-5 w-5 animate-spin text-white"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <circle
+                                    class="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    stroke-width="4"
+                                  ></circle>
+                                  <path
+                                    class="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                  ></path>
+                                </svg>
+                                <span class="font-medium"> Loading... </span>
+                              </>
+                            ) : (
+                              <p>Submit</p>
+                            )}
                           </button>
                         </Form>
                         <ExpenseModal

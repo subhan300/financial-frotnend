@@ -89,7 +89,7 @@ function Income() {
                         total_income: totalIncome,
                         extra_income: income,
                       };
-                      console.log(values, 'values');
+
                       dispatch(createIncome(data));
                       actions.resetForm({
                         values: {
