@@ -8,6 +8,7 @@ import IncomeModal from '../components/IncomeModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { createIncome } from '../redux/features/income/income.reducer';
 import { getUserId } from '../utils/Utils';
+import { useNavigate } from 'react-router-dom';
 import { clearSuccess } from '../redux/features/income/income.slice';
 
 const validationSchema = Yup.object().shape({
@@ -18,6 +19,7 @@ const validationSchema = Yup.object().shape({
 });
 
 function Income() {
+  const navigation = useNavigate();
   const { isLoading, isSuccess } = useSelector((state) => state.income);
   const userId = getUserId();
   const dispatch = useDispatch();
@@ -25,13 +27,12 @@ function Income() {
   const [income, setIncome] = useState([]);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [editItem, setEditingItem] = useState('');
   // Reducer function to calculate the total price
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
   let totalPrice = income.reduce(totalPriceReducer, 0);
-
-
-  
+  let initialValues = '';
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -77,10 +78,11 @@ function Income() {
                   Add Monthly Income
                 </h1>
                 <Formik
+                  enableReinitialize
                   initialValues={{
                     monthly_income: '',
                     date: '',
-                    extra_income: '',
+                    extra_income: income,
                   }}
                   validationSchema={validationSchema}
                   onSubmit={(values, actions) => {
@@ -103,6 +105,7 @@ function Income() {
                         },
                         // you can also set the other form states here
                       });
+                      navigation('/');
                       dispatch(clearSuccess());
                     }, 500);
                   }}
@@ -212,12 +215,53 @@ function Income() {
                                                 {item?.price}
                                               </td>
                                               <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                                <a
-                                                  href="#"
-                                                  className="text-blue-600 dark:text-blue-500 hover:underline"
+                                                <svg
+                                                  onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    console.log(item, 'item');
+                                                    setExpenseModalOpen(true);
+                                                    setEditingItem(item); // Pass the item to be edited to the modal
+                                                  }}
+                                                  className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
+                                                  aria-hidden="true"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  width="24"
+                                                  height="24"
+                                                  fill="none"
+                                                  viewBox="0 0 24 24"
                                                 >
-                                                  Edit
-                                                </a>
+                                                  <path
+                                                    stroke="currentColor"
+                                                    strokeLinecap="round"
+                                                    strokeLinejoin="round"
+                                                    strokeWidth="2"
+                                                    d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                                                  />
+                                                </svg>
+                                                <svg
+                                                  onClick={() => {
+                                                    console.log(item, 'item');
+                                                    const updatedIncome = income.filter(
+                                                      (incomeItem) => incomeItem._id !== item._id
+                                                    );
+                                                    // Update the state with the new array without the deleted item
+                                                    setIncome(updatedIncome);
+                                                    console.log(updatedIncome, 'updatedIncome');
+                                                  }}
+                                                  class="w-6 h-6 ml-2 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
+                                                  aria-hidden="true"
+                                                  xmlns="http://www.w3.org/2000/svg"
+                                                  width="24"
+                                                  height="24"
+                                                  fill="currentColor"
+                                                  viewBox="0 0 24 24"
+                                                >
+                                                  <path
+                                                    fill-rule="evenodd"
+                                                    d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z"
+                                                    clip-rule="evenodd"
+                                                  />
+                                                </svg>
                                               </td>
                                             </tr>
                                           );
@@ -263,6 +307,8 @@ function Income() {
                           </button>
                         </Form>
                         <IncomeModal
+                          editItem={editItem}
+                          income={income}
                           setIncome={setIncome}
                           modalOpen={expenseModalOpen}
                           setModalOpen={setExpenseModalOpen}

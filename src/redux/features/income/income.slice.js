@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createIncome, deleteIncome, getIncome } from './income.reducer';
+import { createIncome, deleteIncome, editIncome, getIncome } from './income.reducer';
 const initialState = {
   incomes: [],
   isLoading: false,
@@ -56,11 +56,37 @@ export const authSlice = createSlice({
       state.isSuccess = false;
       state.error = action.error;
     });
+    builder.addCase(editIncome.pending, (state) => {
+      console.log('editIncome.pending', state);
+      state.isLoading = true;
+      state.isError = false;
+      state.isSuccess = false;
+    });
+    builder.addCase(editIncome.fulfilled, (state, action) => {
+      const updatedIncome = action.payload.data;
+      const index = action.meta.arg.index; // Assuming you have the index in meta
+
+      console.log('editIncome.fulfilled', action);
+      state.isLoading = false;
+      state.isError = false;
+      // Update the item at the specified index
+      if (index !== undefined && index >= 0 && index < state.incomes.length) {
+        state.incomes[index] = updatedIncome;
+      }
+    });
+
+    builder.addCase(editIncome.rejected, (state, action) => {
+      console.log('editIncome.rejected', action);
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+      state.error = action.error;
+    });
     builder.addCase(deleteIncome.fulfilled, (state, action) => {
       console.log('deleteIncome.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
-      state.incomes = action.payload;
+      state.incomes.filter((item) => item._id != action.payload._id);
     });
   },
 });

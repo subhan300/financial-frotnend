@@ -6,10 +6,10 @@ import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
 import IncomeModal from '../components/IncomeModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { createIncome } from '../redux/features/income/income.reducer';
+import { createIncome, editIncome } from '../redux/features/income/income.reducer';
 import { getUserId } from '../utils/Utils';
-import { clearSuccess } from '../redux/features/income/income.slice';
-import { useParams } from 'react-router-dom';
+import { clearState, clearSuccess } from '../redux/features/income/income.slice';
+import { useParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
 
 const validationSchema = Yup.object().shape({
@@ -20,16 +20,15 @@ const validationSchema = Yup.object().shape({
 });
 
 function EditIncome() {
+  const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState('');
-  const { incomes, isSucess, isLoading } = useSelector((state) => state.income);
+  const { incomes, isSucess, isLoading, isError } = useSelector((state) => state.income);
   const router = useParams();
-  console.log(router);
-  console.log(incomes);
   useEffect(() => {
     const res = incomes?.filter((item) => item?._id === router.id);
     setInitialValues(res);
   }, [router.id]);
-  const userId = getUserId();
+  const UserId = getUserId();
   const dispatch = useDispatch();
   const [totalIncome, setTotalIncome] = useState(0);
   const [income, setIncome] = useState([]);
@@ -40,7 +39,11 @@ function EditIncome() {
   // Calculate the total price using the reducer
   let totalPrice = income.reduce(totalPriceReducer, 0);
   console.log(initialValues, 'initialValues');
-
+  useEffect(() => {
+    if (isError) {
+      dispatch(clearState());
+    }
+  }, [isError]);
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -91,19 +94,19 @@ function EditIncome() {
                     monthly_income: initialValues[0]?.monthly_income,
                     date: moment(initialValues[0]?.date).format('YYYY-DD-MM'),
                     extra_income: initialValues[0]?.extra_income,
+                    total_income: initialValues[0]?.total_income,
                   }}
                   validationSchema={validationSchema}
                   onSubmit={(values, actions) => {
                     setTimeout(() => {
                       let data = {
-                        UserId: String(userId),
                         monthly_income: values.monthly_income,
-                        date: values.date,
-                        total_income: totalIncome,
-                        extra_income: income,
+                        date: values?.date,
+                        total_income: values?.total_income,
+                        extra_income: values?.extra_income,
                       };
                       console.log(values, 'values');
-                      dispatch(createIncome(data));
+                      dispatch(editIncome({ UserId, data }));
                       actions.resetForm({
                         values: {
                           // the type of `values` inferred to be Blog
@@ -114,6 +117,7 @@ function EditIncome() {
                         // you can also set the other form states here
                       });
                       dispatch(clearSuccess());
+                      navigate('/income');
                     }, 500);
                   }}
                 >
@@ -159,31 +163,7 @@ function EditIncome() {
                               className="text-sm font-medium text-red-600"
                             />
                           </div>
-                          <div className="mb-5 flex justify-end">
-                            <div>
-                              <svg
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setExpenseModalOpen(true);
-                                }}
-                                class="w-6 h-6 text-gray-800 dark:text-white"
-                                aria-hidden="true"
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                />
-                              </svg>
-                            </div>
-                          </div>
+
                           <div className="max-w-2xl mx-auto mb-5">
                             <div className="flex flex-col">
                               <div className="overflow-x-auto shadow-md sm:rounded-lg">
@@ -205,8 +185,11 @@ function EditIncome() {
                                           >
                                             Price
                                           </th>
-                                          <th scope="col" className="p-4">
-                                            <span className="sr-only">Edit</span>
+                                          <th
+                                            scope="col"
+                                            className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
+                                          >
+                                            Action
                                           </th>
                                         </tr>
                                       </thead>
@@ -221,10 +204,50 @@ function EditIncome() {
                                               <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                 {item?.price}
                                               </td>
-                                              <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                                <a className="text-blue-600 dark:text-blue-500 hover:underline">
-                                                  Edit
-                                                </a>
+
+                                              <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                <span>
+                                                  <svg
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      setExpenseModalOpen(true);
+                                                      setIncome(values?.extra_income);
+                                                    }}
+                                                    className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      stroke="currentColor"
+                                                      strokeLinecap="round"
+                                                      strokeLinejoin="round"
+                                                      strokeWidth="2"
+                                                      d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                                                    />
+                                                  </svg>
+                                                </span>
+                                                <span>
+                                                  <svg
+                                                    onClick={() => setModalOpen(true)}
+                                                    class="w-6 h-6 ml-2 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      fill-rule="evenodd"
+                                                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z"
+                                                      clip-rule="evenodd"
+                                                    />
+                                                  </svg>
+                                                </span>
                                               </td>
                                             </tr>
                                           );
@@ -240,7 +263,7 @@ function EditIncome() {
                             type="submit"
                             className="text-white bg-[#4F46E5] hover:bg-[#433BCB] rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-3.5 focus:outline-none font-extrabold w-full mt-3 shade mb-3 flex items-center justify-center"
                           >
-                            {isLoading && !isSuccess ? (
+                            {isLoading ? (
                               <>
                                 <svg
                                   class="mr-3 h-5 w-5 animate-spin text-white"
@@ -265,11 +288,12 @@ function EditIncome() {
                                 <span class="font-medium"> Loading... </span>
                               </>
                             ) : (
-                              <p>Submit</p>
+                              <p>Edit</p>
                             )}
                           </button>
                         </Form>
                         <IncomeModal
+                          income={income}
                           setIncome={setIncome}
                           modalOpen={expenseModalOpen}
                           setModalOpen={setExpenseModalOpen}

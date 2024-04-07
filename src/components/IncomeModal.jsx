@@ -11,19 +11,40 @@ const validationSchema = Yup.object().shape({
     .min(0, 'Monthly debts must be a positive number'),
 });
 
-function IncomeModal({ modalOpen, setModalOpen, setIncome }) {
-  const [formData, setFormData] = useState(null);
+function IncomeModal({ modalOpen, setModalOpen, setIncome, income, editItem }) {
+  const [initialValues, setInitialValues] = useState({
+    _id: '',
+    income_name: '',
+    price: '',
+  });
+  function generateRandomId() {
+    const timestamp = Date.now().toString(36); // Convert current timestamp to base36
+    const randomNumber = Math.random().toString(36).substr(2, 5); // Generate a random number and take a substring
+    return timestamp + randomNumber; // Concatenate timestamp and random number
+  }
+  console.log(editItem, 'editItem');
   const handleSubmit = (values, { setSubmitting }) => {
-    // Create a new expense object
-    const newIncome = {
-      income_name: values.income_name,
-      price: values.price,
-    };
-    // Append the new expense object to the expenses array
-    setIncome((prevExpenses) => [...prevExpenses, newIncome]);
-    // Reset form submission state
+    if (editItem) {
+      // If editing an existing item, update it in the array
+      const updatedIncome = [...income];
+      const index = updatedIncome.findIndex((incomeItem) => incomeItem._id === editItem._id);
+      if (index !== -1) {
+        updatedIncome[index] = { ...values, _id: editItem._id };
+        setIncome(updatedIncome);
+      }
+    } else {
+      // If adding a new item, append it to the array
+      const newIncome = {
+        _id: generateRandomId(),
+        income_name: values.income_name,
+        price: values.price,
+      };
+      setIncome((prevIncome) => [...prevIncome, newIncome]);
+    }
     setSubmitting(false);
     setModalOpen(false);
+    values.income_name = '';
+    values.price = '';
   };
   const modalContent = useRef(null);
   // close on click outside
@@ -35,17 +56,14 @@ function IncomeModal({ modalOpen, setModalOpen, setIncome }) {
     document.addEventListener('click', clickHandler);
     return () => document.removeEventListener('click', clickHandler);
   });
-
-  // // close if the esc key is pressed
-  // useEffect(() => {
-  //   const keyHandler = ({ keyCode }) => {
-  //     if (!modalOpen || keyCode !== 27) return;
-  //     setModalOpen(false);
-  //   };
-  //   document.addEventListener('keydown', keyHandler);
-  //   return () => document.removeEventListener('keydown', keyHandler);
-  // });
-
+  useEffect(() => {
+    if (editItem) {
+      setInitialValues(editItem);
+    }
+  }, [editItem]);
+  if (!initialValues) {
+    return null; // You can return a loading indicator or just null
+  }
   return (
     <>
       {/* Modal backdrop */}
@@ -79,10 +97,8 @@ function IncomeModal({ modalOpen, setModalOpen, setIncome }) {
         >
           <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">Name</h1>
           <Formik
-            initialValues={{
-              income_name: '',
-              price: '',
-            }}
+            enableReinitialize
+            initialValues={initialValues} // Set initial values to the editing item if available
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
