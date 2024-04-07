@@ -124,13 +124,12 @@ function Login() {
                           placeholder="Enter password"
                           className="w-full py-2 ml-4 text-sm pl-2 !bg-white focus:outline-none border-none"
                         />
-
-                        <a
-                          href="/forgetpassword"
-                          className="flex md:hidden hover:underline text-primary-hover text-xs whitespace-nowrap font-medium ml-2"
+                        <Link
+                          className="hidden md:flex hover:underline text-primary-hover text-xs whitespace-nowrap font-medium ml-2"
+                          to="/forgetpassword"
                         >
-                          Forget?
-                        </a>
+                          Forget Password?
+                        </Link>
                       </div>
                       <lable className="text-[11px] font-medium text-rose-600">
                         {errors.password && touched.password && errors.password}
