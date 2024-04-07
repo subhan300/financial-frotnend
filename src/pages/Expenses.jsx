@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
@@ -7,7 +7,7 @@ import ExpenseModal from '../components/ExpenseModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { createExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
-import { clearSuccess } from '../redux/features/expense/expense.slice';
+import { clearState, clearSuccess } from '../redux/features/expense/expense.slice';
 import { useNavigate } from 'react-router-dom';
 
 const validationSchema = Yup.object().shape({
@@ -25,8 +25,8 @@ const validationSchema = Yup.object().shape({
 function Expenses() {
   const navigate = useNavigate('');
   const [editItem, setEditingItem] = useState('');
-  const { isLoading, isSuccess } = useSelector((state) => state.expense);
-  const userId = getUserId();
+  const { isLoading, isSuccess, isError } = useSelector((state) => state.expense);
+  const UserId = getUserId();
   const dispatch = useDispatch();
   const [total_expense, setTotalExpense] = useState(0);
   const [expense, setAddExpense] = useState([]);
@@ -36,6 +36,15 @@ function Expenses() {
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
   let totalPrice = expense.reduce(totalPriceReducer, 0);
+  useEffect(() => {
+    if (isError) {
+      dispatch(clearState());
+    }
+    return () => {
+      clearSuccess();
+    };
+  }, [isError]);
+  console.log(expense, 'Expense');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -90,14 +99,16 @@ function Expenses() {
                   }}
                   validationSchema={validationSchema}
                   onSubmit={(values, actions) => {
+                    let expensesWithoutId = expense.map(({ _id, ...rest }) => rest);
                     setTimeout(() => {
-                      const { monthly_rent, monthly_debts, debts_period } = values;
+                      const { monthly_rent, monthly_debts, debts_period, other_expense } = values;
+
                       let data = {
-                        UserId: String(userId),
+                        UserId: String(UserId),
                         monthly_rent: monthly_rent,
                         monthly_debts: monthly_debts,
                         debts_period: debts_period,
-                        other_expense: expense,
+                        other_expense: expensesWithoutId,
                         total_expense: total_expense,
                         //fixed_expense: Number(monthly_rent) + Number(monthly_debts),
                       };
@@ -111,9 +122,9 @@ function Expenses() {
                           debts_period: '',
                           other_expense: '',
                         },
+
                         // you can also set the other form states here
                       });
-                      dispatch(clearSuccess());
                     }, 500);
                   }}
                 >

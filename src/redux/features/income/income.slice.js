@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { toast } from 'react-toastify';
 import { createIncome, deleteIncome, editIncome, getIncome } from './income.reducer';
 const initialState = {
   incomes: [],
@@ -44,10 +45,12 @@ export const authSlice = createSlice({
       state.isSuccess = false;
     });
     builder.addCase(createIncome.fulfilled, (state, action) => {
-      console.log('createIncome.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
-      state.incomes.unshift(action?.payload?.data);
+      state.incomes.unshift(action.payload.data);
+      toast.success('Income has been created', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(createIncome.rejected, (state, action) => {
       console.log('createIncome.rejected', action);
@@ -55,6 +58,9 @@ export const authSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
+      toast.error('Something went wrong', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(editIncome.pending, (state) => {
       console.log('editIncome.pending', state);
@@ -81,10 +87,13 @@ export const authSlice = createSlice({
       state.error = action.error;
     });
     builder.addCase(deleteIncome.fulfilled, (state, action) => {
-      console.log('deleteIncome.fulfilled', action);
+      console.log(action, 'action');
       state.isLoading = false;
       state.isError = false;
-      state.incomes.filter((item) => item._id != action.payload._id);
+      state.expenses = state.expenses.filter((item) => item?._id !== action.meta.arg);
+      toast.success('Income has been deleted', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
   },
 });

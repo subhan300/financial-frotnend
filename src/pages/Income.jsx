@@ -9,7 +9,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createIncome } from '../redux/features/income/income.reducer';
 import { getUserId } from '../utils/Utils';
 import { useNavigate } from 'react-router-dom';
-import { clearSuccess } from '../redux/features/income/income.slice';
+import { clearState, clearSuccess } from '../redux/features/income/income.slice';
+import { useEffect } from 'react';
 
 const validationSchema = Yup.object().shape({
   monthly_income: Yup.number()
@@ -20,7 +21,7 @@ const validationSchema = Yup.object().shape({
 
 function Income() {
   const navigation = useNavigate();
-  const { isLoading, isSuccess } = useSelector((state) => state.income);
+  const { isLoading, isSuccess, isError } = useSelector((state) => state.income);
   const userId = getUserId();
   const dispatch = useDispatch();
   const [totalIncome, setTotalIncome] = useState(0);
@@ -32,6 +33,14 @@ function Income() {
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
   let totalPrice = income.reduce(totalPriceReducer, 0);
+  useEffect(() => {
+    if (isError) {
+      clearState();
+    }
+    return () => {
+      clearSuccess();
+    };
+  }, [isError, isSuccess]);
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -85,16 +94,19 @@ function Income() {
                   }}
                   validationSchema={validationSchema}
                   onSubmit={(values, actions) => {
+                    let incomeWithoutId = income.map(({ _id, ...rest }) => rest);
                     setTimeout(() => {
                       let data = {
                         UserId: String(userId),
                         monthly_income: values.monthly_income,
                         date: values.date,
                         total_income: totalIncome,
-                        extra_income: income,
+                        extra_income: incomeWithoutId,
                       };
 
                       dispatch(createIncome(data));
+
+                      navigation('/');
                       actions.resetForm({
                         values: {
                           // the type of `values` inferred to be Blog
@@ -104,7 +116,6 @@ function Income() {
                         },
                         // you can also set the other form states here
                       });
-                      navigation('/');
                       dispatch(clearSuccess());
                     }, 500);
                   }}

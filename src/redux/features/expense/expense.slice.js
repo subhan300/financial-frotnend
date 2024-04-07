@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { createExpense, deleteExpense, getExpense } from './expense.reducer';
+import { toast } from 'react-toastify';
 const initialState = {
   expenses: [],
   isLoading: false,
@@ -28,6 +29,7 @@ export const authSlice = createSlice({
       const { data } = action?.payload;
       state.isLoading = false;
       state.isError = false;
+      state.isSuccess = true;
       state.expenses = data;
     });
     builder.addCase(getExpense.rejected, (state, action) => {
@@ -48,6 +50,9 @@ export const authSlice = createSlice({
       state.isLoading = false;
       state.isError = false;
       state.expenses.unshift(action.payload.data);
+      toast.success('Expense has been created', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(createExpense.rejected, (state, action) => {
       console.log('createExpense.rejected', action);
@@ -55,12 +60,17 @@ export const authSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
+      toast.error('Someting went wrong', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(deleteExpense.fulfilled, (state, action) => {
-      console.log(action, 'deleteExpense.fulfilled');
       state.isLoading = false;
       state.isError = false;
       state.expenses = state.expenses.filter((item) => item?._id !== action.meta.arg);
+      toast.success('Expense has been deleted', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
   },
 });

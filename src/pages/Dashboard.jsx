@@ -26,16 +26,16 @@ import ExpenseGrid from '../partials/dashboard/ExpenseGrid';
 import { getGoal } from '../redux/features/goal.reducer';
 
 function Dashboard() {
-  const userId = getUserId();
+  const UserId = getUserId();
   const dispatch = useDispatch();
   const { goal } = useSelector((state) => state.goal);
   const { incomes, isLoading, isSucess } = useSelector((state) => state.income);
   const { expenses } = useSelector((state) => state.expense);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
-    dispatch(getIncome(String(userId)));
-    dispatch(getExpense(String(userId)));
-    dispatch(getGoal(String(userId)));
+    dispatch(getIncome(String(UserId)));
+    dispatch(getExpense(String(UserId)));
+    dispatch(getGoal(String(UserId)));
   }, [dispatch]);
   return (
     <div className="flex h-screen overflow-hidden">
@@ -55,6 +55,11 @@ function Dashboard() {
               <FinancialCard
                 monthly_saving={goal.length > 0 ? goal[0].monthly_saving || 0 : 0}
                 fixed_expense={incomes[0]?.total_income ? incomes[0].total_income : 0}
+                money_toused={
+                  (goal?.[0]?.monthly_saving ?? 0) -
+                  (incomes?.[0]?.total_income ?? 0) -
+                  (expenses?.[0]?.total_expense ?? 0)
+                }
                 title="Monthly Planing"
               />
 
@@ -62,6 +67,11 @@ function Dashboard() {
               <FinancialCard
                 monthly_saving={goal.length > 0 ? goal[0]?.monthly_saving || 0 : 0}
                 fixed_expense={expenses.length > 0 ? expenses[0]?.total_expense || 0 : 0}
+                money_toused={
+                  (goal?.[0]?.monthly_saving !== undefined ? goal[0].monthly_saving : 0) -
+                  (incomes?.[0]?.total_income !== undefined ? incomes[0].total_income : 0) -
+                  (expenses?.[0]?.total_expense !== undefined ? expenses[0].total_expense : 0)
+                }
                 title="Actual Transactions"
               />
               {/* Card (Income/Expenses) */}
