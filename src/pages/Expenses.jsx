@@ -24,6 +24,7 @@ const validationSchema = Yup.object().shape({
 
 function Expenses() {
   const navigate = useNavigate('');
+  const [editItem, setEditingItem] = useState('');
   const { isLoading, isSuccess } = useSelector((state) => state.expense);
   const userId = getUserId();
   const dispatch = useDispatch();
@@ -244,12 +245,50 @@ function Expenses() {
                                                   {`${item?.price}$`}
                                                 </td>
                                                 <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                                  <a
-                                                    href="#"
-                                                    className="text-blue-600 dark:text-blue-500 hover:underline"
+                                                  <svg
+                                                    onClick={(e) => {
+                                                      e.stopPropagation();
+                                                      setExpenseModalOpen(true);
+                                                    }}
+                                                    className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
                                                   >
-                                                    Edit
-                                                  </a>
+                                                    <path
+                                                      stroke="currentColor"
+                                                      strokeLinecap="round"
+                                                      strokeLinejoin="round"
+                                                      strokeWidth="2"
+                                                      d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                                                    />
+                                                  </svg>
+                                                  <svg
+                                                    onClick={() => {
+                                                      const updatedExpense = expense?.filter(
+                                                        (expenseItem) =>
+                                                          expenseItem._id !== item._id
+                                                      );
+                                                      // Update the state with the new array without the deleted item
+                                                      setAddExpense(updatedExpense);
+                                                    }}
+                                                    class="w-6 h-6 ml-2 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
+                                                    aria-hidden="true"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="24"
+                                                    height="24"
+                                                    fill="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                  >
+                                                    <path
+                                                      fill-rule="evenodd"
+                                                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z"
+                                                      clip-rule="evenodd"
+                                                    />
+                                                  </svg>
                                                 </td>
                                               </tr>
                                             </>
@@ -296,6 +335,7 @@ function Expenses() {
                           </button>
                         </Form>
                         <ExpenseModal
+                          expense={expense}
                           setAddExpense={setAddExpense}
                           modalOpen={expenseModalOpen}
                           setModalOpen={setExpenseModalOpen}

@@ -11,12 +11,13 @@ const validationSchema = Yup.object().shape({
     .min(0, 'Monthly debts must be a positive number'),
 });
 
-function IncomeModal({ modalOpen, setModalOpen, setIncome, income, editItem }) {
+function IncomeModal({ modalOpen, setModalOpen, setIncome, item, editItem }) {
   const [initialValues, setInitialValues] = useState({
     _id: '',
     income_name: '',
     price: '',
   });
+  console.log(editItem, 'editItem');
   function generateRandomId() {
     const timestamp = Date.now().toString(36); // Convert current timestamp to base36
     const randomNumber = Math.random().toString(36).substr(2, 5); // Generate a random number and take a substring
@@ -26,7 +27,7 @@ function IncomeModal({ modalOpen, setModalOpen, setIncome, income, editItem }) {
   const handleSubmit = (values, { setSubmitting }) => {
     if (editItem) {
       // If editing an existing item, update it in the array
-      const updatedIncome = [...income];
+      const updatedIncome = [...item];
       const index = updatedIncome.findIndex((incomeItem) => incomeItem._id === editItem._id);
       if (index !== -1) {
         updatedIncome[index] = { ...values, _id: editItem._id };

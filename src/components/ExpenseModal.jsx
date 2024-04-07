@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Transition from '../utils/Transition';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { generateRandomId } from '../utils/generateRandomId';
 
 const validationSchema = Yup.object().shape({
   expense_name: Yup.string().required('Expense title is required'),
@@ -11,18 +12,30 @@ const validationSchema = Yup.object().shape({
     .min(0, 'Monthly debts must be a positive number'),
 });
 
-function ExpenseModal({ modalOpen, setModalOpen, setAddExpense }) {
-  const [formData, setFormData] = useState(null);
-
+function ExpenseModal({ modalOpen, setModalOpen, setAddExpense, expense, editItem }) {
+  const [initialValues, setInitialValues] = useState({
+    _id: generateRandomId(),
+    expense_name: '',
+    price: '',
+  });
   const handleSubmit = (values, { setSubmitting }) => {
-    // Create a new expense object
-    const newExpense = {
-      expense_name: values.expense_name,
-      price: values.price,
-    };
-    // Append the new expense object to the expenses array
-    setAddExpense((prevExpenses) => [...prevExpenses, newExpense]);
-    // Reset form submission state
+    if (editItem) {
+      // If editing an existing item, update it in the array
+      const updatedIncome = [...expense];
+      const index = updatedIncome.findIndex((incomeItem) => incomeItem._id === editItem._id);
+      if (index !== -1) {
+        updatedIncome[index] = { ...values, _id: editItem._id };
+        setAddExpense(updatedIncome);
+      }
+    } else {
+      // If adding a new item, append it to the array
+      const newIncome = {
+        _id: generateRandomId(),
+        expense_name: values?.expense_name,
+        price: values?.price,
+      };
+      setAddExpense((prevIncome) => [...prevIncome, newIncome]);
+    }
     setSubmitting(false);
     setModalOpen(false);
   };
@@ -37,16 +50,25 @@ function ExpenseModal({ modalOpen, setModalOpen, setAddExpense }) {
     return () => document.removeEventListener('click', clickHandler);
   });
 
-  // // close if the esc key is pressed
-  // useEffect(() => {
-  //   const keyHandler = ({ keyCode }) => {
-  //     if (!modalOpen || keyCode !== 27) return;
-  //     setModalOpen(false);
-  //   };
-  //   document.addEventListener('keydown', keyHandler);
-  //   return () => document.removeEventListener('keydown', keyHandler);
-  // });
-
+  // close if the esc key is pressed
+  useEffect(() => {
+    const keyHandler = ({ keyCode }) => {
+      if (!modalOpen || keyCode !== 27) return;
+      setModalOpen(false);
+    };
+    document.addEventListener('keydown', keyHandler);
+    return () => document.removeEventListener('keydown', keyHandler);
+  });
+  useEffect(() => {
+    if (editItem) {
+      setInitialValues(editItem);
+    }
+  }, [editItem]);
+  if (!initialValues) {
+    return null; // You can return a loading indicator or just null
+  }
+  console.log(editItem, 'editItem====');
+  console.log(expense, 'expense');
   return (
     <>
       {/* Modal backdrop */}
@@ -82,10 +104,8 @@ function ExpenseModal({ modalOpen, setModalOpen, setAddExpense }) {
             Add Expense
           </h1>
           <Formik
-            initialValues={{
-              expense_name: '',
-              price: '',
-            }}
+            enableReinitialize
+            initialValues={initialValues}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >

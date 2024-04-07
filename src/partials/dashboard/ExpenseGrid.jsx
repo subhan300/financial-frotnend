@@ -3,8 +3,9 @@ import { useSelector, useDispatch } from 'react-redux';
 import { deleteExpense } from '../../redux/features/expense/expense.reducer';
 import ConfirmModal from '../../components/ConfirmModal';
 import ExtraExpenseModal from '../../components/ExtraExpenseModal';
-
+import { useNavigate } from 'react-router-dom';
 function ExpenseGrid() {
+  const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [extraIncomeModalOpen, setExtraIncomeModalOpen] = useState(false);
 
@@ -86,7 +87,7 @@ function ExpenseGrid() {
                             <span className="font-medium text-emerald-500"></span>
                             <svg
                               onClick={() => {
-                                navigation(`income/${item._id}`);
+                                navigate(`expenses/${item._id}`);
                               }}
                               className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
                               aria-hidden="true"

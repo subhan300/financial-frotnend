@@ -57,10 +57,10 @@ export const authSlice = createSlice({
       state.error = action.error;
     });
     builder.addCase(deleteExpense.fulfilled, (state, action) => {
-      console.log(action?.payload, 'deleteExpense.fulfilled');
+      console.log(action, 'deleteExpense.fulfilled');
       state.isLoading = false;
       state.isError = false;
-      state.expenses = action?.payload;
+      state.expenses = state.expenses.filter((item) => item?._id !== action.meta.arg);
     });
   },
 });

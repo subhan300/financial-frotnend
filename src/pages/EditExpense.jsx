@@ -1,13 +1,14 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
-import { useDispatch } from 'react-redux';
 import { createExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
-
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
+import { clearState } from '../redux/features/expense/expense.slice';
 const validationSchema = Yup.object().shape({
   monthly_rent: Yup.number()
     .required('Monthly rent is required')
@@ -21,8 +22,12 @@ const validationSchema = Yup.object().shape({
 });
 
 function EditExpenses() {
+  const { expenses, isError, isSucces, isLoading } = useSelector((state) => state.expense);
   const [isOpen, setIsOpen] = useState(false);
-  const userId = getUserId();
+  const [editItem, setEditingItem] = useState('');
+  const UserId = getUserId();
+  const [initialValues, setInitialValues] = useState('');
+  const router = useParams();
   const dispatch = useDispatch();
   const [total_expense, setTotalExpense] = useState(0);
   const [expense, setAddExpense] = useState([]);
@@ -31,13 +36,24 @@ function EditExpenses() {
   // Reducer function to calculate the total price
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
-  let totalPrice = expense.reduce(totalPriceReducer, 0);
+  let totalPrice = expense?.reduce(totalPriceReducer, 0);
   const handleOpenModal = () => {
     setIsOpen(true);
   };
   const handleCloseModal = () => {
     setIsOpen(false);
   };
+  useEffect(() => {
+    const res = expenses?.filter((item) => item?._id === router.id);
+    setInitialValues(res);
+    setAddExpense(res[0]?.other_expense);
+  }, [router.id]);
+  useEffect(() => {
+    if (isError) {
+      dispatch(clearState());
+    }
+  }, [isError]);
+  console.log(expense, 'expense=====');
   return (
     <>
       <div className="flex h-screen overflow-hidden">
@@ -84,18 +100,19 @@ function EditExpenses() {
                     Add Monthly Expenses
                   </h1>
                   <Formik
+                    enableReinitialize
                     initialValues={{
-                      monthly_rent: '',
-                      monthly_debts: '',
-                      debts_period: '',
-                      other_expense: '',
-                      fixed_expense: '',
+                      monthly_rent: initialValues[0]?.monthly_rent,
+                      monthly_debts: initialValues[0]?.monthly_debts,
+                      debts_period: initialValues[0]?.debts_period,
+                      other_expense: expense,
+                      fixed_expense: initialValues[0]?.fixed_expense,
                     }}
                     validationSchema={validationSchema}
                     onSubmit={(values, { setSubmitting }) => {
                       const { monthly_rent, monthly_debts, debts_period, fixed_expense } = values;
                       let data = {
-                        UserId: String(userId),
+                        UserId: String(UserId),
                         monthly_rent: monthly_rent,
                         monthly_debts: monthly_debts,
                         debts_period: debts_period,
@@ -176,6 +193,7 @@ function EditExpenses() {
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     setExpenseModalOpen(true);
+                                    setEditingItem(item);
                                   }}
                                   class="w-6 h-6 text-gray-800 dark:text-white"
                                   aria-hidden="true"
@@ -217,37 +235,88 @@ function EditExpenses() {
                                             >
                                               Price
                                             </th>
-                                            <th scope="col" className="p-4">
-                                              <span className="sr-only">Edit</span>
+                                            <th
+                                              scope="col"
+                                              className="py-3 px-6 text-xs font-medium tracking-wider text-left text-gray-700 uppercase dark:text-gray-400"
+                                            >
+                                              Action
                                             </th>
                                           </tr>
                                         </thead>
                                         <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                          {expense?.map((item, index) => {
-                                            return (
-                                              <>
-                                                <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                                  <td className="py-4 px-6 text-sm font-medium capitalize text-gray-900 whitespace-nowrap dark:text-white">
-                                                    {item?.expense_name}
-                                                  </td>
+                                          {expense &&
+                                            expense?.map((item, index) => {
+                                              return (
+                                                <>
+                                                  <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                    <td className="py-4 px-6 text-sm font-medium capitalize text-gray-900 whitespace-nowrap dark:text-white">
+                                                      {item?.expense_name}
+                                                    </td>
 
-                                                  <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                    {`${item?.price}$`}
-                                                  </td>
-                                                  <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
-                                                    <a
-                                                      onClick={() => {
-                                                        handleOpenModal();
-                                                      }}
-                                                      className="text-blue-600 dark:text-blue-500 hover:underline"
-                                                    >
-                                                      Edit
-                                                    </a>
-                                                  </td>
-                                                </tr>
-                                              </>
-                                            );
-                                          })}
+                                                    <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                      {`${item?.price}$`}
+                                                    </td>
+                                                    <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                      <span>
+                                                        <svg
+                                                          onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setExpenseModalOpen(true);
+                                                            setEditingItem(item);
+                                                          }}
+                                                          className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
+                                                          aria-hidden="true"
+                                                          xmlns="http://www.w3.org/2000/svg"
+                                                          width="24"
+                                                          height="24"
+                                                          fill="none"
+                                                          viewBox="0 0 24 24"
+                                                        >
+                                                          <path
+                                                            stroke="currentColor"
+                                                            strokeLinecap="round"
+                                                            strokeLinejoin="round"
+                                                            strokeWidth="2"
+                                                            d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                                                          />
+                                                        </svg>
+                                                      </span>
+                                                      <span>
+                                                        <svg
+                                                          onClick={() => {
+                                                            console.log(item, 'item');
+                                                            const updatedIncome =
+                                                              values?.other_expense?.filter(
+                                                                (incomeItem) =>
+                                                                  incomeItem._id !== item._id
+                                                              );
+                                                            // Update the state with the new array without the deleted item
+                                                            setAddExpense(updatedIncome);
+                                                            console.log(
+                                                              updatedIncome,
+                                                              'updatedIncome'
+                                                            );
+                                                          }}
+                                                          class="w-6 h-6 ml-2 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
+                                                          aria-hidden="true"
+                                                          xmlns="http://www.w3.org/2000/svg"
+                                                          width="24"
+                                                          height="24"
+                                                          fill="currentColor"
+                                                          viewBox="0 0 24 24"
+                                                        >
+                                                          <path
+                                                            fill-rule="evenodd"
+                                                            d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z"
+                                                            clip-rule="evenodd"
+                                                          />
+                                                        </svg>
+                                                      </span>
+                                                    </td>
+                                                  </tr>
+                                                </>
+                                              );
+                                            })}
                                         </tbody>
                                       </table>
                                     </div>
@@ -264,9 +333,11 @@ function EditExpenses() {
                             </button>
                           </Form>
                           <ExpenseModal
+                            item={expense}
                             setAddExpense={setAddExpense}
                             modalOpen={expenseModalOpen}
                             setModalOpen={setExpenseModalOpen}
+                            editItem={editItem}
                           />
                         </>
                       );
@@ -279,9 +350,10 @@ function EditExpenses() {
         </div>
       </div>
       <ExpenseModal
+        expense={expense}
+        setAddExpense={setAddExpense}
         modalOpen={isOpen}
         setModalOpen={handleOpenModal}
-        setAddExpense={setAddExpense}
       />
     </>
   );

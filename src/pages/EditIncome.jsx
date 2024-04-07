@@ -24,6 +24,7 @@ function EditIncome() {
   const [initialValues, setInitialValues] = useState('');
   const { incomes, isSucess, isLoading, isError } = useSelector((state) => state.income);
   const router = useParams();
+  const [editItem, setEditingItem] = useState();
   const UserId = getUserId();
   const dispatch = useDispatch();
   const [totalIncome, setTotalIncome] = useState(0);
@@ -172,6 +173,7 @@ function EditIncome() {
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   setExpenseModalOpen(true);
+                                  setEd;
                                 }}
                                 class="w-6 h-6 text-gray-800 dark:text-white"
                                 aria-hidden="true"
@@ -239,6 +241,7 @@ function EditIncome() {
                                                       onClick={(e) => {
                                                         e.stopPropagation();
                                                         setExpenseModalOpen(true);
+                                                        setEditingItem(item);
                                                       }}
                                                       className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
                                                       aria-hidden="true"
@@ -330,7 +333,8 @@ function EditIncome() {
                           </button>
                         </Form>
                         <IncomeModal
-                          income={income}
+                          item={income}
+                          editItem={editItem}
                           setIncome={setIncome}
                           modalOpen={expenseModalOpen}
                           setModalOpen={setExpenseModalOpen}
