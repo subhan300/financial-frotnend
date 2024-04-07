@@ -64,17 +64,15 @@ export const authSlice = createSlice({
     });
     builder.addCase(editIncome.fulfilled, (state, action) => {
       const updatedIncome = action.payload.data;
-      const index = action.meta.arg.index; // Assuming you have the index in meta
-
       console.log('editIncome.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
-      // Update the item at the specified index
-      if (index !== undefined && index >= 0 && index < state.incomes.length) {
+      state.isSuccess = true;
+      const index = state.incomes.findIndex((item) => item?._id === action.meta.arg);
+      if (index != -1) {
         state.incomes[index] = updatedIncome;
       }
     });
-
     builder.addCase(editIncome.rejected, (state, action) => {
       console.log('editIncome.rejected', action);
       state.isLoading = false;

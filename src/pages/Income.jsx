@@ -32,7 +32,6 @@ function Income() {
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
   let totalPrice = income.reduce(totalPriceReducer, 0);
-  let initialValues = '';
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -240,8 +239,8 @@ function Income() {
                                                 </svg>
                                                 <svg
                                                   onClick={() => {
-                                                    console.log(item, 'item');
-                                                    const updatedIncome = income.filter(
+                                                    console.log(income, 'income');
+                                                    const updatedIncome = income?.filter(
                                                       (incomeItem) => incomeItem._id !== item._id
                                                     );
                                                     // Update the state with the new array without the deleted item

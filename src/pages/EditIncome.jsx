@@ -24,26 +24,29 @@ function EditIncome() {
   const [initialValues, setInitialValues] = useState('');
   const { incomes, isSucess, isLoading, isError } = useSelector((state) => state.income);
   const router = useParams();
-  useEffect(() => {
-    const res = incomes?.filter((item) => item?._id === router.id);
-    setInitialValues(res);
-  }, [router.id]);
   const UserId = getUserId();
   const dispatch = useDispatch();
   const [totalIncome, setTotalIncome] = useState(0);
   const [income, setIncome] = useState([]);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  // Reducer function to calculate the total price
-  const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
+  const totalPriceReducer = (accumulator, currentValue) =>
+    accumulator + Number(currentValue.price) + Number(initialValues[0].total_income);
+
   // Calculate the total price using the reducer
-  let totalPrice = income.reduce(totalPriceReducer, 0);
-  console.log(initialValues, 'initialValues');
+  let totalPrice = income?.reduce(totalPriceReducer, 0);
+  useEffect(() => {
+    const res = incomes?.filter((item) => item?._id === router.id);
+    setInitialValues(res);
+    setIncome(res[0]?.extra_income);
+    console.log(res, 'res');
+  }, [router.id]);
   useEffect(() => {
     if (isError) {
       dispatch(clearState());
     }
   }, [isError]);
+  console.log(Number(totalPrice), 'totalPrice====');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -93,7 +96,7 @@ function EditIncome() {
                   initialValues={{
                     monthly_income: initialValues[0]?.monthly_income,
                     date: moment(initialValues[0]?.date).format('YYYY-DD-MM'),
-                    extra_income: initialValues[0]?.extra_income,
+                    extra_income: income,
                     total_income: initialValues[0]?.total_income,
                   }}
                   validationSchema={validationSchema}
@@ -102,7 +105,7 @@ function EditIncome() {
                       let data = {
                         monthly_income: values.monthly_income,
                         date: values?.date,
-                        total_income: values?.total_income,
+                        total_income: totalIncome,
                         extra_income: values?.extra_income,
                       };
                       console.log(values, 'values');
@@ -116,13 +119,13 @@ function EditIncome() {
                         },
                         // you can also set the other form states here
                       });
+                      navigate('/');
                       dispatch(clearSuccess());
-                      navigate('/income');
                     }, 500);
                   }}
                 >
                   {({ values, isSubmitting }) => {
-                    console.log(values, 'values=========');
+                    console.log(values, 'valuesssssss');
                     setTotalIncome(Number(values.monthly_income) + Number(totalPrice));
                     return (
                       <>
@@ -163,7 +166,31 @@ function EditIncome() {
                               className="text-sm font-medium text-red-600"
                             />
                           </div>
-
+                          <div className="mb-5 flex justify-end">
+                            <div>
+                              <svg
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setExpenseModalOpen(true);
+                                }}
+                                class="w-6 h-6 text-gray-800 dark:text-white"
+                                aria-hidden="true"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="24"
+                                height="24"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  stroke="currentColor"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round"
+                                  stroke-width="2"
+                                  d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                />
+                              </svg>
+                            </div>
+                          </div>
                           <div className="max-w-2xl mx-auto mb-5">
                             <div className="flex flex-col">
                               <div className="overflow-x-auto shadow-md sm:rounded-lg">
@@ -194,64 +221,74 @@ function EditIncome() {
                                         </tr>
                                       </thead>
                                       <tbody className="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                                        {values?.extra_income?.map((item, index) => {
-                                          return (
-                                            <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
-                                              <td className="py-4 px-6 text-sm font-medium capitalize text-gray-900 whitespace-nowrap dark:text-white">
-                                                {item?.income_name}
-                                              </td>
+                                        {income &&
+                                          income?.map((item, index) => {
+                                            return (
+                                              <tr className="hover:bg-gray-100 dark:hover:bg-gray-700">
+                                                <td className="py-4 px-6 text-sm font-medium capitalize text-gray-900 whitespace-nowrap dark:text-white">
+                                                  {item?.income_name}
+                                                </td>
 
-                                              <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                {item?.price}
-                                              </td>
+                                                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                  {item?.price}
+                                                </td>
 
-                                              <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                <span>
-                                                  <svg
-                                                    onClick={(e) => {
-                                                      e.stopPropagation();
-                                                      setExpenseModalOpen(true);
-                                                      setIncome(values?.extra_income);
-                                                    }}
-                                                    className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
-                                                    aria-hidden="true"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="24"
-                                                    height="24"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                  >
-                                                    <path
-                                                      stroke="currentColor"
-                                                      strokeLinecap="round"
-                                                      strokeLinejoin="round"
-                                                      strokeWidth="2"
-                                                      d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
-                                                    />
-                                                  </svg>
-                                                </span>
-                                                <span>
-                                                  <svg
-                                                    onClick={() => setModalOpen(true)}
-                                                    class="w-6 h-6 ml-2 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
-                                                    aria-hidden="true"
-                                                    xmlns="http://www.w3.org/2000/svg"
-                                                    width="24"
-                                                    height="24"
-                                                    fill="currentColor"
-                                                    viewBox="0 0 24 24"
-                                                  >
-                                                    <path
-                                                      fill-rule="evenodd"
-                                                      d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z"
-                                                      clip-rule="evenodd"
-                                                    />
-                                                  </svg>
-                                                </span>
-                                              </td>
-                                            </tr>
-                                          );
-                                        })}
+                                                <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                                  <span>
+                                                    <svg
+                                                      onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setExpenseModalOpen(true);
+                                                      }}
+                                                      className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
+                                                      aria-hidden="true"
+                                                      xmlns="http://www.w3.org/2000/svg"
+                                                      width="24"
+                                                      height="24"
+                                                      fill="none"
+                                                      viewBox="0 0 24 24"
+                                                    >
+                                                      <path
+                                                        stroke="currentColor"
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth="2"
+                                                        d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
+                                                      />
+                                                    </svg>
+                                                  </span>
+                                                  <span>
+                                                    <svg
+                                                      onClick={() => {
+                                                        console.log(item, 'item');
+                                                        const updatedIncome =
+                                                          values?.extra_income?.filter(
+                                                            (incomeItem) =>
+                                                              incomeItem._id !== item._id
+                                                          );
+                                                        // Update the state with the new array without the deleted item
+                                                        setIncome(updatedIncome);
+                                                        console.log(updatedIncome, 'updatedIncome');
+                                                      }}
+                                                      class="w-6 h-6 ml-2 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
+                                                      aria-hidden="true"
+                                                      xmlns="http://www.w3.org/2000/svg"
+                                                      width="24"
+                                                      height="24"
+                                                      fill="currentColor"
+                                                      viewBox="0 0 24 24"
+                                                    >
+                                                      <path
+                                                        fill-rule="evenodd"
+                                                        d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z"
+                                                        clip-rule="evenodd"
+                                                      />
+                                                    </svg>
+                                                  </span>
+                                                </td>
+                                              </tr>
+                                            );
+                                          })}
                                       </tbody>
                                     </table>
                                   </div>
