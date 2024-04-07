@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
 import { clearSuccess } from '../redux/features/expense/expense.slice';
+import { useNavigate } from 'react-router-dom';
 
 const validationSchema = Yup.object().shape({
   monthly_rent: Yup.number()
@@ -22,6 +23,7 @@ const validationSchema = Yup.object().shape({
 });
 
 function Expenses() {
+  const navigate = useNavigate('');
   const { isLoading, isSuccess } = useSelector((state) => state.expense);
   const userId = getUserId();
   const dispatch = useDispatch();
@@ -99,6 +101,7 @@ function Expenses() {
                         //fixed_expense: Number(monthly_rent) + Number(monthly_debts),
                       };
                       dispatch(createExpense(data));
+                      navigate('/');
                       actions.resetForm({
                         values: {
                           // the type of `values` inferred to be Blog

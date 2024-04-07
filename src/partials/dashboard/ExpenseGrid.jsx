@@ -5,10 +5,8 @@ import ConfirmModal from '../../components/ConfirmModal';
 import ExtraExpenseModal from '../../components/ExtraExpenseModal';
 
 function ExpenseGrid() {
-
   const [modalOpen, setModalOpen] = useState(false);
   const [extraIncomeModalOpen, setExtraIncomeModalOpen] = useState(false);
-
 
   const { expenses } = useSelector((state) => state.expense);
   const dispatch = useDispatch();
@@ -26,38 +24,70 @@ function ExpenseGrid() {
           {/* "Today" group */}
           <div>
             <header className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm font-semibold p-2 flex items-center">
-              <div className='w-full'>Name</div>
-              <div className='w-full'>Monthly Rent</div>
-              <div className='w-full'>Monthly Debts</div>
-              <div className='w-full'>Period</div>
-              <div className='w-full cursor-pointer' onClick={() => setExtraIncomeModalOpen(true)}>Extra Expense ...</div>
-              <ExtraExpenseModal modalOpen={extraIncomeModalOpen} setModalOpen={setExtraIncomeModalOpen} value={expenses} />
+              <div className="w-full">Monthly Rent</div>
+              <div className="w-full">Monthly Debts</div>
+
+              <div className="w-full cursor-pointer" onClick={() => setExtraIncomeModalOpen(true)}>
+                Extra Expense ...
+              </div>
+              <div className="w-full">Price</div>
+              <ExtraExpenseModal
+                modalOpen={extraIncomeModalOpen}
+                setModalOpen={setExtraIncomeModalOpen}
+                value={expenses}
+              />
             </header>
             <ul className="my-1">
               {/* Item */}
               {expenses?.length > 0 ? (
-                expenses?.map((item, index) => {
-                  return (
-                    <li className="flex px-2">
+                expenses.map((item, index) => (
+                  <ul>
+                    <li key={index} className="flex px-2">
                       <div className="w-9 h-9 rounded-full shrink-0 bg-rose-500 my-2 mr-3">
-                        <svg className="w-9 h-9 fill-current text-rose-50" viewBox="0 0 36 36">
-                          <path d="M17.7 24.7l1.4-1.4-4.3-4.3H25v-2H14.8l4.3-4.3-1.4-1.4L11 18z" />
+                        <svg className="w-9 h-9 fill-current text-emerald-50" viewBox="0 0 36 36">
+                          <path d="M18.3 11.3l-1.4 1.4 4.3 4.3H11v2h10.2l-4.3 4.3 1.4 1.4L25 18z" />
                         </svg>
                       </div>
                       <div className="grow flex items-center border-b border-slate-100 dark:border-slate-700 text-sm py-2">
-                        <div className="grow flex justify-between">
-                          <div className="self-center">
+                        <div className="grow flex justify-between items-center">
+                          <div>
                             <a
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
-                            ></a>
-                            {item?.other_expense[index].expense_name}
+                            >
+                              {`$${item?.monthly_rent}`}
+                            </a>
+                          </div>
+                          <div>
+                            <a
+                              className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                              href="#0"
+                            >
+                              {item?.monthly_rent}
+                            </a>
+                          </div>
+                          <div>
+                            <a
+                              className="text-center font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                              href="#0"
+                            >
+                              {`${item?.other_expense[0]?.expense_name}`}
+                            </a>
+                          </div>
+                          <div>
+                            <a
+                              className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                              href="#0"
+                            >
+                              {`${item?.other_expense[0]?.price}`}
+                            </a>
                           </div>
                           <div className="flex items-center ml-2">
-                            <span className="font-medium text-red-600">
-                              -{`${item?.other_expense[index].price}`}
-                            </span>
+                            <span className="font-medium text-emerald-500"></span>
                             <svg
+                              onClick={() => {
+                                navigation(`income/${item._id}`);
+                              }}
                               className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
                               aria-hidden="true"
                               xmlns="http://www.w3.org/2000/svg"
@@ -90,15 +120,20 @@ function ExpenseGrid() {
                                 clip-rule="evenodd"
                               />
                             </svg>
-                            <ConfirmModal modalOpen={modalOpen} setModalOpen={setModalOpen} value={expenses[0]._id} valueType={'expense'} />
+                            <ConfirmModal
+                              modalOpen={modalOpen}
+                              setModalOpen={setModalOpen}
+                              value={expenses[0]._id}
+                              valueType={'expense'}
+                            />
                           </div>
                         </div>
                       </div>
                     </li>
-                  );
-                })
+                  </ul>
+                ))
               ) : (
-                <p className="text-center">No Data</p>
+                <p className="text-center">No Records</p>
               )}
             </ul>
           </div>
