@@ -39,13 +39,12 @@ function Register() {
           dispatch(userRegister(values));
           actions.resetForm({
             values: {
-              // the type of `values` inferred to be Blog
               username: '',
               email: '',
               password: '',
             },
-            // you can also set the other form states here
           });
+          navigate('/emailverification');
           dispatch(clearSuccess());
         }, 500);
       }}

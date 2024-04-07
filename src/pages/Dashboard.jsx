@@ -37,7 +37,6 @@ function Dashboard() {
     dispatch(getExpense(String(userId)));
     dispatch(getGoal(String(userId)));
   }, [dispatch]);
-  console.log(incomes[0].total_income, 'expenses===');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}

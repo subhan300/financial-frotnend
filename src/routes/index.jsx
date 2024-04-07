@@ -34,6 +34,14 @@ const AppRoutes = () => {
           }
         />
         <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/income"
           element={
             <ProtectedRoute>

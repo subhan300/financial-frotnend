@@ -4,7 +4,6 @@ import { Formik, Form, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
 import { userlogin } from '../redux/features/auth/auth.reducer';
 import { clearState, clearSuccess } from '../redux/features/auth/auth.slice';
-import { makeRequest } from '../utils/makeRequest';
 function Login() {
   const navigate = useNavigate();
   const { isSuccess, isError, isLoading } = useSelector((state) => state.auth);
@@ -17,7 +16,6 @@ function Login() {
       dispatch(clearState());
     }
   }, [isError, isSuccess]);
-  console.log(isSuccess);
   return (
     <Formik
       initialValues={{ email: '', password: '' }}
@@ -38,7 +36,6 @@ function Login() {
       }}
     >
       {({ values, touched, errors, isSubmitting, handleBlur, handleChange }) => {
-        console.log(values, 'valuesss');
         return (
           <Form>
             <div className="h-screen px-2 overflow-hidden w-full bg-[#FAFBFC] relative flex justify-center items-center">
@@ -140,7 +137,7 @@ function Login() {
                     type="submit"
                     className="text-white bg-[#4F46E5] hover:bg-[#433BCB] rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-3.5 focus:outline-none font-extrabold w-full mt-3 shade mb-3 flex items-center justify-center"
                   >
-                    {isLoading && !isSuccess ? (
+                    {isLoading ? (
                       <>
                         <svg
                           class="mr-3 h-5 w-5 animate-spin text-white"

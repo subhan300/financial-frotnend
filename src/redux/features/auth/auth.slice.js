@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { logout, userRegister, userlogin } from './auth.reducer';
+import { toast } from 'react-toastify';
 const initialState = {
   auth: [],
   isLoading: false,
@@ -18,24 +19,28 @@ export const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(userlogin.pending, (state) => {
-      console.log('userlogin.rejected', state);
       state.isLoading = true;
       state.isError = false;
       state.isSuccess = false;
     });
     builder.addCase(userlogin.fulfilled, (state, action) => {
-      console.log('userlogin.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
       state.isSuccess = true;
       state.auth = action.payload;
+      toast.success('Login has been succesfull', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(userlogin.rejected, (state, action) => {
-      console.log('userlogin.rejected', action);
+      const response = JSON.parse(action.payload.request.response);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
+      toast.error(response?.message, {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(userRegister.pending, (state) => {
       console.log('userRegister.rejected', state);

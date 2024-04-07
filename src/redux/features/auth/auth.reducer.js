@@ -1,5 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { makeRequest } from '../../../utils/makeRequest';
+import { toast } from 'react-toastify';
 export const userlogin = createAsyncThunk('auth/userlogin', async (data, thunkAPI) => {
   try {
     let response = await makeRequest(`/api/v1/users/login/`, 'POST', data);
@@ -39,6 +40,9 @@ export const forgetPasswordEmail = createAsyncThunk(
     try {
       let response = await makeRequest(`/api/v1/users/forget-password`, 'POST', email, null);
       if (response) {
+        toast.success('Email has been sent successfully', {
+          position: toast.POSITION.TOP_RIGHT,
+        });
         return response;
       }
     } catch (error) {
@@ -48,11 +52,12 @@ export const forgetPasswordEmail = createAsyncThunk(
 );
 export const resetPassword = createAsyncThunk('/auth/resetPassword', async (data, thunkAPI) => {
   const { token } = data;
-  console.log(data, 'Data=====');
   try {
     let response = await makeRequest(`/api/v1/users/change-password/${token}`, 'POST', data, null);
     if (response) {
-      console.log(response, 'RESOPONSE============>');
+      toast.success('Password has been reset successfully', {
+        position: toast.POSITION.TOP_RIGHT,
+      });
       return response;
     }
   } catch (error) {
