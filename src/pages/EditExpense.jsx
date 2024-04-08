@@ -4,11 +4,11 @@ import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
-import { createExpense } from '../redux/features/expense/expense.reducer';
+import { createExpense, editExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
-import { clearState } from '../redux/features/expense/expense.slice';
+import { clearState, clearSuccess } from '../redux/features/expense/expense.slice';
 const validationSchema = Yup.object().shape({
   monthly_rent: Yup.number()
     .required('Monthly rent is required')
@@ -22,7 +22,8 @@ const validationSchema = Yup.object().shape({
 });
 
 function EditExpenses() {
-  const { expenses, isError, isSucces, isLoading } = useSelector((state) => state.expense);
+  const navigate = useNavigate();
+  const { expenses, isError, isSuccess, isLoading } = useSelector((state) => state.expense);
   const [isOpen, setIsOpen] = useState(false);
   const [editItem, setEditingItem] = useState('');
   const UserId = getUserId();
@@ -52,8 +53,11 @@ function EditExpenses() {
     if (isError) {
       dispatch(clearState());
     }
+    return () => {
+      clearSuccess();
+    };
   }, [isError]);
-  console.log(expense, 'expense=====');
+  console.log(isSuccess, 'isSuccess');
   return (
     <>
       <div className="flex h-screen overflow-hidden">
@@ -90,7 +94,7 @@ function EditExpenses() {
                     <div class="flex flex-col flex-grow ml-4">
                       <div class="text-sm text-gray-500">Monthly Expenses</div>
                       <div class="font-bold text-lg">
-                        $<span id="yearly-cost-result">{total_expense}</span>
+                        $<span id="yearly-cost-result">{total_expense || 0}</span>
                       </div>
                     </div>
                   </div>
@@ -109,19 +113,33 @@ function EditExpenses() {
                       fixed_expense: initialValues[0]?.fixed_expense,
                     }}
                     validationSchema={validationSchema}
-                    onSubmit={(values, { setSubmitting }) => {
-                      const { monthly_rent, monthly_debts, debts_period, fixed_expense } = values;
-                      let data = {
-                        UserId: String(UserId),
-                        monthly_rent: monthly_rent,
-                        monthly_debts: monthly_debts,
-                        debts_period: debts_period,
-                        other_expense: expense,
-                        total_expense: total_expense,
-                        fixed_expense: Number(monthly_rent) + Number(monthly_debts),
-                      };
-                      dispatch(createExpense(data));
-                      setSubmitting(false);
+                    onSubmit={(values, actions) => {
+                      setTimeout(() => {
+                        const { monthly_rent, monthly_debts, debts_period, fixed_expense } = values;
+                        let data = {
+                          UserId: String(UserId),
+                          monthly_rent: monthly_rent,
+                          monthly_debts: monthly_debts,
+                          debts_period: debts_period,
+                          other_expense: expense,
+                          total_expense: total_expense,
+                          fixed_expense: Number(monthly_rent) + Number(monthly_debts),
+                        };
+                        dispatch(editExpense(data));
+                        navigate('/');
+                        actions.resetForm({
+                          values: {
+                            // the type of `values` inferred to be Blog
+                            monthly_rent: '',
+                            monthly_debts: '',
+                            debts_period: '',
+                            other_expense: '',
+                            total_expense: '',
+                            fixed_expense: '',
+                          },
+                          // you can also set the other form states here
+                        });
+                      }, 500);
                     }}
                   >
                     {({ values, isSubmitting }) => {
@@ -326,10 +344,35 @@ function EditExpenses() {
                             </div>
                             <button
                               type="submit"
-                              className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
-                              disabled={isSubmitting}
+                              className="text-white bg-[#4F46E5] hover:bg-[#433BCB] rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-3.5 focus:outline-none font-extrabold w-full mt-3 shade mb-3 flex items-center justify-center"
                             >
-                              Submit
+                              {isLoading ? (
+                                <>
+                                  <svg
+                                    class="mr-3 h-5 w-5 animate-spin text-white"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                  >
+                                    <circle
+                                      class="opacity-25"
+                                      cx="12"
+                                      cy="12"
+                                      r="10"
+                                      stroke="currentColor"
+                                      stroke-width="4"
+                                    ></circle>
+                                    <path
+                                      class="opacity-75"
+                                      fill="currentColor"
+                                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                  </svg>
+                                  <span class="font-medium"> Loading... </span>
+                                </>
+                              ) : (
+                                <p>Edit</p>
+                              )}
                             </button>
                           </Form>
                           <ExpenseModal

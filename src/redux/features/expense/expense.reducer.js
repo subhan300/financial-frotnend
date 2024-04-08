@@ -20,6 +20,18 @@ export const createExpense = createAsyncThunk('expense/createExpense', async (da
     return thunkAPI.rejectWithValue(error.response);
   }
 });
+export const editExpense = createAsyncThunk('expense/editExpense', async (payload, thunkAPI) => {
+  console.log(payload, 'payload===');
+  const { UserId } = payload;
+  try {
+    let response = await makeRequest(`api/v1/expense/edit-expense/${UserId}`, 'PATCH', payload);
+    if (response) {
+      return response;
+    }
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response);
+  }
+});
 export const deleteExpense = createAsyncThunk('expense/deleteExpense', async (id, thunkAPI) => {
   try {
     let response = await makeRequest(`api/v1/expense/delete-expense/${id}`, 'DELETE', {});

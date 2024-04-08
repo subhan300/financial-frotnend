@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createExpense, deleteExpense, getExpense } from './expense.reducer';
+import { createExpense, deleteExpense, editExpense, getExpense } from './expense.reducer';
 import { toast } from 'react-toastify';
 const initialState = {
   expenses: [],
@@ -56,6 +56,36 @@ export const authSlice = createSlice({
     });
     builder.addCase(createExpense.rejected, (state, action) => {
       console.log('createExpense.rejected', action);
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+      state.error = action.error;
+      toast.error('Someting went wrong', {
+        position: toast.BOTTOM_RIGHT,
+      });
+    });
+    builder.addCase(editExpense.pending, (state) => {
+      console.log('editEx.pending', state);
+      state.isLoading = true;
+      state.isError = false;
+      state.isSuccess = false;
+    });
+    builder.addCase(editExpense.fulfilled, (state, action) => {
+      const updatedExpense = action.payload.data;
+      console.log(action?.payload, 'editExpense.fulfilled');
+      state.isLoading = false;
+      state.isError = false;
+      state.isSuccess = true;
+      const index = state.expenses.findIndex((item) => item?._id === action.payload.data._id);
+      if (index != -1) {
+        state.expenses[index] = updatedExpense;
+      }
+      toast.success('Expense has been updated', {
+        position: toast.BOTTOM_RIGHT,
+      });
+    });
+    builder.addCase(editExpense.rejected, (state, action) => {
+      console.log('editExpense.rejected', action);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;

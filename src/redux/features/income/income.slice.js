@@ -78,6 +78,9 @@ export const authSlice = createSlice({
       if (index != -1) {
         state.incomes[index] = updatedIncome;
       }
+      toast.success('Income has been Updated', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(editIncome.rejected, (state, action) => {
       console.log('editIncome.rejected', action);
@@ -85,6 +88,9 @@ export const authSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
+      toast.error('Something went wrong', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(deleteIncome.fulfilled, (state, action) => {
       console.log(action, 'action');

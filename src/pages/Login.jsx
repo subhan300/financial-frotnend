@@ -9,11 +9,11 @@ function Login() {
   const { isSuccess, isError, isLoading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   useEffect(() => {
-    if (isSuccess) {
-      navigate('/');
-    }
     if (isError) {
       dispatch(clearState());
+    }
+    if (isSuccess) {
+      navigate('/');
     }
   }, [isError, isSuccess]);
   return (

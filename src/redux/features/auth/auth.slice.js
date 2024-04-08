@@ -33,7 +33,7 @@ export const authSlice = createSlice({
       });
     });
     builder.addCase(userlogin.rejected, (state, action) => {
-      const response = JSON.parse(action.payload.request.response);
+      const response = JSON.parse(action?.payload?.request?.response);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
