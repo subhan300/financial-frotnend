@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import Transition from '../utils/Transition';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import { generateRandomId } from '../utils/generateRandomId';
 
 const validationSchema = Yup.object().shape({
   income_name: Yup.string().required('Expense title is required'),
@@ -13,39 +14,28 @@ const validationSchema = Yup.object().shape({
 
 function IncomeModal({ modalOpen, setModalOpen, setIncome, item, editItem }) {
   const [initialValues, setInitialValues] = useState({
-    _id: '',
+    _id: generateRandomId(),
     income_name: '',
     price: '',
   });
-  console.log(editItem, 'editItem');
-  function generateRandomId() {
-    const timestamp = Date.now().toString(36); // Convert current timestamp to base36
-    const randomNumber = Math.random().toString(36).substr(2, 5); // Generate a random number and take a substring
-    return timestamp + randomNumber; // Concatenate timestamp and random number
-  }
-  console.log(editItem, 'editItem');
   const handleSubmit = (values, { setSubmitting }) => {
     if (editItem) {
       // If editing an existing item, update it in the array
-      const updatedIncome = [...item];
-      const index = updatedIncome.findIndex((incomeItem) => incomeItem._id === editItem._id);
-      if (index !== -1) {
-        updatedIncome[index] = { ...values, _id: editItem._id };
-        setIncome(updatedIncome);
-      }
+      const updatedIncome = item?.map((incomeItem) =>
+        incomeItem._id === editItem._id ? { ...values, _id: editItem._id } : incomeItem
+      );
+      setIncome(updatedIncome);
     } else {
       // If adding a new item, append it to the array
       const newIncome = {
         _id: generateRandomId(),
-        income_name: values.income_name,
-        price: values.price,
+        income_name: values?.income_name,
+        price: values?.price,
       };
       setIncome((prevIncome) => [...prevIncome, newIncome]);
     }
     setSubmitting(false);
     setModalOpen(false);
-    values.income_name = '';
-    values.price = '';
   };
   const modalContent = useRef(null);
   // close on click outside

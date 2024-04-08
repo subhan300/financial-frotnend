@@ -67,8 +67,6 @@ function ExpenseModal({ modalOpen, setModalOpen, setAddExpense, expense, editIte
   if (!initialValues) {
     return null; // You can return a loading indicator or just null
   }
-  console.log(editItem, 'editItem====');
-  console.log(expense, 'expense');
   return (
     <>
       {/* Modal backdrop */}

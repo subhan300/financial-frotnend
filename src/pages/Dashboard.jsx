@@ -68,9 +68,9 @@ function Dashboard() {
                 monthly_saving={goal.length > 0 ? goal[0]?.monthly_saving || 0 : 0}
                 fixed_expense={expenses.length > 0 ? expenses[0]?.total_expense || 0 : 0}
                 money_toused={
-                  (goal?.[0]?.monthly_saving !== undefined ? goal[0].monthly_saving : 0) -
-                  (incomes?.[0]?.total_income !== undefined ? incomes[0].total_income : 0) -
-                  (expenses?.[0]?.total_expense !== undefined ? expenses[0].total_expense : 0)
+                  (goal?.[0]?.monthly_saving ?? 0) -
+                  (incomes?.[0]?.total_income ?? 0) -
+                  (expenses?.[0]?.total_expense ?? 0)
                 }
                 title="Actual Transactions"
               />

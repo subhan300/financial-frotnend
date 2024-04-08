@@ -40,7 +40,7 @@ function Income() {
     return () => {
       clearSuccess();
     };
-  }, [isError, isSuccess]);
+  }, [isError]);
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -90,7 +90,7 @@ function Income() {
                   initialValues={{
                     monthly_income: '',
                     date: '',
-                    extra_income: income,
+                    extra_income: '',
                   }}
                   validationSchema={validationSchema}
                   onSubmit={(values, actions) => {
@@ -103,18 +103,14 @@ function Income() {
                         total_income: totalIncome,
                         extra_income: incomeWithoutId,
                       };
-
                       dispatch(createIncome(data));
-
                       navigation('/');
                       actions.resetForm({
                         values: {
-                          // the type of `values` inferred to be Blog
                           monthly_income: '',
                           date: '',
-                          extra_income: {},
+                          extra_income: '',
                         },
-                        // you can also set the other form states here
                       });
                       dispatch(clearSuccess());
                     }, 500);
@@ -317,7 +313,6 @@ function Income() {
                           </button>
                         </Form>
                         <IncomeModal
-                          editItem={editItem}
                           income={income}
                           setIncome={setIncome}
                           modalOpen={expenseModalOpen}
