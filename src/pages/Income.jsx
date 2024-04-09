@@ -37,10 +37,13 @@ function Income() {
     if (isError) {
       clearState();
     }
+    if (isSuccess) {
+      navigate('/');
+    }
     return () => {
       clearSuccess();
     };
-  }, [isError]);
+  }, [isError, isSuccess]);
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -104,7 +107,6 @@ function Income() {
                         extra_income: incomeWithoutId,
                       };
                       dispatch(createIncome(data));
-                      navigation('/');
                       actions.resetForm({
                         values: {
                           monthly_income: '',

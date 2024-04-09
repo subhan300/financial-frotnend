@@ -10,12 +10,16 @@ function Register() {
   const dispatch = useDispatch();
   useEffect(() => {
     if (isSuccess) {
-      dispatch(clearSuccess());
+      navigate('/emailverification');
     }
     if (isError) {
       dispatch(clearState());
     }
+    return () => {
+      dispatch(clearSuccess());
+    };
   }, [isError, isSuccess]);
+  console.log(isSuccess, 'isSuccess');
   return (
     <Formik
       initialValues={{ username: '', email: '', password: '' }}
@@ -44,7 +48,6 @@ function Register() {
               password: '',
             },
           });
-          navigate('/emailverification');
           dispatch(clearSuccess());
         }, 500);
       }}

@@ -39,10 +39,9 @@ function DropdownProfile({ align }) {
   const handleSignout = () => {
     setDropdownOpen(!dropdownOpen);
     localStorage.removeItem('persist:root');
-    dispatch(clearState());
-    dispatch(logout());
-    dispatch(clearSuccess());
     localStorage.clear();
+    dispatch(clearState());
+    dispatch(clearSuccess());
     navigate('/login');
   };
   return (

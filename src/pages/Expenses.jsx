@@ -40,10 +40,13 @@ function Expenses() {
     if (isError) {
       dispatch(clearState());
     }
+    if (isSuccess) {
+      navigate('/');
+    }
     return () => {
       clearSuccess();
     };
-  }, [isError]);
+  }, [isError, isSuccess]);
   console.log(expense, 'Expense');
   return (
     <div className="flex h-screen overflow-hidden">
@@ -113,7 +116,6 @@ function Expenses() {
                         //fixed_expense: Number(monthly_rent) + Number(monthly_debts),
                       };
                       dispatch(createExpense(data));
-                      navigate('/');
                       actions.resetForm({
                         values: {
                           // the type of `values` inferred to be Blog

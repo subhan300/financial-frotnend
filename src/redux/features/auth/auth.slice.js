@@ -13,8 +13,11 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     clearState: () => initialState,
-    clearSuccess: () => {
-      initialState.isSuccess = false;
+    clearSuccess: (state) => {
+      return {
+        ...state,
+        isSuccess: false,
+      };
     },
   },
   extraReducers: (builder) => {
@@ -52,6 +55,7 @@ export const authSlice = createSlice({
       console.log('userRegister.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
+      state.isSuccess = true;
     });
     builder.addCase(userRegister.rejected, (state, action) => {
       console.log('userRegister.rejected', action);
@@ -59,6 +63,9 @@ export const authSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
+      toast.error(action.payload.data.message, {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
   },
 });

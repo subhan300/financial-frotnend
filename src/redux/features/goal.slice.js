@@ -12,8 +12,11 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     clearState: () => initialState,
-    clearSuccess: () => {
-      initialState.isSuccess = false;
+    clearSuccess: (state) => {
+      return {
+        ...state,
+        isSuccess: false,
+      };
     },
   },
   extraReducers: (builder) => {

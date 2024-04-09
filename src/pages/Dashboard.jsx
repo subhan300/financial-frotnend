@@ -33,10 +33,25 @@ function Dashboard() {
   const { expenses } = useSelector((state) => state.expense);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
-    dispatch(getIncome(String(UserId)));
-    dispatch(getExpense(String(UserId)));
-    dispatch(getGoal(String(UserId)));
-  }, [dispatch]);
+    const fetchData = async () => {
+      try {
+        if (UserId) {
+          await Promise.all([
+            dispatch(getIncome(String(UserId))),
+            dispatch(getExpense(String(UserId))),
+            dispatch(getGoal(String(UserId))),
+          ]);
+        }
+      } catch (error) {
+        // Handle errors if any of the dispatches fail
+        console.error('Error fetching data:', error);
+      }
+    };
+    // Call fetchData function
+    fetchData();
+    // Since we have no dependencies, pass an empty dependency array to run this effect only once
+  }, []);
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}

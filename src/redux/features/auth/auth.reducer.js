@@ -66,7 +66,7 @@ export const resetPassword = createAsyncThunk('/auth/resetPassword', async (data
 });
 export const logout = createAsyncThunk('/auth/logout', async (thunkAPI) => {
   try {
-    let response = await makeRequest(`/api/v1/users/logout`, 'POST', {}, null);
+    let response = await makeRequest(`/api/v1/users/logout`, 'POST', {});
     if (response) {
       console.log(response, 'RESOPONSE============>');
       return response;

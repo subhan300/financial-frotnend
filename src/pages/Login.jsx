@@ -15,6 +15,9 @@ function Login() {
     if (isSuccess) {
       navigate('/');
     }
+    return () => {
+      dispatch(clearSuccess());
+    };
   }, [isError, isSuccess]);
   return (
     <Formik
@@ -31,7 +34,7 @@ function Login() {
         }
         return errors;
       }}
-      onSubmit={(values, { setSubmitting }) => {
+      onSubmit={(values) => {
         dispatch(userlogin(values));
       }}
     >
