@@ -82,9 +82,9 @@ function Goals() {
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="M12 5v14m-6-7h12"
                       ></path>
                       <circle cx="6" cy="12" r="2" fill="currentColor"></circle>

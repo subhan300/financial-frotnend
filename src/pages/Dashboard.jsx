@@ -57,7 +57,7 @@ function Dashboard() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
               {/* Income Card */}
-              <FinancialCard
+              {/* <FinancialCard
                 monthly_saving={goal.length > 0 ? goal[0].monthly_saving || 0 : 0}
                 fixed_expense={incomes?.[0]?.total_income ? incomes[0].total_income : 0}
                 money_toused={
@@ -66,10 +66,10 @@ function Dashboard() {
                   (expenses?.[0]?.total_expense ?? 0)
                 }
                 title="Monthly Planing"
-              />
+              /> */}
 
               {/* Expense Card */}
-              <FinancialCard
+              {/* <FinancialCard
                 monthly_saving={goal?.length > 0 ? goal?.[0]?.monthly_saving || 0 : 0}
                 fixed_expense={expenses?.length > 0 ? expenses?.[0]?.total_expense || 0 : 0}
                 money_toused={
@@ -78,7 +78,7 @@ function Dashboard() {
                   (expenses?.[0]?.total_expense ?? 0)
                 }
                 title="Actual Transactions"
-              />
+              /> */}
               {/* Card (Income/Expenses) */}
               <FinanceGrid />
               <ExpenseGrid />

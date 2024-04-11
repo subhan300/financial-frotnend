@@ -72,9 +72,9 @@ function Expenses() {
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="2"
                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
                       ></path>
                     </svg>
@@ -210,9 +210,9 @@ function Expenses() {
                               >
                                 <path
                                   stroke="currentColor"
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
                                   d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
                                 />
                               </svg>
@@ -332,7 +332,7 @@ function Expenses() {
                                     cy="12"
                                     r="10"
                                     stroke="currentColor"
-                                    stroke-width="4"
+                                    strokeWidth="4"
                                   ></circle>
                                   <path
                                     class="opacity-75"
