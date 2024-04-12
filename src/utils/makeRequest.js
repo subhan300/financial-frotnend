@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getUserToken } from './Utils';
 
 const apiClient = axios.create({
-  baseURL: 'https://financial-frotnend.vercel.app', // Base API URL
+  baseURL: 'https://financial-management-backend-one.vercel.app/', // Base API URL
   headers: {
     'Content-Type': 'application/json',
   },
