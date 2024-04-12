@@ -22,9 +22,9 @@ export const createExpense = createAsyncThunk('expense/createExpense', async (da
 });
 export const editExpense = createAsyncThunk('expense/editExpense', async (payload, thunkAPI) => {
   console.log(payload, 'payload===');
-  const { UserId } = payload;
+  const { UserId, data } = payload;
   try {
-    let response = await makeRequest(`api/v1/expense/edit-expense/${UserId}`, 'PATCH', payload);
+    let response = await makeRequest(`api/v1/expense/edit-expense/${UserId}`, 'PATCH', data);
     if (response) {
       return response;
     }

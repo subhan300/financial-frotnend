@@ -57,7 +57,6 @@ function EditExpenses() {
       clearSuccess();
     };
   }, [isError]);
-  console.log(isSuccess, 'isSuccess');
   return (
     <>
       <div className="flex h-screen overflow-hidden">
@@ -115,21 +114,25 @@ function EditExpenses() {
                     validationSchema={validationSchema}
                     onSubmit={(values, actions) => {
                       setTimeout(() => {
-                        const { monthly_rent, monthly_debts, debts_period, fixed_expense } = values;
+                        const { monthly_rent, monthly_debts, debts_period, other_expense } = values;
+
+                        // Remove _id field from other_expense array
+                        const expenseWithoutId = other_expense.map((expense) => {
+                          const { _id, ...rest } = expense;
+                          return rest;
+                        });
                         let data = {
-                          UserId: String(UserId),
                           monthly_rent: monthly_rent,
                           monthly_debts: monthly_debts,
                           debts_period: debts_period,
-                          other_expense: expense,
-                          total_expense: total_expense,
+                          other_expense: expenseWithoutId,
+                          total_expense: total_expense, // Assuming total_expense is defined elsewhere
                           fixed_expense: Number(monthly_rent) + Number(monthly_debts),
                         };
-                        dispatch(editExpense(data));
+                        dispatch(editExpense({ UserId, data }));
                         navigate('/');
                         actions.resetForm({
                           values: {
-                            // the type of `values` inferred to be Blog
                             monthly_rent: '',
                             monthly_debts: '',
                             debts_period: '',
@@ -148,6 +151,7 @@ function EditExpenses() {
                           Number(values.monthly_debts) +
                           Number(totalPrice)
                       );
+                      console.log(values, 'Edit expense');
                       return (
                         <>
                           <Form className="mt-5">
@@ -376,7 +380,7 @@ function EditExpenses() {
                             </button>
                           </Form>
                           <ExpenseModal
-                            item={expense}
+                            expense={expense}
                             setAddExpense={setAddExpense}
                             modalOpen={expenseModalOpen}
                             setModalOpen={setExpenseModalOpen}
