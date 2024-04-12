@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getUserToken } from './Utils';
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:8000', // Base API URL
+  baseURL: 'https://financial-frotnend.vercel.app', // Base API URL
   headers: {
     'Content-Type': 'application/json',
   },
