@@ -23,6 +23,7 @@ export const createIncome = createAsyncThunk('income/createIncome', async (data,
 });
 export const editIncome = createAsyncThunk('income/editIncome', async (payload, thunkAPI) => {
   const { UserId, data } = payload;
+  console.log(payload, 'payload');
   try {
     let response = await makeRequest(`api/v1/income/edit-income/${UserId}`, 'PATCH', data);
     if (response) {

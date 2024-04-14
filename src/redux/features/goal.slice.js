@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { createGoal, getGoal } from './goal.reducer';
+import { toast } from 'react-toastify';
+import { createGoal, deleteGoal, getGoal } from './goal.reducer';
 const initialState = {
   goal: [],
   isLoading: false,
@@ -51,6 +52,9 @@ export const authSlice = createSlice({
       state.isLoading = false;
       state.isError = false;
       state.goal.unshift(action?.payload?.data);
+      toast.success('Goal has been created', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
     builder.addCase(createGoal.rejected, (state, action) => {
       console.log('createGoal.rejected', action);
@@ -58,6 +62,15 @@ export const authSlice = createSlice({
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
+    });
+    builder.addCase(deleteGoal.fulfilled, (state, action) => {
+      console.log('deleteGoal.fulfilled', action);
+      state.isLoading = false;
+      state.isError = false;
+      state.goal = state.goal.filter((item) => item?._id !== action.meta.arg);
+      toast.success('Goal has been deleted', {
+        position: toast.BOTTOM_RIGHT,
+      });
     });
   },
 });

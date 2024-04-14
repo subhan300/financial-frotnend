@@ -109,8 +109,8 @@ function BarChart01({
               ul.firstChild.remove();
             }
             // Reuse the built-in legendItems generator
-            const items = c?.options?.plugins?.legend?.labels?.generateLabels(c);
-            items?.forEach((item) => {
+            const items = c.options.plugins.legend.labels.generateLabels(c);
+            items.forEach((item) => {
               const li = document.createElement('li');
               li.style.marginRight = tailwindConfig().theme.margin[4];
               // Button element

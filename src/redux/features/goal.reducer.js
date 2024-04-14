@@ -22,3 +22,15 @@ export const getGoal = createAsyncThunk('goal/getGoal', async (UserId, thunkAPI)
     return thunkAPI.rejectWithValue(error.response);
   }
 });
+
+export const deleteGoal = createAsyncThunk('goal/deleteGoal', async (id, thunkAPI) => {
+  console.log(id, 'id');
+  try {
+    let response = await makeRequest(`api/v1/goal/delete-goal/${id}`, 'DELETE', {});
+    if (response) {
+      return response;
+    }
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response);
+  }
+});

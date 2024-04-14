@@ -4,40 +4,34 @@ import { deleteExpense } from '../../redux/features/expense/expense.reducer';
 import ConfirmModal from '../../components/ConfirmModal';
 import ExtraExpenseModal from '../../components/ExtraExpenseModal';
 import { useNavigate } from 'react-router-dom';
-function ExpenseGrid() {
+import { deleteGoal } from '../../redux/features/goal.reducer';
+function GoalGrid() {
   const navigate = useNavigate();
   const [modalOpen, setModalOpen] = useState(false);
   const [extraIncomeModalOpen, setExtraIncomeModalOpen] = useState(false);
 
-  const { expenses } = useSelector((state) => state.expense);
+  const { goal } = useSelector((state) => state.goal);
   return (
     <>
       <div className="col-span-full bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">
         <header className="px-5 py-4 border-b border-slate-100 dark:border-slate-700">
-          <h2 className="font-semibold text-slate-800 dark:text-slate-100">Expense</h2>
+          <h2 className="font-semibold text-slate-800 dark:text-slate-100">Your Goal</h2>
         </header>
         <div className="p-3">
           {/* Card content */}
           {/* "Today" group */}
           <div>
             <header className="text-xs uppercase text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-700 dark:bg-opacity-50 rounded-sm font-semibold p-2 flex items-center">
-              <div className="w-full">Monthly Rent</div>
-              <div className="w-full">Monthly Debts</div>
-
-              <div className="w-full cursor-pointer" onClick={() => setExtraIncomeModalOpen(true)}>
-                Extra Expense ...
-              </div>
+              <div className="w-full">Name</div>
+              <div className="w-full">Percentage</div>
+              <div className="w-full">Total Month</div>
+              <div className="w-full cursor-pointer">Monthly Saving</div>
               <div className="w-full">Price</div>
-              <ExtraExpenseModal
-                modalOpen={extraIncomeModalOpen}
-                setModalOpen={setExtraIncomeModalOpen}
-                value={expenses}
-              />
             </header>
             <ul className="my-1">
               {/* Item */}
-              {expenses?.length > 0 ? (
-                expenses.map((item, index) => (
+              {goal?.length > 0 ? (
+                goal.map((item, index) => (
                   <ul>
                     <li key={index} className="flex px-2">
                       <div className="w-9 h-9 rounded-full shrink-0 bg-rose-500 my-2 mr-3">
@@ -52,7 +46,7 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {`$${item?.monthly_rent}`}
+                              {`${item?.name}`}
                             </a>
                           </div>
                           <div>
@@ -60,7 +54,15 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {item?.monthly_rent}
+                              {item?.percentage}
+                            </a>
+                          </div>
+                          <div>
+                            <a
+                              className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
+                              href="#0"
+                            >
+                              {item?.timeto_take}
                             </a>
                           </div>
                           <div>
@@ -68,7 +70,7 @@ function ExpenseGrid() {
                               className="text-center font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {`${item?.other_expense[0]?.expense_name}`}
+                              ${item?.monthly_saving}
                             </a>
                           </div>
                           <div>
@@ -76,7 +78,7 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {`${item?.other_expense[0]?.price}`}
+                              ${item?.price}
                             </a>
                           </div>
                           <div className="flex items-center ml-2">
@@ -120,8 +122,8 @@ function ExpenseGrid() {
                             <ConfirmModal
                               modalOpen={modalOpen}
                               setModalOpen={setModalOpen}
-                              value={expenses[0]._id}
-                              valueType={'expense'}
+                              value={goal[0]._id}
+                              valueType={'goal'}
                             />
                           </div>
                         </div>
@@ -140,4 +142,4 @@ function ExpenseGrid() {
   );
 }
 
-export default ExpenseGrid;
+export default GoalGrid;

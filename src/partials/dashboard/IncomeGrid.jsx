@@ -12,10 +12,6 @@ function FinanceGrid() {
 
   const navigation = useNavigate();
   const { incomes } = useSelector((state) => state.income);
-  const dispatch = useDispatch();
-  const handleDeleteIncome = (id) => {
-    dispatch(deleteIncome(id));
-  };
   console.log(incomes, 'incomes');
   return (
     <div className="col-span-full bg-white dark:bg-slate-800 shadow-lg rounded-sm border border-slate-200 dark:border-slate-700">

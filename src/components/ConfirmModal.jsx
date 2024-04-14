@@ -3,6 +3,7 @@ import Transition from '../utils/Transition';
 import { deleteExpense } from '../redux/features/expense/expense.reducer';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteIncome } from '../redux/features/income/income.reducer';
+import { deleteGoal } from '../redux/features/goal.reducer';
 
 function ConfirmModal({ modalOpen, setModalOpen, value, valueType }) {
   const modalContent = useRef(null);
@@ -22,8 +23,12 @@ function ConfirmModal({ modalOpen, setModalOpen, value, valueType }) {
     if (valueType === 'expense') {
       dispatch(deleteExpense(id));
       setModalOpen(false);
-    } else {
+    } else if (valueType === 'income') {
       dispatch(deleteIncome(id));
+      setModalOpen(false);
+    } else {
+      console.log(id, 'valueType === income');
+      dispatch(deleteGoal(id));
       setModalOpen(false);
     }
   };

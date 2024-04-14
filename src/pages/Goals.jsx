@@ -93,7 +93,9 @@ function Goals() {
 
                   <div class="flex flex-col flex-grow ml-4">
                     <div class="font-bold text-lg mt-2">
-                      <span id="yearly-cost-result">{`It will take ${monthsToGoal} month to reach your goal`}</span>
+                      <span id="yearly-cost-result">{`It will take ${
+                        monthsToGoal !== undefined ? monthsToGoal : 0
+                      } month to reach your goal`}</span>
                     </div>
                   </div>
                 </div>

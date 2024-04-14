@@ -12,12 +12,8 @@ function FinancialCard(props) {
     labels: ['Saving', 'Fixed Expenses', 'Money to used'],
     datasets: [
       {
-        labels: 'Top Countries',
-        data: [
-          Number(props.monthly_saving),
-          Number(props?.fixed_expense),
-          Number(props?.money_toused),
-        ],
+        label: '$',
+        data: [props?.monthly_saving, props?.fixed_expense, props?.money_toused],
         backgroundColor: [
           tailwindConfig().theme.colors.indigo[500],
           tailwindConfig().theme.colors.blue[400],
