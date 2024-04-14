@@ -40,13 +40,11 @@ function Expenses() {
     if (isError) {
       dispatch(clearState());
     }
-    if (isSuccess) {
-      navigate('/');
-    }
+
     return () => {
       clearSuccess();
     };
-  }, [isError, isSuccess]);
+  }, [isError]);
   console.log(expense, 'Expense');
   return (
     <div className="flex h-screen overflow-hidden">

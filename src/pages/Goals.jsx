@@ -37,13 +37,13 @@ function Goals() {
     // setMonthlySaving(totalMonthlySavings);
     // Check if savings percentage is valid (0 to 100)
     if (savingsPercentage < 0 || savingsPercentage > 100) {
-      console.log('Invalid savings percentage. Must be between 0 and 100.');
+      setErrorMessage('Invalid savings percentage. Must be between 0 and 100.');
     } else if (totalMonthlySavings > monthlyIncome) {
-      console.log('Monthly savings exceed monthly income. Please review your finances.');
+      setErrorMessage('Monthly savings exceed monthly income. Please review your finances.');
     } else if (totalMonthlySavings > 1.3 * monthlyIncome) {
-      console.log('Monthly savings exceed monthly income by 30%. Please review your finances.');
+      setErrorMessage('Monthly savings exceed monthly income by 30%. Please review your finances.');
     } else {
-      console.log('');
+      setErrorMessage('');
       // Calculate total savings needed
       const totalSavingsNeeded = carPrice;
       // Calculate months needed
@@ -57,7 +57,6 @@ function Goals() {
     dispatch(getIncome(UserId));
     dispatch(getExpense(UserId));
   }, []);
-  console.log(incomes, 'incomes=====');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -123,7 +122,6 @@ function Goals() {
                   }}
                 >
                   {({ values }) => {
-                    console.log(values, 'values');
                     const monthsToGoal = calculateMonthsToGoal(
                       Number(incomes[0]?.total_income),
                       Number(expenses[0]?.total_expense),
@@ -131,6 +129,7 @@ function Goals() {
                       values?.percentage
                     );
                     setMonthsToGoal(monthsToGoal);
+                    console.log(monthsToGoal);
                     return (
                       <>
                         <Form className="mt-5">

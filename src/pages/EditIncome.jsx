@@ -38,7 +38,7 @@ function EditIncome() {
   let totalPrice = income?.reduce(totalPriceReducer, 0);
   useEffect(() => {
     const res = incomes?.filter((item) => item?._id === router.id);
-    setInitialValues(res);
+    res && setInitialValues(res);
     setIncome(res[0]?.extra_income);
     console.log(res, 'res');
   }, [router.id]);
@@ -47,7 +47,6 @@ function EditIncome() {
       dispatch(clearState());
     }
   }, [isError]);
-  console.log(Number(totalPrice), 'totalPrice====');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -96,20 +95,21 @@ function EditIncome() {
                   enableReinitialize
                   initialValues={{
                     monthly_income: initialValues[0]?.monthly_income,
-                    date: moment(initialValues[0]?.date).format('YYYY-DD-MM'),
+                    date: initialValues[0]?.date,
                     extra_income: income,
                     total_income: initialValues[0]?.total_income,
                   }}
                   validationSchema={validationSchema}
                   onSubmit={(values, actions) => {
+                    let incomeWithoutId = values?.extra_income.map(({ _id, ...rest }) => rest);
                     setTimeout(() => {
                       let data = {
                         monthly_income: values.monthly_income,
                         date: values?.date,
                         total_income: totalIncome,
-                        extra_income: values?.extra_income,
+                        extra_income: incomeWithoutId,
                       };
-                      console.log(values, 'values');
+
                       dispatch(editIncome({ UserId, data }));
                       actions.resetForm({
                         values: {
@@ -159,6 +159,7 @@ function EditIncome() {
                             <Field
                               type="date"
                               name="date"
+                              value={moment(values.date).format('YYYY-MM-DD')} // Set the value prop
                               className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
                             />
                             <ErrorMessage
