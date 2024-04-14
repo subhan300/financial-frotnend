@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Formik, Form, ErrorMessage } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
@@ -6,20 +6,22 @@ import { userRegister, userlogin } from '../redux/features/auth/auth.reducer';
 import { clearState, clearSuccess } from '../redux/features/auth/auth.slice';
 function Register() {
   const navigate = useNavigate();
+  const [email, setEmail] = useState('');
   const { isSuccess, isError, isLoading } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   useEffect(() => {
     if (isSuccess) {
-      navigate('/emailverification');
+      navigate(`/emailverification`);
     }
     if (isError) {
       dispatch(clearState());
+      dispatch(clearSuccess());
     }
     return () => {
       dispatch(clearSuccess());
     };
   }, [isError, isSuccess]);
-  console.log(isSuccess, 'isSuccess');
+  console.log(email, 'email');
   return (
     <Formik
       initialValues={{ username: '', email: '', password: '' }}
@@ -53,7 +55,7 @@ function Register() {
       }}
     >
       {({ values, touched, errors, isSubmitting, handleBlur, handleChange }) => {
-        console.log(values, 'valuesss');
+        setEmail(values.email);
         return (
           <Form>
             <div className="h-screen px-2 overflow-hidden w-full bg-[#FAFBFC] relative flex justify-center items-center">

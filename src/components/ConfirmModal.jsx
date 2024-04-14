@@ -18,7 +18,6 @@ function ConfirmModal({ modalOpen, setModalOpen, value, valueType }) {
   //   });
 
   const dispatch = useDispatch();
-
   const handleDeleteExpense = (id) => {
     if (valueType === 'expense') {
       dispatch(deleteExpense(id));
@@ -32,7 +31,6 @@ function ConfirmModal({ modalOpen, setModalOpen, value, valueType }) {
       setModalOpen(false);
     }
   };
-
   return (
     <>
       {/* Modal backdrop */}

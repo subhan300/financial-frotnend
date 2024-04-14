@@ -99,8 +99,17 @@ export const authSlice = createSlice({
       console.log(action, 'action');
       state.isLoading = false;
       state.isError = false;
-      state.expenses = state.expenses.filter((item) => item?._id !== action.meta.arg);
+      state.incomes = state.expenses.filter((item) => item?._id !== action.meta.arg);
       toast.success('Income has been deleted', {
+        position: toast.BOTTOM_RIGHT,
+      });
+    });
+    builder.addCase(deleteIncome.rejected, (state, action) => {
+      console.log(action, 'action');
+      state.isLoading = false;
+      state.isError = false;
+      state.isError = true;
+      toast.success('Something went wrong', {
         position: toast.BOTTOM_RIGHT,
       });
     });
