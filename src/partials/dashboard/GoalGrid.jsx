@@ -54,7 +54,7 @@ function GoalGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {item?.percentage}
+                              {`%${item?.percentage}`}
                             </a>
                           </div>
                           <div>
@@ -85,7 +85,7 @@ function GoalGrid() {
                             <span className="font-medium text-emerald-500"></span>
                             <svg
                               onClick={() => {
-                                navigate(`expenses/${item._id}`);
+                                navigate(`goal/${item._id}`);
                               }}
                               className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
                               aria-hidden="true"

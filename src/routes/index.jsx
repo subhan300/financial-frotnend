@@ -18,6 +18,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import ForgetPassword from '../pages/ForgetPassword';
 import EditIncome from '../pages/EditIncome';
 import EditExpenses from '../pages/EditExpense';
+import EditGoal from '../pages/EditGoal';
 
 const AppRoutes = () => {
   const { auth } = useSelector((state) => state.auth);
@@ -70,6 +71,14 @@ const AppRoutes = () => {
           element={
             <ProtectedRoute>
               <EditIncome />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/goal/:id"
+          element={
+            <ProtectedRoute>
+              <EditGoal />
             </ProtectedRoute>
           }
         />

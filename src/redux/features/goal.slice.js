@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
-import { createGoal, deleteGoal, getGoal } from './goal.reducer';
+import { createGoal, deleteGoal, editGoal, getGoal } from './goal.reducer';
 const initialState = {
   goal: [],
   isLoading: false,
@@ -8,7 +8,7 @@ const initialState = {
   isError: false,
   error: null,
 };
-export const authSlice = createSlice({
+export const goalSlice = createSlice({
   name: 'goal',
   initialState,
   reducers: {
@@ -63,6 +63,35 @@ export const authSlice = createSlice({
       state.isSuccess = false;
       state.error = action.error;
     });
+    builder.addCase(editGoal.pending, (state) => {
+      console.log('editGoal.pending', state);
+      state.isLoading = true;
+      state.isError = false;
+      state.isSuccess = false;
+    });
+    builder.addCase(editGoal.fulfilled, (state, action) => {
+      console.log('editGoal.fulfilled', action);
+      state.isLoading = false;
+      state.isError = false;
+      state.isSuccess = true;
+      const index = state.goal.findIndex((item) => item?._id === action.meta.arg);
+      if (index != -1) {
+        state.goal[index] = updatedIncome;
+      }
+      toast.success('Goal has been updated', {
+        position: toast.BOTTOM_RIGHT,
+      });
+    });
+    builder.addCase(editGoal.rejected, (state, action) => {
+      console.log('editGoal.rejected', action);
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+      state.error = action.error;
+      toast.error('Something went wrong', {
+        position: toast.BOTTOM_RIGHT,
+      });
+    });
     builder.addCase(deleteGoal.fulfilled, (state, action) => {
       console.log('deleteGoal.fulfilled', action);
       state.isLoading = false;
@@ -74,5 +103,5 @@ export const authSlice = createSlice({
     });
   },
 });
-export const { clearState, clearSuccess } = authSlice.actions;
-export default authSlice.reducer;
+export const { clearState, clearSuccess } = goalSlice.actions;
+export default goalSlice.reducer;

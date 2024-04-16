@@ -8,7 +8,7 @@ const initialState = {
   isError: false,
   error: null,
 };
-export const authSlice = createSlice({
+export const incomeSlice = createSlice({
   name: 'income',
   initialState,
   reducers: {
@@ -96,7 +96,7 @@ export const authSlice = createSlice({
       });
     });
     builder.addCase(deleteIncome.fulfilled, (state, action) => {
-      console.log(action, 'action');
+      console.log(action, 'deleteIncome.fulfilled');
       state.isLoading = false;
       state.isError = false;
       state.incomes = state.expenses.filter((item) => item?._id !== action.meta.arg);
@@ -115,5 +115,5 @@ export const authSlice = createSlice({
     });
   },
 });
-export const { clearState, clearSuccess } = authSlice.actions;
-export default authSlice.reducer;
+export const { clearState, clearSuccess } = incomeSlice.actions;
+export default incomeSlice.reducer;

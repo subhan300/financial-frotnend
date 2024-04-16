@@ -8,7 +8,7 @@ const initialState = {
   isError: false,
   error: null,
 };
-export const authSlice = createSlice({
+export const expenseSlice = createSlice({
   name: 'expense',
   initialState,
   reducers: {
@@ -107,5 +107,5 @@ export const authSlice = createSlice({
     });
   },
 });
-export const { clearState, clearSuccess } = authSlice.actions;
-export default authSlice.reducer;
+export const { clearState, clearSuccess } = expenseSlice.actions;
+export default expenseSlice.reducer;

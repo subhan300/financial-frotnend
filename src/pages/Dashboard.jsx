@@ -34,10 +34,14 @@ function Dashboard() {
   const { expenses } = useSelector((state) => state.expense);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
-    dispatch(getIncome(String(userId)));
-    dispatch(getExpense(String(userId)));
-    dispatch(getGoal(String(userId)));
-  }, [dispatch]);
+    Promise.all([
+      dispatch(getIncome(userId)),
+      dispatch(getExpense(userId)),
+      dispatch(getGoal(userId)),
+    ]).catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  }, [dispatch, userId]);
   console.log(expenses[0]?.total_expense, 'expenses===');
   return (
     <div className="flex h-screen overflow-hidden">
