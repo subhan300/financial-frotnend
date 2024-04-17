@@ -5,8 +5,8 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 // Import pages
 import AppRoutes from './routes/index';
-
 function App() {
+
   useEffect(() => {
     document.querySelector('html').style.scrollBehavior = 'auto';
     window.scroll({ top: 0 });
