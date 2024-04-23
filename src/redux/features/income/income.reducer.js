@@ -11,6 +11,17 @@ export const getIncome = createAsyncThunk('income/getIncome', async (UserId, thu
     return thunkAPI.rejectWithValue(error.response);
   }
 });
+export const getIncomeLastDate = createAsyncThunk('income/getLastDate', async (UserId, thunkAPI) => {
+  try {
+    let response = await makeRequest(`api/v1/income/getLastDate?userId=${UserId}`, 'GET', {});
+    if (response) {
+      console.log(response, 'response=====');
+      return response;
+    }
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response);
+  }
+});
 export const createIncome = createAsyncThunk('income/createIncome', async (data, thunkAPI) => {
   try {
     let response = await makeRequest(`api/v1/income/add-income/`, 'POST', data);

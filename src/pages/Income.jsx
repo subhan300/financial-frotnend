@@ -11,6 +11,8 @@ import { getUserId } from '../utils/Utils';
 import { useNavigate } from 'react-router-dom';
 import { clearState, clearSuccess } from '../redux/features/income/income.slice';
 import { useEffect } from 'react';
+import FormDisableComponent from '../components/FormDisableComponent';
+import dayjs from 'dayjs';
 
 const validationSchema = Yup.object().shape({
   monthly_income: Yup.number()
@@ -20,8 +22,8 @@ const validationSchema = Yup.object().shape({
 });
 
 function Income() {
-  const navigation = useNavigate();
-  const { isLoading, isSuccess, isError } = useSelector((state) => state.income);
+  const navigate = useNavigate();
+  const { isLoading, isSuccess, isError,incomeLastDate } = useSelector((state) => state.income);
   const userId = getUserId();
   const dispatch = useDispatch();
   const [totalIncome, setTotalIncome] = useState(0);
@@ -34,8 +36,9 @@ function Income() {
   // Calculate the total price using the reducer
   let totalPrice = income.reduce(totalPriceReducer, 0);
   useEffect(() => {
-    if (isError) {
+    if (isSuccess) {
       clearState();
+      setIncome([])
     }
     if (isSuccess) {
       navigate('/');
@@ -44,8 +47,15 @@ function Income() {
       clearSuccess();
     };
   }, [isError, isSuccess]);
-  return (
-    <div className="flex h-screen overflow-hidden">
+  const disable=false
+  console.log("isloading",isLoading,"SUBESS",isSuccess)
+  useEffect(()=>{
+     const res=dayjs(incomeLastDate?.date).add(1,'month')
+     console.log("res",res)
+  },[
+
+  ])
+   {return disable?<FormDisableComponent />:<div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -90,15 +100,17 @@ function Income() {
                 </h1>
                 <Formik
                   enableReinitialize
+                
                   initialValues={{
                     monthly_income: '',
                     date: '',
                     extra_income: '',
                   }}
                   validationSchema={validationSchema}
-                  onSubmit={(values, actions) => {
+                  onSubmit={async(values, actions) => {
+                    
                     let incomeWithoutId = income.map(({ _id, ...rest }) => rest);
-                    setTimeout(() => {
+                   
                       let data = {
                         UserId: String(userId),
                         monthly_income: values.monthly_income,
@@ -106,7 +118,9 @@ function Income() {
                         total_income: totalIncome,
                         extra_income: incomeWithoutId,
                       };
-                      dispatch(createIncome(data));
+                      const res=await dispatch(createIncome(data));
+                      console.log("res",res)
+                      if(res.payload.statusCode){
                       actions.resetForm({
                         values: {
                           monthly_income: '',
@@ -115,15 +129,19 @@ function Income() {
                         },
                       });
                       dispatch(clearSuccess());
-                    }, 500);
+                      setIncome([])
+                    
+                    }else{
+                      console.log("error",res)
+                    }
+                   
                   }}
                 >
                   {({ values, isSubmitting }) => {
-                    console.log(values, 'values');
                     setTotalIncome(Number(values.monthly_income) + Number(totalPrice));
                     return (
                       <>
-                        <Form className="mt-5">
+                        <Form   className="mt-5">
                           <div className="mb-5">
                             <label
                               className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
@@ -134,6 +152,7 @@ function Income() {
                             <Field
                               type="number"
                               name="monthly_income"
+                              
                               className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
                             />
                             <ErrorMessage
@@ -153,6 +172,7 @@ function Income() {
                               type="date"
                               name="date"
                               className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                            
                             />
                             <ErrorMessage
                               name="date"
@@ -330,7 +350,8 @@ function Income() {
         </main>
       </div>
     </div>
-  );
+                }
+  
 }
 
 export default Income;

@@ -1,12 +1,13 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
-import { createIncome, deleteIncome, editIncome, getIncome } from './income.reducer';
+import { createIncome, deleteIncome, editIncome, getIncome, getIncomeLastDate } from './income.reducer';
 const initialState = {
   incomes: [],
   isLoading: false,
   isSuccess: false,
   isError: false,
   error: null,
+  incomeLastDate:""
 };
 export const incomeSlice = createSlice({
   name: 'income',
@@ -34,14 +35,32 @@ export const incomeSlice = createSlice({
       state.isError = false;
       state.incomes = data;
     });
+    builder.addCase(getIncomeLastDate.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+      state.error = action.error;
+    });
+    builder.addCase(getIncomeLastDate.pending, (state) => {
+      state.isLoading = true;
+      state.isError = false;
+      state.isSuccess = false;
+    });
+    builder.addCase(getIncomeLastDate.fulfilled, (state, action) => {
+      const { data } = action?.payload;
+      state.isLoading = false;
+      state.isError = false;
+      state.incomes = data;
+    });
     builder.addCase(getIncome.rejected, (state, action) => {
-      console.log('getIncome.rejected', action);
+      console.log('getIncomeLastDate', action);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
     });
     builder.addCase(createIncome.pending, (state) => {
+      console.log("state",createIncome.pending)
       console.log('createIncome.pending', state);
       state.isLoading = true;
       state.isError = false;
