@@ -1,13 +1,19 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
-import { createIncome, deleteIncome, editIncome, getIncome, getIncomeLastDate } from './income.reducer';
+import {
+  createIncome,
+  deleteIncome,
+  editIncome,
+  getIncome,
+  getIncomeLastDate,
+} from './income.reducer';
 const initialState = {
   incomes: [],
   isLoading: false,
   isSuccess: false,
   isError: false,
   error: null,
-  incomeLastDate:""
+  incomeLastDate: '',
 };
 export const incomeSlice = createSlice({
   name: 'income',
@@ -30,16 +36,9 @@ export const incomeSlice = createSlice({
     });
     builder.addCase(getIncome.fulfilled, (state, action) => {
       console.log('getIncome.fulfilled', action);
-      const { data } = action?.payload;
       state.isLoading = false;
       state.isError = false;
-      state.incomes = data;
-    });
-    builder.addCase(getIncomeLastDate.rejected, (state, action) => {
-      state.isLoading = false;
-      state.isError = true;
-      state.isSuccess = false;
-      state.error = action.error;
+      state.incomes = action?.payload?.data;
     });
     builder.addCase(getIncomeLastDate.pending, (state) => {
       state.isLoading = true;
@@ -50,7 +49,13 @@ export const incomeSlice = createSlice({
       const { data } = action?.payload;
       state.isLoading = false;
       state.isError = false;
-      state.incomes = data;
+      state.incomeLastDate = data;
+    });
+    builder.addCase(getIncomeLastDate.rejected, (state, action) => {
+      state.isLoading = false;
+      state.isError = true;
+      state.isSuccess = false;
+      state.error = action.error;
     });
     builder.addCase(getIncome.rejected, (state, action) => {
       console.log('getIncomeLastDate', action);
@@ -60,7 +65,7 @@ export const incomeSlice = createSlice({
       state.error = action.error;
     });
     builder.addCase(createIncome.pending, (state) => {
-      console.log("state",createIncome.pending)
+      console.log('state', createIncome.pending);
       console.log('createIncome.pending', state);
       state.isLoading = true;
       state.isError = false;
@@ -118,7 +123,7 @@ export const incomeSlice = createSlice({
       console.log(action, 'deleteIncome.fulfilled');
       state.isLoading = false;
       state.isError = false;
-      state.incomes = state.expenses.filter((item) => item?._id !== action.meta.arg);
+      state.incomes = state?.incomes?.filter((item) => item?._id !== action.meta.arg);
       toast.success('Income has been deleted', {
         position: toast.BOTTOM_RIGHT,
       });

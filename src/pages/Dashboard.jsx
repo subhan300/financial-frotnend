@@ -35,14 +35,14 @@ function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
     Promise.all([
+      dispatch(getGoal(userId)),
       dispatch(getIncome(userId)),
       dispatch(getExpense(userId)),
-      dispatch(getGoal(userId)),
     ]).catch((error) => {
       console.error('Error fetching data:', error);
     });
-  }, [dispatch, userId]);
-  console.log(expenses[0]?.total_expense, 'expenses===');
+  }, []);
+  console.log(goal, 'goal====');
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -59,7 +59,7 @@ function Dashboard() {
             <div className="grid grid-cols-12 gap-6">
               {/* Income Card */}
               <FinancialCard
-                monthly_saving={goal.length > 0 ? goal[0].monthly_saving || 0 : 0}
+                monthly_saving={goal && goal.length > 0 ? goal[0].monthly_saving || 0 : 0}
                 fixed_expense={expenses?.[0]?.total_expense ? expenses[0].total_expense : 0}
                 money_toused={
                   (goal?.[0]?.monthly_saving ?? 0) -
@@ -71,7 +71,7 @@ function Dashboard() {
 
               {/* Expense Card */}
               <FinancialCard
-                monthly_saving={goal.length > 0 ? goal[0].monthly_saving || 0 : 0}
+                monthly_saving={goal && goal.length > 0 ? goal[0].monthly_saving || 0 : 0}
                 fixed_expense={expenses?.[0]?.total_expense ? expenses[0].total_expense : 0}
                 money_toused={
                   (goal?.[0]?.monthly_saving ?? 0) -
