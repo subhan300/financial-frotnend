@@ -135,6 +135,8 @@ function EditGoal() {
                       percentage: values.percentage,
                       timeto_take: monthsToGoal,
                       monthly_saving: monthlySaving,
+                      haveNotified:false
+
                     };
                     dispatch(editGoal(data));
                     navigate('/');

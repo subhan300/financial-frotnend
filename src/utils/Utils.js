@@ -63,3 +63,45 @@ export const getUserId = () => {
     return null; // Or throw an appropriate error
   }
 };
+
+export const getLatestItem = (item) => {
+  const maxCreatedItem = item.reduce((prevGoal, currentGoal) => {
+    const prevCreatedAt = new Date(prevGoal.createdAt);
+    const currentCreatedAt = new Date(currentGoal.createdAt);
+    return prevCreatedAt > currentCreatedAt ? prevGoal : currentGoal;
+  }, {});
+  return maxCreatedItem
+};
+export const calculateIsGoalComplete = (goal) => {
+  const maxCreatedAtGoal = getLatestItem(goal)
+  if (goal) {
+    const { goalTracking, percentage, monthly_saving, price } = maxCreatedAtGoal;
+    let totalSavings = 0;
+
+    // Calculate total savings from goal tracking entries
+    goalTracking?.forEach(({ totalIncome, totalExpense }) => {
+      const savings = ((totalIncome - totalExpense) * percentage) / 100;
+      totalSavings += savings;
+    });
+
+    const remainingSavings = price - totalSavings;
+
+    const monthsToGoal = Math.ceil(remainingSavings / monthly_saving);
+  // debugger
+    // console.log('totalSavings:', totalSavings);
+    // console.log('remainingSavings:', remainingSavings);
+    // console.log('monthsToGoal:', monthsToGoal);
+    let status = 'notCompleted';
+    if (monthsToGoal < 1) {
+      status = 'completed';
+    }else if(!monthsToGoal && !remainingSavings ){
+      status="pending"
+    }
+    return {
+      totalSavings,
+      remainingSavings,
+      monthsToGoal,
+      status,
+    };
+  }
+};

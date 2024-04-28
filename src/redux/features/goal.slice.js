@@ -1,18 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 import { createGoal, deleteGoal, editGoal, getGoal } from './goal.reducer';
+import { getLatestItem } from '../../utils/Utils';
 const initialState = {
   goal: [],
   isLoading: false,
   isSuccess: false,
   isError: false,
   error: null,
+  totalSavings:"",
+  remainingSavings:"",
+  monthsToGoal:"",
+  status:'pending',
+  haveNotified:false
 };
 export const goalSlice = createSlice({
   name: 'goal',
   initialState,
   reducers: {
     clearState: () => initialState,
+    goalSet:(state,action)=>{
+      return {...state,...action.payload}},
     clearSuccess: (state) => {
       return {
         ...state,
@@ -29,10 +37,16 @@ export const goalSlice = createSlice({
     });
     builder.addCase(getGoal.fulfilled, (state, action) => {
       console.log('getGoal.fulfilled', action);
+   
+      const item=getLatestItem(action?.payload?.data)
+
       state.isLoading = false;
       state.isError = false;
       state.isSuccess = true;
       state.goal = action?.payload?.data;
+      state.status=item.status,
+      state.haveNotified=item.haveNotified
+      
     });
     builder.addCase(getGoal.rejected, (state, action) => {
       console.log('getGoal.rejected', action);
@@ -103,5 +117,5 @@ export const goalSlice = createSlice({
     });
   },
 });
-export const { clearState, clearSuccess } = goalSlice.actions;
+export const { clearState, clearSuccess,goalSet } = goalSlice.actions;
 export default goalSlice.reducer;

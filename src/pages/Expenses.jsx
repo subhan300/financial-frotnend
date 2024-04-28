@@ -5,10 +5,12 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { createExpense } from '../redux/features/expense/expense.reducer';
-import { getUserId } from '../utils/Utils';
+import { createExpense, editExpense, getExpense } from '../redux/features/expense/expense.reducer';
+import { getLatestItem, getUserId } from '../utils/Utils';
 import { clearState, clearSuccess } from '../redux/features/expense/expense.slice';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import FormDisableComponent from '../components/FormDisableComponent';
 
 const validationSchema = Yup.object().shape({
   monthly_rent: Yup.number()
@@ -24,7 +26,12 @@ const validationSchema = Yup.object().shape({
 
 function Expenses() {
   const navigate = useNavigate('');
-  const [editItem, setEditingItem] = useState('');
+  const { incomeLastDate } = useSelector((state) => state.income);
+  const {expenses } = useSelector((state) => state.expense);
+  console.log("expesnes===",expenses)
+  const [disableForm, setDisableForm] = useState(false);
+  const [loader, setLoader] = useState(false);
+
   const { isLoading, isSuccess, isError } = useSelector((state) => state.expense);
   const UserId = getUserId();
   const dispatch = useDispatch();
@@ -37,6 +44,15 @@ function Expenses() {
   // Calculate the total price using the reducer
   let totalPrice = expense.reduce(totalPriceReducer, 0);
   useEffect(() => {
+    setLoader(true)
+    Promise.all([
+      dispatch(getExpense(UserId)),
+    ]).catch((error) => {
+      console.error('Error fetching data:', error);
+    }).finally(e=>{setLoader(false)})
+  
+  }, [dispatch, UserId]);
+  useEffect(() => {
     if (isError) {
       dispatch(clearState());
     }
@@ -45,9 +61,22 @@ function Expenses() {
       clearSuccess();
     };
   }, [isError]);
-  console.log(expense, 'Expense');
-  return (
-    <div className="flex h-screen overflow-hidden">
+  useEffect(() => {
+    // debugger
+   if(expenses.length){
+    const expenseItem= getLatestItem(expenses)
+  
+    if (expenseItem.isExpenseUsable) {
+      setDisableForm(false);
+    } else {
+      setDisableForm(true);
+    }
+   }else{
+    setDisableForm(true);
+   }
+  }, [expenses]);
+
+  return loader?<h1>...Loading</h1>: disableForm?<FormDisableComponent text="Hey , you can not Expense before Income OR can not add again before the month end" /> :  <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -99,9 +128,8 @@ function Expenses() {
                     fixed_expense: '',
                   }}
                   validationSchema={validationSchema}
-                  onSubmit={(values, actions) => {
+                  onSubmit={async(values, actions) => {
                     let expensesWithoutId = expense.map(({ _id, ...rest }) => rest);
-                    setTimeout(() => {
                       const { monthly_rent, monthly_debts, debts_period, other_expense } = values;
 
                       let data = {
@@ -111,9 +139,14 @@ function Expenses() {
                         debts_period: debts_period,
                         other_expense: expensesWithoutId,
                         total_expense: total_expense,
+                        isExpenseUsable:false
+
+
                         //fixed_expense: Number(monthly_rent) + Number(monthly_debts),
                       };
-                      dispatch(createExpense(data));
+                      const res=await dispatch(editExpense(data));
+                      console.log("res===",res)
+                     if(res?.payload?.statusCode===200){
                       actions.resetForm({
                         values: {
                           // the type of `values` inferred to be Blog
@@ -122,10 +155,13 @@ function Expenses() {
                           debts_period: '',
                           other_expense: '',
                         },
+                     })
+                     navigate("/")
+                    }
+                    
 
-                        // you can also set the other form states here
-                      });
-                    }, 500);
+                      //   // you can also set the other form states here
+                      // });
                   }}
                 >
                   {({ values, isSubmitting }) => {
@@ -361,7 +397,7 @@ function Expenses() {
         </main>
       </div>
     </div>
-  );
+  
 }
 
 export default Expenses;

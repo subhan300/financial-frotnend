@@ -47,10 +47,11 @@ export const incomeSlice = createSlice({
       state.isSuccess = false;
     });
     builder.addCase(getIncomeLastDate.fulfilled, (state, action) => {
-      const { data } = action?.payload;
+      const { date } = action?.payload;
+      console.log("data===",date)
       state.isLoading = false;
       state.isError = false;
-      state.incomes = data;
+      state.incomeLastDate = date;
     });
     builder.addCase(getIncome.rejected, (state, action) => {
       console.log('getIncomeLastDate', action);

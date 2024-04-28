@@ -128,8 +128,9 @@ function EditExpenses() {
                           other_expense: expenseWithoutId,
                           total_expense: total_expense, // Assuming total_expense is defined elsewhere
                           fixed_expense: Number(monthly_rent) + Number(monthly_debts),
+                          expenseId:initialValues[0]._id
                         };
-                        dispatch(editExpense({ UserId, data }));
+                        dispatch(editExpense({ UserId, ...data }));
                         navigate('/');
                         actions.resetForm({
                           values: {
@@ -151,7 +152,7 @@ function EditExpenses() {
                           Number(values.monthly_debts) +
                           Number(totalPrice)
                       );
-                      console.log(values, 'Edit expense');
+                    
                       return (
                         <>
                           <Form className="mt-5">
@@ -306,7 +307,6 @@ function EditExpenses() {
                                                       <span>
                                                         <svg
                                                           onClick={() => {
-                                                            console.log(item, 'item');
                                                             const updatedIncome =
                                                               values?.other_expense?.filter(
                                                                 (incomeItem) =>
@@ -314,10 +314,7 @@ function EditExpenses() {
                                                               );
                                                             // Update the state with the new array without the deleted item
                                                             setAddExpense(updatedIncome);
-                                                            console.log(
-                                                              updatedIncome,
-                                                              'updatedIncome'
-                                                            );
+                                                           
                                                           }}
                                                           class="w-6 h-6 ml-2 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
                                                           aria-hidden="true"

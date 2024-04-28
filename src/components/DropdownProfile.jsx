@@ -42,6 +42,7 @@ function DropdownProfile({ align }) {
     localStorage.clear();
     dispatch(clearState());
     dispatch(clearSuccess());
+    localStorage.removeItem("user")
     navigate('/login');
   };
   return (

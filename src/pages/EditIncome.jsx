@@ -108,6 +108,7 @@ function EditIncome() {
                         date: values?.date,
                         total_income: totalIncome,
                         extra_income: incomeWithoutId,
+                        incomeId:initialValues[0]._id
                       };
 
                       dispatch(editIncome({ UserId, data }));
