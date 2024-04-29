@@ -10,7 +10,7 @@ import FinanceGrid from '../partials/dashboard/IncomeGrid';
 import Banner from '../partials/Banner';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIncome } from '../redux/features/income/income.reducer';
-import { calculateIsGoalComplete, getUserId, getUserToken } from '../utils/Utils';
+import { calculateIsGoalComplete, getLatestItem, getUserId, getUserToken } from '../utils/Utils';
 import { getExpense } from '../redux/features/expense/expense.reducer';
 import ExpenseGrid from '../partials/dashboard/ExpenseGrid';
 import { getGoal } from '../redux/features/goal.reducer';
@@ -20,21 +20,39 @@ function Dashboard() {
   const userId = getUserId();
   const dispatch = useDispatch();
 
-  
   const { incomes, isLoading, isSucess } = useSelector((state) => state.income);
+  const [graphItem, setGraphItem] = useState({ goal: '', incomes: '', expenses: '' });
   const { expenses } = useSelector((state) => state.expense);
   const { goal } = useSelector((state) => state.goal);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  console.log("income",incomes,"expense",expenses)
+  console.log('income', incomes, 'expense', expenses);
   useEffect(() => {
     Promise.all([
       dispatch(getGoal(userId)),
       dispatch(getIncome(userId)),
       dispatch(getExpense(userId)),
-    ]).catch((error) => {
-      console.error('Error fetching data:', error);
-    });
+    ])
+      .then(([goalResponse, incomeResponse, expenseResponse]) => {
+        // Handle each response here if needed
+        const [goalPayload, incomePayload, expensePayload] = [
+          goalResponse,
+          incomeResponse,
+          expenseResponse,
+        ].map((response) => response.payload.data);
+
+        const goalItem = getLatestItem(goalPayload);
+        const incomeItem = getLatestItem(incomePayload);
+        const expenseItem = getLatestItem(expensePayload);
+        setGraphItem({ goal: goalItem, incomes: incomeItem, expenses: expenseItem });
+        console.log('=====Goal response:', goalItem);
+        console.log('=====Income response:', incomeItem);
+        console.log('======Expense response:', expenseItem);
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      });
   }, [dispatch, userId]);
+
   useEffect(() => {
     if (goal) {
       const goalValues = calculateIsGoalComplete(goal);
@@ -42,7 +60,7 @@ function Dashboard() {
     }
   }, [goal]);
   // calculateIsGoalComplete(goal)
-  console.log("goal===",goal,incomes,expenses)
+  console.log('goal===', goal, incomes, expenses);
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -58,17 +76,27 @@ function Dashboard() {
             {/* Cards */}
             <div className="grid grid-cols-12 gap-6">
               <FinancialCard
-                monthly_saving={goal?.length? goal[0].monthly_saving || 0 : 0}
-                fixed_expense={expenses?.[0]?.total_expense ? expenses[0].total_expense : 0}
+                monthly_saving={graphItem?.goal?.monthly_saving || 0}
+                fixed_expense={graphItem?.expenses?.total_expense || 0}
                 money_toused={
-                  (goal?.[0]?.monthly_saving ?? 0) -
-                  (incomes?.[0]?.total_income ?? 0) -
-                  (expenses?.[0]?.total_expense ?? 0)
+                  (graphItem?.incomes?.total_income || 0) -
+                  ((graphItem?.goal?.monthly_saving || 0) +
+                    (graphItem?.expenses?.total_expense || 0))
+                }
+                title="Monthly Planning"
+              />
+              {/* <FinancialCard
+                monthly_saving={graphItem?.goal? graphItem?.goal.monthly_saving || 0 : 0}
+                fixed_expense={graphItem?.expenses?.total_expense ? graphItem?.expenses?.total_expense : 0}
+                money_toused={
+                  (graphItem?.goal?.monthly_saving ?? 0) -graphItem?.
+                  (graphItem?.incomes?.total_income ?? 0) -
+                  (graphItem?.expenses?.total_expense ?? 0)
                 }
                 title="Monthly Planing"
-              />
+              /> */}
 
-              <FinancialCard
+              {/* <FinancialCard
                 monthly_saving={goal?.length ? goal[0].monthly_saving || 0 : 0}
                 fixed_expense={expenses?.[0]?.total_expense ? expenses[0].total_expense : 0}
                 money_toused={
@@ -77,7 +105,7 @@ function Dashboard() {
                   (expenses?.[0]?.total_expense ?? 0)
                 }
                 title="Actual Transactions"
-              />
+              /> */}
               <GoalGrid />
               <FinanceGrid />
               <ExpenseGrid />
