@@ -28,9 +28,9 @@ function Dashboard() {
   console.log("income",incomes,"expense",expenses)
   useEffect(() => {
     Promise.all([
+      dispatch(getGoal(userId)),
       dispatch(getIncome(userId)),
       dispatch(getExpense(userId)),
-      dispatch(getGoal(userId)),
     ]).catch((error) => {
       console.error('Error fetching data:', error);
     });

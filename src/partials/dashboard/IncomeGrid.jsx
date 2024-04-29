@@ -38,7 +38,7 @@ function FinanceGrid() {
           <ul className="my-1">
             {/* Item */}
             {incomes?.length > 0 ? (
-              incomes.map((item, index) => (
+              incomes?.map((item, index) => (
                 <ul>
                   <li key={index} className="flex px-2">
                     <div className="w-9 h-9 rounded-full shrink-0 bg-emerald-500 my-2 mr-3">

@@ -349,8 +349,13 @@ function Expenses() {
                             </div>
                           </div>
                           <button
+                            disabled={incomes?.length === 0}
                             type="submit"
-                            className="text-white bg-[#4F46E5] hover:bg-[#433BCB] rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-3.5 focus:outline-none font-extrabold w-full mt-3 shade mb-3 flex items-center justify-center"
+                            className={`text-white ${
+                              incomes && incomes.length === 0
+                                ? 'bg-[#756fe7]'
+                                : 'bg-[#4F46E5] hover:bg-[#433BCB]'
+                            }  rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-3.5 focus:outline-none font-extrabold w-full mt-3 shade mb-3 flex items-center justify-center`}
                           >
                             {isLoading && !isSuccess ? (
                               <>
