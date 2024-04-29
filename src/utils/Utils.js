@@ -38,7 +38,7 @@ export const getUserToken = () => {
      console.log("tokem======",tokenData)
 // debugger
     // Return the accessToken
-    return  tokenData.accessToken;
+    return  tokenData?.accessToken;
   } catch (error) {
     console.error('Error retrieving access token from localStorage:', error);
     // Handle missing or invalid token gracefully (e.g., redirect to login)
@@ -51,7 +51,7 @@ export const getUserId = () => {
     const tokenDataString = JSON.parse(localStorage.getItem("user"));
 
     // const { _id } = tokenDataString || {};
-    return tokenDataString.user._id;
+    return tokenDataString?.user?._id;
   } catch (error) {
     console.error('Error retrieving access token from localStorage:', error);
     // Handle missing or invalid token gracefully (e.g., redirect to login)

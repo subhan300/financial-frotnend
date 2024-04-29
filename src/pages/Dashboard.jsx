@@ -25,7 +25,6 @@ function Dashboard() {
   const { expenses } = useSelector((state) => state.expense);
   const { goal } = useSelector((state) => state.goal);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  console.log('income', incomes, 'expense', expenses);
   useEffect(() => {
     Promise.all([
       dispatch(getGoal(userId)),
@@ -44,9 +43,9 @@ function Dashboard() {
         const incomeItem = getLatestItem(incomePayload);
         const expenseItem = getLatestItem(expensePayload);
         setGraphItem({ goal: goalItem, incomes: incomeItem, expenses: expenseItem });
-        console.log('=====Goal response:', goalItem);
-        console.log('=====Income response:', incomeItem);
-        console.log('======Expense response:', expenseItem);
+        // console.log('=====Goal response:', goalItem);
+        // console.log('=====Income response:', incomeItem);
+        // console.log('======Expense response:', expenseItem);
       })
       .catch((error) => {
         console.error('Error fetching data:', error);
@@ -60,7 +59,6 @@ function Dashboard() {
     }
   }, [goal]);
   // calculateIsGoalComplete(goal)
-  console.log('goal===', goal, incomes, expenses);
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}

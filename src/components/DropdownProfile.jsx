@@ -37,13 +37,11 @@ function DropdownProfile({ align }) {
     return () => document.removeEventListener('keydown', keyHandler);
   });
   const handleSignout = () => {
-    setDropdownOpen(!dropdownOpen);
-    // localStorage.removeItem('persist:root');
-    localStorage.clear();
-    dispatch(clearState());
-    dispatch(clearSuccess());
     localStorage.removeItem("user")
     navigate('/login');
+    // setDropdownOpen(!dropdownOpen);
+
+   
   };
   return (
     <div className="relative inline-flex">
@@ -97,14 +95,14 @@ function DropdownProfile({ align }) {
               </Link>
             </li> */}
             <li>
-              <Link
+              <button
                 className="font-medium text-sm text-indigo-500 hover:text-indigo-600 dark:hover:text-indigo-400 flex items-center py-1 px-3"
                 onClick={() => {
                   handleSignout();
                 }}
               >
                 Sign Out
-              </Link>
+              </button>
             </li>
           </ul>
         </div>
