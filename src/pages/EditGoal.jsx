@@ -6,7 +6,7 @@ import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { getExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
-import { getIncome } from '../redux/features/income/income.reducer';
+import { getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
 import { createGoal, editGoal, getGoal } from '../redux/features/goal.reducer';
 import { data } from 'autoprefixer';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -60,9 +60,21 @@ function EditGoal() {
   }
   const [monthsToGoal, setMonthsToGoal] = useState('');
   useEffect(() => {
+    // setLoader(true)
+    Promise.all([
+      dispatch(getIncome(UserId)),
+      dispatch(getIncomeLastDate(UserId)),
+      dispatch(getExpense(UserId)),
+      dispatch(getGoal(UserId)),
+    ]).catch((error) => {
+      console.error('Error fetching data:', error);
+    })
+  
+  }, [dispatch, UserId]);
+  useEffect(() => {
     const res = goal?.filter((item) => item?._id === router.id);
     setInitialValues(res);
-  }, [router.id]);
+  }, [router.id,goal]);
   useEffect(() => {
     if (isError) {
       clearState();

@@ -4,7 +4,7 @@ import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
-import { createExpense, editExpense } from '../redux/features/expense/expense.reducer';
+import { createExpense, editExpense, getExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -45,10 +45,18 @@ function EditExpenses() {
     setIsOpen(false);
   };
   useEffect(() => {
+    Promise.all([
+      dispatch(getExpense(UserId)),
+    ]).catch((error) => {
+      console.error('Error fetching data:', error);
+    })
+  
+  }, [dispatch, UserId]);
+  useEffect(() => {
     const res = expenses?.filter((item) => item?._id === router.id);
     setInitialValues(res);
     setAddExpense(res[0]?.other_expense);
-  }, [router.id]);
+  }, [router.id,expenses]);
   useEffect(() => {
     if (isError) {
       dispatch(clearState());

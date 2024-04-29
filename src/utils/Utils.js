@@ -31,14 +31,14 @@ export const formatValue = (value) =>
 export const getUserToken = () => {
   try {
     // Retrieve the token data from localStorage using the key "persist:root"
-    const tokenDataString = localStorage.getItem('persist:root');
+    const tokenDataString = localStorage.getItem('user');
 
     // Parse the token data JSON string to an object
     const tokenData = JSON.parse(tokenDataString);
-    const auth = JSON.parse(tokenData.auth);
-
+     console.log("tokem======",tokenData)
+// debugger
     // Return the accessToken
-    return auth.auth.data.accessToken;
+    return  tokenData.accessToken;
   } catch (error) {
     console.error('Error retrieving access token from localStorage:', error);
     // Handle missing or invalid token gracefully (e.g., redirect to login)
@@ -48,15 +48,10 @@ export const getUserToken = () => {
 export const getUserId = () => {
   try {
     // Retrieve the token data from localStorage using the key "persist:root"
-    const tokenDataString = localStorage.getItem('persist:root');
+    const tokenDataString = JSON.parse(localStorage.getItem("user"));
 
-    // Parse the token data JSON string to an object
-    const tokenData = JSON.parse(tokenDataString);
-    const auth = JSON.parse(tokenData.auth);
-
-    // Return the accessToken
-    const { _id } = auth.auth.data.user;
-    return _id;
+    // const { _id } = tokenDataString || {};
+    return tokenDataString.user._id;
   } catch (error) {
     console.error('Error retrieving access token from localStorage:', error);
     // Handle missing or invalid token gracefully (e.g., redirect to login)
