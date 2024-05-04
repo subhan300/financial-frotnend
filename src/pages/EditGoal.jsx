@@ -32,31 +32,29 @@ function EditGoal() {
   const [monthlySaving, setMonthlySaving] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-  function calculateMonthsToGoal(monthlyIncome, monthlyExpenses, carPrice, savingsPercentage) {
+
+  function calculateMonthsToGoal(monthlyIncome, priceOfGoal, savingsPercentage, monthlyExpense) {
+    const savedAmount = monthlyIncome - monthlyExpense;
     // Calculate monthly savings based on percentage
-    const monthlySavingsPercentage = monthlyIncome * (savingsPercentage / 100);
-
-    // Add monthly savings from percentage to existing savings
-    const totalMonthlySavings = monthlySavingsPercentage + (monthlyIncome - monthlyExpenses);
-    setMonthlySaving(totalMonthlySavings);
-    console.log(totalMonthlySavings, 'totalMonthlySavings====');
-    // setMonthlySaving(totalMonthlySavings);
-    // Check if savings percentage is valid (0 to 100)
-    if (savingsPercentage < 0 || savingsPercentage > 100) {
-      setErrorMessage('Invalid savings percentage. Must be between 0 and 100.');
-    } else if (totalMonthlySavings > monthlyIncome) {
-      setErrorMessage('Monthly savings exceed monthly income. Please review your finances.');
-    } else if (totalMonthlySavings > 1.3 * monthlyIncome) {
-      setErrorMessage('Monthly savings exceed monthly income by 30%. Please review your finances.');
-    } else {
+    const totalMonthlySavings = (savedAmount * savingsPercentage) / 100;
+    if (savingsPercentage < 10 || savingsPercentage > 50) {
+      return setErrorMessage('Invalid savings percentage. Must be between 10 and 50.');
+    } else if (savingsPercentage > 30) {
       setErrorMessage('');
-      // Calculate total savings needed
-      const totalSavingsNeeded = carPrice;
-      // Calculate months needed
-      const monthsNeeded = Math.ceil(totalSavingsNeeded / totalMonthlySavings);
-
-      return monthsNeeded;
+      setModalOpen(true);
+    } else if (totalMonthlySavings > monthlyIncome) {
+      return setErrorMessage('Monthly savings exceed monthly income. Please review your finances.');
     }
+
+    setErrorMessage('');
+    setMonthlySaving(totalMonthlySavings);
+    // debugger
+    // Calculate total savings needed
+    const monthsNeeded = Math.ceil(priceOfGoal / totalMonthlySavings);
+    // Calculate months needed
+
+    return monthsNeeded;
+    // }
   }
   const [monthsToGoal, setMonthsToGoal] = useState('');
   useEffect(() => {
@@ -155,11 +153,12 @@ function EditGoal() {
                   }}
                 >
                   {({ values }) => {
+                   
                     const monthsToGoal = calculateMonthsToGoal(
-                      Number(incomes[0]?.total_income),
-                      Number(expenses[0]?.total_expense),
+                      incomes[0]?.total_income,
                       values?.price,
-                      values?.percentage
+                      values?.percentage,
+                      expenses[0]?.total_expense
                     );
                     setMonthsToGoal(monthsToGoal);
                     console.log(monthsToGoal);

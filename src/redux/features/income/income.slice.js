@@ -119,7 +119,7 @@ export const incomeSlice = createSlice({
       console.log(action, 'deleteIncome.fulfilled');
       state.isLoading = false;
       state.isError = false;
-      state.incomes = state.expenses.filter((item) => item?._id !== action.meta.arg);
+      state.incomes = state.incomes.filter((item) => item?._id !== action.meta.arg);
       toast.success('Income has been deleted', {
         position: toast.BOTTOM_RIGHT,
       });

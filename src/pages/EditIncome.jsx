@@ -22,7 +22,10 @@ const validationSchema = Yup.object().shape({
 function EditIncome() {
   const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState('');
-  const { incomes, isSucess, isLoading, isError } = useSelector((state) => state.income);
+  const { incomes, isSucess, isLoading, isError } = useSelector((state) => {
+    console.log("state= income",state.income)
+    return state.income
+  });
   const router = useParams();
   const [editItem, setEditingItem] = useState();
   const UserId = getUserId();
@@ -32,7 +35,7 @@ function EditIncome() {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const totalPriceReducer = (accumulator, currentValue) =>
-    accumulator + Number(currentValue.price) + Number(initialValues[0].total_income);
+    accumulator + Number(currentValue.price);
    
   // Calculate the total price using the reducer
   let totalPrice = income?.reduce(totalPriceReducer, 0);
@@ -48,16 +51,23 @@ function EditIncome() {
   }, [dispatch, UserId]);
   useEffect(() => {
     const res = incomes?.filter((item) => item?._id === router.id);
-    res && setInitialValues(res);
-    setIncome(res[0]?.extra_income);
-    console.log(res, 'res');
+    if(res){
+      // debugger
+      setInitialValues(res);
+      setTotalIncome(res[0]?.total_income)
+      setIncome(res[0]?.extra_income);
+      console.log("res====",res[0])
+      
+    }
+
+   
   }, [router.id,incomes]);
   useEffect(() => {
     if (isError) {
       dispatch(clearState());
     }
   }, [isError]);
-  console.log("incoems",incomes)
+console.log("totla incomes==",totalIncome,"extra income",income)
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -139,6 +149,7 @@ function EditIncome() {
                 >
                   {({ values, isSubmitting }) => {
                     console.log(values, 'valuesssssss');
+                    debugger
                     setTotalIncome(Number(values.monthly_income) + Number(totalPrice));
                     return (
                       <>

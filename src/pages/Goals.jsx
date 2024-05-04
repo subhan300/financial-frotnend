@@ -182,7 +182,6 @@ function Goals() {
                     {({ values }) => {
                       if (values.percentage !== tempPer) {
                         setTempPer(values.percentage);
-
                         const monthsToGoal = calculateMonthsToGoal(
                           totalIncome,
                           values?.price,

@@ -120,7 +120,7 @@ function ExpenseGrid() {
                             <ConfirmModal
                               modalOpen={modalOpen}
                               setModalOpen={setModalOpen}
-                              value={expenses[0]._id}
+                              value={item._id}
                               valueType={'expense'}
                             />
                           </div>

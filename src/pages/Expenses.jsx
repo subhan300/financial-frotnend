@@ -117,13 +117,13 @@ function Expenses() {
               </div>
               <div className="flex flex-col w-full lg:w-[60%] bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-700 p-5">
                 <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">
-                  Add Monthly Expenses
+                  Add Fixed Expense
                 </h1>
                 <Formik
                   initialValues={{
                     monthly_rent: '',
-                    monthly_debts: '',
-                    debts_period: '',
+                    monthly_debts: '1',
+                    debts_period: '1',
                     other_expense: '',
                     fixed_expense: '',
                   }}
@@ -131,7 +131,6 @@ function Expenses() {
                   onSubmit={async(values, actions) => {
                     let expensesWithoutId = expense.map(({ _id, ...rest }) => rest);
                       const { monthly_rent, monthly_debts, debts_period, other_expense } = values;
-
                       let data = {
                         UserId: String(UserId),
                         monthly_rent: monthly_rent,
@@ -191,42 +190,9 @@ function Expenses() {
                               className="text-sm font-medium text-red-600"
                             />
                           </div>
-                          <div className="mb-5">
-                            <label
-                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                              htmlFor="monthlyDebts"
-                            >
-                              Monthly Debts
-                            </label>
-                            <Field
-                              type="number"
-                              name="monthly_debts"
-                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                            />
-                            <ErrorMessage
-                              name="monthly_debts"
-                              component="div"
-                              className="text-sm font-medium text-red-600"
-                            />
-                          </div>
-                          <div className="mb-5">
-                            <label
-                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                              htmlFor="periodOfDebt"
-                            >
-                              Period of Debt (in time)
-                            </label>
-                            <Field
-                              type="number"
-                              name="debts_period"
-                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                            />
-                            <ErrorMessage
-                              name="debts_period"
-                              component="div"
-                              className="text-sm font-medium text-red-600"
-                            />
-                          </div>
+                        
+                        
+                        
                           <div className="mb-5 flex justify-end">
                             <div>
                               <svg

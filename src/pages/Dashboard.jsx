@@ -77,9 +77,9 @@ function Dashboard() {
                 monthly_saving={graphItem?.goal?.monthly_saving || 0}
                 fixed_expense={graphItem?.expenses?.total_expense || 0}
                 money_toused={
-                  (graphItem?.incomes?.total_income || 0) -
-                  ((graphItem?.goal?.monthly_saving || 0) +
-                    (graphItem?.expenses?.total_expense || 0))
+                  (Number(graphItem?.incomes?.total_income) || 0) -
+                  ((Number(graphItem?.goal?.monthly_saving) || 0) +
+                  (Number(graphItem?.expenses?.total_expense) || 0))
                 }
                 title="Monthly Planning"
               />
