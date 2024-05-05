@@ -11,6 +11,7 @@ import { createGoal, editGoal, getGoal } from '../redux/features/goal.reducer';
 import { data } from 'autoprefixer';
 import { useNavigate, useParams } from 'react-router-dom';
 import { clearState, clearSuccess } from '../redux/features/goal.slice';
+import GoalModal from '../components/GoalModal';
 
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
@@ -23,10 +24,15 @@ const validationSchema = Yup.object().shape({
 function EditGoal() {
   const router = useParams();
   const [initialValues, setInitialValues] = useState('');
+  const [tempPer, setTempPer] = useState('');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen2, setModalOpen2] = useState(false);
   const UserId = getUserId();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { goal, isLoading, isSuccess, isError } = useSelector((state) => state.goal);
+  const { goal, isLoading, isSuccess, isError, status, haveNotified } = useSelector(
+    (state) => state.goal
+  );
   const { incomes } = useSelector((state) => state.income);
   const { expenses } = useSelector((state) => state.expense);
   const [monthlySaving, setMonthlySaving] = useState('');
@@ -66,13 +72,12 @@ function EditGoal() {
       dispatch(getGoal(UserId)),
     ]).catch((error) => {
       console.error('Error fetching data:', error);
-    })
-  
+    });
   }, [dispatch, UserId]);
   useEffect(() => {
     const res = goal?.filter((item) => item?._id === router.id);
     setInitialValues(res);
-  }, [router.id,goal]);
+  }, [router.id, goal]);
   useEffect(() => {
     if (isError) {
       clearState();
@@ -81,9 +86,24 @@ function EditGoal() {
       dispatch(clearSuccess());
     };
   }, [isError, dispatch]);
-  console.log(isSuccess, 'isSucess');
+  useEffect(() => {
+    if (status === 'completed' && !haveNotified) {
+      setModalOpen2(true);
+      dispatch(editGoal({ haveNotified: true }));
+    }
+  }, [status]);
   return (
     <div className="flex h-screen overflow-hidden">
+      <GoalModal
+        text="The reccommended amount of savings is usually between 20-25%"
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+      />
+      <GoalModal
+        text="Your Goal is Completed "
+        modalOpen={modalOpen2}
+        setModalOpen={setModalOpen2}
+      />
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -145,24 +165,24 @@ function EditGoal() {
                       percentage: values.percentage,
                       timeto_take: monthsToGoal,
                       monthly_saving: monthlySaving,
-                      haveNotified:false
-
+                      haveNotified: false,
                     };
                     dispatch(editGoal(data));
                     navigate('/');
                   }}
                 >
                   {({ values }) => {
-                   
-                    const monthsToGoal = calculateMonthsToGoal(
-                      incomes[0]?.total_income,
-                      values?.price,
-                      values?.percentage,
-                      expenses[0]?.total_expense
-                    );
-                    setMonthsToGoal(monthsToGoal);
-                    console.log(monthsToGoal);
-                    console.log(values);
+                    if (values.percentage !== tempPer) {
+                      setTempPer(values.percentage);
+                      const monthsToGoal = calculateMonthsToGoal(
+                        incomes[0]?.total_income,
+                        values?.price,
+                        values?.percentage,
+                        expenses[0]?.total_expense
+                      );
+                      setMonthsToGoal(monthsToGoal);
+                    }
+
                     return (
                       <>
                         <Form className="mt-5">

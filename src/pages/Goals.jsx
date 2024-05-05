@@ -30,7 +30,6 @@ function Goals() {
   const dispatch = useDispatch();
   const { incomes, isLoading, isSucess, incomeLastDate } = useSelector((state) => state.income);
   const { status, haveNotified } = useSelector((state) => {
-    console.log("goal======",state.goal)
     return state.goal
   });
   const { expenses } = useSelector((state) => state.expense);
@@ -56,10 +55,7 @@ function Goals() {
 
     setErrorMessage('');
     setMonthlySaving(totalMonthlySavings);
-    // debugger
-    // Calculate total savings needed
     const monthsNeeded = Math.ceil(priceOfGoal / totalMonthlySavings);
-    // Calculate months needed
 
     return monthsNeeded;
     // }
