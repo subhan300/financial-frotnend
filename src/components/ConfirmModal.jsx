@@ -5,17 +5,20 @@ import { useSelector, useDispatch } from 'react-redux';
 import { deleteIncome } from '../redux/features/income/income.reducer';
 import { deleteGoal } from '../redux/features/goal.reducer';
 
-function ConfirmModal({ modalOpen, setModalOpen, value, valueType }) {
+function ConfirmModal({ modalOpen, setModalOpen, value, valueType,date }) {
   const modalContent = useRef(null);
 
 
   const dispatch = useDispatch();
-  const handleDeleteExpense = (id) => {
-    if (valueType === 'expense') {
-      dispatch(deleteExpense(id));
-      setModalOpen(false);
-    } else if (valueType === 'income') {
+  const handleDeleteExpense = (id,date) => {
+    // if (valueType === 'expense') {
+    //   dispatch(deleteExpense(id));
+    //   setModalOpen(false);
+    // } else 
+    if (valueType === 'income') {
+      // debugger
       dispatch(deleteIncome(id));
+      dispatch(deleteExpense(date));
       setModalOpen(false);
     } else {
       console.log(id, 'valueType === income');
@@ -78,7 +81,7 @@ function ConfirmModal({ modalOpen, setModalOpen, value, valueType }) {
           </p>
           <button
             onClick={() => {
-              handleDeleteExpense(value);
+              handleDeleteExpense(value,date);
             }}
             className="w-full py-2 bg-[#4F46E5] hover:bg-[#433BCB] text-white rounded-md mt-5"
           >
