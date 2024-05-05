@@ -7,7 +7,7 @@ import ExpenseModal from '../components/ExpenseModal';
 import IncomeModal from '../components/IncomeModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { createIncome, editIncome, getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
-import { getUserId } from '../utils/Utils';
+import { dateFormat, getUserId } from '../utils/Utils';
 import { clearState, clearSuccess } from '../redux/features/income/income.slice';
 import { useParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
@@ -126,7 +126,7 @@ console.log("totla incomes==",totalIncome,"extra income",income)
                     setTimeout(() => {
                       let data = {
                         monthly_income: values.monthly_income,
-                        date: values?.date,
+                        date: dateFormat(values?.date),
                         total_income: totalIncome,
                         extra_income: incomeWithoutId,
                         incomeId:initialValues[0]._id
@@ -135,12 +135,10 @@ console.log("totla incomes==",totalIncome,"extra income",income)
                       dispatch(editIncome({ UserId, data }));
                       actions.resetForm({
                         values: {
-                          // the type of `values` inferred to be Blog
                           monthly_income: '',
                           date: '',
                           extra_income: {},
                         },
-                        // you can also set the other form states here
                       });
                       navigate('/');
                       dispatch(clearSuccess());

@@ -7,7 +7,7 @@ import ExpenseModal from '../components/ExpenseModal';
 import IncomeModal from '../components/IncomeModal';
 import { useDispatch, useSelector } from 'react-redux';
 import { createIncome, getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
-import { getUserId } from '../utils/Utils';
+import { dateFormat, getUserId } from '../utils/Utils';
 import { useNavigate } from 'react-router-dom';
 import { clearState, clearSuccess } from '../redux/features/income/income.slice';
 import { useEffect } from 'react';
@@ -132,7 +132,7 @@ function Income() {
                       let data = {
                         UserId: String(userId),
                         monthly_income: values.monthly_income,
-                        date: values.date,
+                        date: dateFormat(values.date),
                         total_income: totalIncome,
                         extra_income: incomeWithoutId,
                       };

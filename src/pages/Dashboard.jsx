@@ -55,6 +55,7 @@ function Dashboard() {
   useEffect(() => {
     if (goal) {
       const goalValues = calculateIsGoalComplete(goal);
+      console.log("goal values===",goalValues)
       dispatch(goalSet(goalValues));
     }
   }, [goal]);

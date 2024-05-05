@@ -5,7 +5,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { getExpense } from '../redux/features/expense/expense.reducer';
-import { getUserId } from '../utils/Utils';
+import { dateFormat, getUserId } from '../utils/Utils';
 import { getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
 import { createGoal, editGoal, getGoal } from '../redux/features/goal.reducer';
 import { data } from 'autoprefixer';
@@ -163,7 +163,7 @@ function Goals() {
                         percentage: values.percentage,
                         timeto_take: monthsToGoal,
                         monthly_saving: monthlySaving,
-                        goalTracking: [{ totalIncome, totalExpense, date: incomeLastDate }],
+                        goalTracking: [{ totalIncome, totalExpense, date: dateFormat(incomeLastDate) }],
                         status: 'notCompleted',
                       };
                       const res = await dispatch(createGoal(data));

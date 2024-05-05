@@ -166,7 +166,6 @@ function Expenses() {
                   {({ values, isSubmitting }) => {
                     setTotalExpense(
                       Number(values.monthly_rent) +
-                        Number(values.monthly_debts) +
                         Number(totalPrice)
                     );
                     return (

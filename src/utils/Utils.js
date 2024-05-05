@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import resolveConfig from 'tailwindcss/resolveConfig';
 
 export const tailwindConfig = () => {
@@ -72,7 +73,7 @@ export const calculateIsGoalComplete = (goal) => {
   if (goal) {
     const { goalTracking, percentage, monthly_saving, price } = maxCreatedAtGoal;
     let totalSavings = 0;
-
+       debugger
     // Calculate total savings from goal tracking entries
     goalTracking?.forEach(({ totalIncome, totalExpense }) => {
       const savings = ((totalIncome - totalExpense) * percentage) / 100;
@@ -100,3 +101,8 @@ export const calculateIsGoalComplete = (goal) => {
     };
   }
 };
+
+
+export const dateFormat=(date)=>{
+  return dayjs(date).format("YYYY-MM-DD")
+}
