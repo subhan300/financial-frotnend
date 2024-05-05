@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Transition from '../utils/Transition';
 
 import UserAvatar from '../images/user-avatar-32.png';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../redux/features/auth/auth.reducer';
 import { clearState, clearSuccess } from '../redux/features/auth/auth.slice';
 
@@ -11,7 +11,8 @@ function DropdownProfile({ align }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-
+  const {auth}=useSelector(state=>state.auth)
+  console.log("auth==",auth.user)
   const trigger = useRef(null);
   const dropdown = useRef(null);
 
@@ -55,7 +56,7 @@ function DropdownProfile({ align }) {
         <img className="w-8 h-8 rounded-full" src={UserAvatar} width="32" height="32" alt="User" />
         <div className="flex items-center truncate">
           <span className="truncate ml-2 text-sm font-medium dark:text-slate-300 group-hover:text-slate-800 dark:group-hover:text-slate-200">
-            Acme Inc.
+           {auth?.user?.username || ""}
           </span>
           <svg className="w-3 h-3 shrink-0 ml-1 fill-current text-slate-400" viewBox="0 0 12 12">
             <path d="M5.9 11.4L.5 6l1.4-1.4 4 4 4-4L11.3 6z" />
@@ -81,8 +82,8 @@ function DropdownProfile({ align }) {
           onBlur={() => setDropdownOpen(false)}
         >
           <div className="pt-0.5 pb-2 px-3 mb-1 border-b border-slate-200 dark:border-slate-700">
-            <div className="font-medium text-slate-800 dark:text-slate-100">Acme Inc.</div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 italic">Administrator</div>
+            <div className="font-medium text-slate-800 dark:text-slate-100">{auth?.user?.username || ""}</div>
+            {/* <div className="text-xs text-slate-500 dark:text-slate-400 italic">Administrator</div> */}
           </div>
           <ul>
             {/* <li>
