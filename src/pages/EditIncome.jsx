@@ -52,11 +52,9 @@ function EditIncome() {
   useEffect(() => {
     const res = incomes?.filter((item) => item?._id === router.id);
     if(res){
-      // debugger
       setInitialValues(res);
       setTotalIncome(res[0]?.total_income)
       setIncome(res[0]?.extra_income);
-      console.log("res====",res[0])
       
     }
 
@@ -146,8 +144,6 @@ console.log("totla incomes==",totalIncome,"extra income",income)
                   }}
                 >
                   {({ values, isSubmitting }) => {
-                    console.log(values, 'valuesssssss');
-                    debugger
                     setTotalIncome(Number(values.monthly_income) + Number(totalPrice));
                     return (
                       <>

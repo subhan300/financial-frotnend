@@ -123,7 +123,6 @@ function EditExpenses() {
                     onSubmit={(values, actions) => {
                       setTimeout(() => {
                         const { monthly_rent, monthly_debts, debts_period, other_expense } = values;
-debugger
                         // Remove _id field from other_expense array
                         const expenseWithoutId = other_expense.map((expense) => {
                           const { _id, ...rest } = expense;

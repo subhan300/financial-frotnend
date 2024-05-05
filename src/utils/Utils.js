@@ -36,7 +36,7 @@ export const getUserToken = () => {
 
     // Parse the token data JSON string to an object
     const tokenData = JSON.parse(tokenDataString);
-     console.log("tokem======",tokenData)
+     console.log("token======",tokenData)
 // debugger
     // Return the accessToken
     return  tokenData?.accessToken;
@@ -73,7 +73,6 @@ export const calculateIsGoalComplete = (goal) => {
   if (goal) {
     const { goalTracking, percentage, monthly_saving, price } = maxCreatedAtGoal;
     let totalSavings = 0;
-       debugger
     // Calculate total savings from goal tracking entries
     goalTracking?.forEach(({ totalIncome, totalExpense }) => {
       const savings = ((totalIncome - totalExpense) * percentage) / 100;
@@ -81,12 +80,8 @@ export const calculateIsGoalComplete = (goal) => {
     });
 
     const remainingSavings = price - totalSavings;
-
     const monthsToGoal = Math.ceil(remainingSavings / monthly_saving);
-  // debugger
-    // console.log('totalSavings:', totalSavings);
-    // console.log('remainingSavings:', remainingSavings);
-    // console.log('monthsToGoal:', monthsToGoal);
+ 
     let status = 'notCompleted';
     if (monthsToGoal < 1) {
       status = 'completed';
