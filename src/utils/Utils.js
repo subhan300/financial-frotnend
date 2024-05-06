@@ -36,10 +36,10 @@ export const getUserToken = () => {
 
     // Parse the token data JSON string to an object
     const tokenData = JSON.parse(tokenDataString);
-     console.log("token======",tokenData)
-// debugger
+    console.log('token======', tokenData);
+    // debugger
     // Return the accessToken
-    return  tokenData?.accessToken;
+    return tokenData?.accessToken;
   } catch (error) {
     console.error('Error retrieving access token from localStorage:', error);
     // Handle missing or invalid token gracefully (e.g., redirect to login)
@@ -49,7 +49,7 @@ export const getUserToken = () => {
 export const getUserId = () => {
   try {
     // Retrieve the token data from localStorage using the key "persist:root"
-    const tokenDataString = JSON.parse(localStorage.getItem("user"));
+    const tokenDataString = JSON.parse(localStorage.getItem('user'));
 
     // const { _id } = tokenDataString || {};
     return tokenDataString?.user?._id;
@@ -66,10 +66,10 @@ export const getLatestItem = (item) => {
     const currentCreatedAt = new Date(currentGoal.createdAt);
     return prevCreatedAt > currentCreatedAt ? prevGoal : currentGoal;
   }, {});
-  return maxCreatedItem
+  return maxCreatedItem;
 };
 export const calculateIsGoalComplete = (goal) => {
-  const maxCreatedAtGoal = getLatestItem(goal)
+  const maxCreatedAtGoal = getLatestItem(goal);
   if (goal) {
     const { goalTracking, percentage, monthly_saving, price } = maxCreatedAtGoal;
     let totalSavings = 0;
@@ -81,12 +81,12 @@ export const calculateIsGoalComplete = (goal) => {
 
     const remainingSavings = price - totalSavings;
     const monthsToGoal = Math.ceil(remainingSavings / monthly_saving);
- 
+
     let status = 'notCompleted';
     if (monthsToGoal < 1) {
       status = 'completed';
-    }else if(!monthsToGoal && !remainingSavings ){
-      status="pending"
+    } else if (!monthsToGoal && !remainingSavings) {
+      status = 'pending';
     }
     return {
       totalSavings,
@@ -97,7 +97,13 @@ export const calculateIsGoalComplete = (goal) => {
   }
 };
 
+export const dateFormat = (date) => {
+  return dayjs(date).format('YYYY-MM-DD');
+};
 
-export const dateFormat=(date)=>{
-  return dayjs(date).format("YYYY-MM-DD")
-}
+export const totalPrice = (items) => {
+  if (!items?.length) return 0;
+  return items.reduce((accumulator, currentValue) => {
+    return accumulator + parseInt(currentValue.price);
+  }, 0);
+};

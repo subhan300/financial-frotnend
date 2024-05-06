@@ -10,7 +10,7 @@ import FinanceGrid from '../partials/dashboard/IncomeGrid';
 import Banner from '../partials/Banner';
 import { useDispatch, useSelector } from 'react-redux';
 import { getIncome } from '../redux/features/income/income.reducer';
-import { calculateIsGoalComplete, getLatestItem, getUserId, getUserToken } from '../utils/Utils';
+import { calculateIsGoalComplete, getLatestItem, getUserId, getUserToken, totalPrice } from '../utils/Utils';
 import { getExpense } from '../redux/features/expense/expense.reducer';
 import ExpenseGrid from '../partials/dashboard/ExpenseGrid';
 import { getGoal } from '../redux/features/goal.reducer';
@@ -51,11 +51,11 @@ function Dashboard() {
         console.error('Error fetching data:', error);
       });
   }, [dispatch, userId]);
-
+  console.log('grpahitem', graphItem);
   useEffect(() => {
     if (goal) {
       const goalValues = calculateIsGoalComplete(goal);
-      console.log("goal values===",goalValues)
+      console.log('goal values===', goalValues);
       dispatch(goalSet(goalValues));
     }
   }, [goal]);
@@ -76,12 +76,8 @@ function Dashboard() {
             <div className="grid grid-cols-12 gap-6">
               <FinancialCard
                 monthly_saving={graphItem?.goal?.monthly_saving || 0}
-                fixed_expense={graphItem?.expenses?.total_expense || 0}
-                money_toused={
-                  (Number(graphItem?.incomes?.total_income) || 0) -
-                  ((Number(graphItem?.goal?.monthly_saving) || 0) +
-                  (Number(graphItem?.expenses?.total_expense) || 0))
-                }
+                fixed_expense={graphItem?.expenses?.monthly_rent || 0}
+                money_toused={totalPrice(graphItem?.expenses?.other_expense)}
                 title="Monthly Planning"
               />
               {/* <FinancialCard
