@@ -109,7 +109,7 @@ function Income() {
                     <div class="flex flex-col flex-grow ml-4">
                       <div class="text-sm text-gray-500">Monthly Income</div>
                       <div class="font-bold text-lg">
-                      RON<span id="yearly-cost-result">{totalIncome}</span>
+                      RON <span id="yearly-cost-result">{totalIncome}</span>
                       </div>
                     </div>
                   </div>

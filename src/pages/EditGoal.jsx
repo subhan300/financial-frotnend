@@ -41,16 +41,20 @@ function EditGoal() {
 
   function calculateMonthsToGoal(monthlyIncome, priceOfGoal, savingsPercentage, monthlyExpense) {
     // const savedAmount = monthlyIncome - monthlyExpense;
-  
+
     const totalMonthlySavings = (monthlyIncome * savingsPercentage) / 100;
     if (savingsPercentage < 10 || savingsPercentage > 50) {
       return setErrorMessage('Invalid savings percentage. Must be between 10 and 50.');
     } else if (savingsPercentage > 30) {
       setErrorMessage('');
-      setModalOpen(true);
+      if (savingsPercentage != tempPer) {
+        setModalOpen(true);
+      }
     } else if (totalMonthlySavings > monthlyIncome) {
       return setErrorMessage('Monthly savings exceed monthly income. Please review your finances.');
     }
+
+    setTempPer(savingsPercentage);
 
     setErrorMessage('');
     setMonthlySaving(totalMonthlySavings);
@@ -158,6 +162,7 @@ function EditGoal() {
                   }}
                   validationSchema={validationSchema}
                   onSubmit={(values) => {
+                    debugger
                     let data = {
                       UserId: UserId,
                       name: values.name,
@@ -168,20 +173,20 @@ function EditGoal() {
                       haveNotified: false,
                     };
                     dispatch(editGoal(data));
-                    navigate('/');
+                    // navigate('/');
                   }}
                 >
                   {({ values }) => {
-                    if (values.percentage !== tempPer) {
-                      setTempPer(values.percentage);
-                      const monthsToGoal = calculateMonthsToGoal(
-                        incomes[0]?.total_income,
-                        values?.price,
-                        values?.percentage,
-                        expenses[0]?.total_expense
-                      );
-                      setMonthsToGoal(monthsToGoal);
-                    }
+                    // if (values.percentage !== tempPer) {
+
+                    const monthsToGoal = calculateMonthsToGoal(
+                      incomes[0]?.total_income,
+                      values?.price,
+                      values?.percentage,
+                      expenses[0]?.total_expense
+                    );
+                    setMonthsToGoal(monthsToGoal);
+                    // }
 
                     return (
                       <>
