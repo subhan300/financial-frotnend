@@ -101,7 +101,7 @@ console.log("totla incomes==",totalIncome,"extra income",income)
                   <div class="flex flex-col flex-grow ml-4">
                     <div class="text-sm text-gray-500">Monthly Income</div>
                     <div class="font-bold text-lg">
-                      $<span id="yearly-cost-result">{totalIncome}</span>
+                      RON<span id="yearly-cost-result">{totalIncome}</span>
                     </div>
                   </div>
                 </div>

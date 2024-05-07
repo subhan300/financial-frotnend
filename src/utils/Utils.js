@@ -75,7 +75,8 @@ export const calculateIsGoalComplete = (goal) => {
     let totalSavings = 0;
     // Calculate total savings from goal tracking entries
     goalTracking?.forEach(({ totalIncome, totalExpense }) => {
-      const savings = ((totalIncome - totalExpense) * percentage) / 100;
+      // const savings = ((totalIncome - totalExpense) * percentage) / 100;
+      const savings = ((totalIncome) * percentage) / 100;
       totalSavings += savings;
     });
 

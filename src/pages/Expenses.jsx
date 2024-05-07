@@ -110,7 +110,7 @@ function Expenses() {
                   <div class="flex flex-col flex-grow ml-4">
                     <div class="text-sm text-gray-500">Monthly Expenses</div>
                     <div class="font-bold text-lg">
-                      $<span id="yearly-cost-result">{total_expense}</span>
+                    RON<span id="yearly-cost-result">{total_expense}</span>
                     </div>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ function Expenses() {
                                                 </td>
 
                                                 <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                  {`${item?.price}$`}
+                                                  {`${item?.price}RON`}
                                                 </td>
                                                 <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
                                                   <svg

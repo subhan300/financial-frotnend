@@ -39,11 +39,10 @@ function Goals() {
   const [errorMessage, setErrorMessage] = useState('');
   const totalIncome = incomes?.filter((val) => val.date === incomeLastDate)?.[0]?.total_income;
   const totalExpense=expenses.filter(val=>val.date===incomeLastDate)?.[0]?.total_expense;
-  // const totalExpense = expenses?.[0]?.total_expense;
+  
   function calculateMonthsToGoal(monthlyIncome, priceOfGoal, savingsPercentage, monthlyExpense) {
-    const savedAmount = monthlyIncome - monthlyExpense;
-    // Calculate monthly savings based on percentage
-    const totalMonthlySavings = (savedAmount * savingsPercentage) / 100;
+    // const savedAmount = monthlyIncome - monthlyExpense;
+    const totalMonthlySavings = (monthlyIncome * savingsPercentage) / 100;
     if (savingsPercentage < 10 || savingsPercentage > 50) {
       return setErrorMessage('Invalid savings percentage. Must be between 10 and 50.');
     } else if (savingsPercentage > 30) {

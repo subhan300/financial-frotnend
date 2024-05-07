@@ -53,7 +53,7 @@ function FinanceGrid() {
                             className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                             href="#0"
                           >
-                            {`$${item?.monthly_income}`}
+                            {`RON ${item?.monthly_income}`}
                           </a>
                         </div>
                         <div>
@@ -77,7 +77,7 @@ function FinanceGrid() {
                             className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                             href="#0"
                           >
-                            {`${item?.extra_income[0]?.price || 0}`}
+                            {`RON ${item?.extra_income[0]?.price || 0}`}
                           </a>
                         </div>
                         <div className="flex items-center ml-2">

@@ -52,7 +52,7 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {`$${item?.monthly_rent}`}
+                              {`RON ${item?.monthly_rent}`}
                             </a>
                           </div>
                           <div>
@@ -60,7 +60,7 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {item?.monthly_rent}
+                              RON {item?.monthly_rent}
                             </a>
                           </div>
                           <div>
@@ -76,7 +76,7 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {`${item?.other_expense[0]?.price || 0}`}
+                              {`RON ${item?.other_expense[0]?.price || 0}`}
                             </a>
                           </div>
                           <div className="flex items-center ml-2">
