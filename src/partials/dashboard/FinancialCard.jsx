@@ -9,11 +9,11 @@ import { tailwindConfig, hexToRGB } from '../../utils/Utils';
 
 function FinancialCard(props) {
   const chartData = {
-    labels: ['Saving', 'Fixed Expenses', 'Money to used'],
+    labels: ['Saving', 'Fixed Expenses', 'Money to used',"Additional Expense"],
     datasets: [
       {
-        label: '$',
-        data: [props?.monthly_saving, props?.fixed_expense, props?.money_toused],
+        label: 'RON',
+        data: [props?.monthly_saving, props?.fixed_expense, props?.money_toused,props?.additionalExpense],
         backgroundColor: [
           tailwindConfig().theme.colors.indigo[500],
           tailwindConfig().theme.colors.blue[400],

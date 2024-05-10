@@ -110,7 +110,7 @@ function Expenses() {
                   <div class="flex flex-col flex-grow ml-4">
                     <div class="text-sm text-gray-500">Monthly Expenses</div>
                     <div class="font-bold text-lg">
-                    RON<span id="yearly-cost-result">{total_expense}</span>
+                    <span id="yearly-cost-result">{total_expense} RON</span>
                     </div>
                   </div>
                 </div>

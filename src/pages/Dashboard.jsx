@@ -60,6 +60,7 @@ function Dashboard() {
     }
   }, [goal]);
   // calculateIsGoalComplete(goal)
+  console.log("graphite",graphItem)
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -77,7 +78,8 @@ function Dashboard() {
               <FinancialCard
                 monthly_saving={graphItem?.goal?.monthly_saving || 0}
                 fixed_expense={graphItem?.expenses?.monthly_rent || 0}
-                money_toused={totalPrice(graphItem?.expenses?.other_expense)}
+                additionalExpense={totalPrice(graphItem?.expenses?.other_expense)}
+                money_toused={graphItem.incomes.total_income-graphItem?.expenses?.monthly_rent-graphItem?.goal?.monthly_saving}
                 title="Monthly Planning"
               />
               {/* <FinancialCard
