@@ -5,10 +5,12 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { createExpense } from '../redux/features/expense/expense.reducer';
-import { getUserId } from '../utils/Utils';
+import { createExpense, editExpense, getExpense } from '../redux/features/expense/expense.reducer';
+import { getLatestItem, getUserId } from '../utils/Utils';
 import { clearState, clearSuccess } from '../redux/features/expense/expense.slice';
 import { useNavigate } from 'react-router-dom';
+import dayjs from 'dayjs';
+import FormDisableComponent from '../components/FormDisableComponent';
 
 const validationSchema = Yup.object().shape({
   monthly_rent: Yup.number()
@@ -24,8 +26,12 @@ const validationSchema = Yup.object().shape({
 
 function Expenses() {
   const navigate = useNavigate('');
-  const [editItem, setEditingItem] = useState('');
-  const { incomes } = useSelector((state) => state.income);
+  const { incomeLastDate } = useSelector((state) => state.income);
+  const {expenses } = useSelector((state) => state.expense);
+  console.log("expesnes===",expenses)
+  const [disableForm, setDisableForm] = useState(false);
+  const [loader, setLoader] = useState(false);
+
   const { isLoading, isSuccess, isError } = useSelector((state) => state.expense);
   const UserId = getUserId();
   const dispatch = useDispatch();
@@ -38,6 +44,15 @@ function Expenses() {
   // Calculate the total price using the reducer
   let totalPrice = expense.reduce(totalPriceReducer, 0);
   useEffect(() => {
+    setLoader(true)
+    Promise.all([
+      dispatch(getExpense(UserId)),
+    ]).catch((error) => {
+      console.error('Error fetching data:', error);
+    }).finally(e=>{setLoader(false)})
+  
+  }, [dispatch, UserId]);
+  useEffect(() => {
     if (isError) {
       dispatch(clearState());
     }
@@ -46,9 +61,22 @@ function Expenses() {
       clearSuccess();
     };
   }, [isError]);
-  console.log(incomes?.length, 'incomes?.lenght');
-  return (
-    <div className="flex h-screen overflow-hidden">
+  useEffect(() => {
+    // debugger
+   if(expenses.length){
+    const expenseItem= getLatestItem(expenses)
+  
+    if (expenseItem.isExpenseUsable) {
+      setDisableForm(false);
+    } else {
+      setDisableForm(true);
+    }
+   }else{
+    setDisableForm(true);
+   }
+  }, [expenses]);
+
+  return loader?<h1>...Loading</h1>: disableForm?<FormDisableComponent text="Hey , you can not Expense before Income OR can not add again before the month end" /> :  <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
       <Sidebar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
 
@@ -82,29 +110,27 @@ function Expenses() {
                   <div class="flex flex-col flex-grow ml-4">
                     <div class="text-sm text-gray-500">Monthly Expenses</div>
                     <div class="font-bold text-lg">
-                      $<span id="yearly-cost-result">{total_expense}</span>
+                    <span id="yearly-cost-result">{total_expense} RON</span>
                     </div>
                   </div>
                 </div>
               </div>
               <div className="flex flex-col w-full lg:w-[60%] bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-700 p-5">
                 <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">
-                  Add Monthly Expenses
+                  Add Fixed Expense
                 </h1>
                 <Formik
                   initialValues={{
                     monthly_rent: '',
-                    monthly_debts: '',
-                    debts_period: '',
+                    monthly_debts: '1',
+                    debts_period: '1',
                     other_expense: '',
                     fixed_expense: '',
                   }}
                   validationSchema={validationSchema}
-                  onSubmit={(values, actions) => {
+                  onSubmit={async(values, actions) => {
                     let expensesWithoutId = expense.map(({ _id, ...rest }) => rest);
-                    setTimeout(() => {
                       const { monthly_rent, monthly_debts, debts_period, other_expense } = values;
-
                       let data = {
                         UserId: String(UserId),
                         monthly_rent: monthly_rent,
@@ -112,9 +138,14 @@ function Expenses() {
                         debts_period: debts_period,
                         other_expense: expensesWithoutId,
                         total_expense: total_expense,
+                        isExpenseUsable:false
+
+
                         //fixed_expense: Number(monthly_rent) + Number(monthly_debts),
                       };
-                      dispatch(createExpense(data));
+                      const res=await dispatch(editExpense(data));
+                      console.log("res===",res)
+                     if(res?.payload?.statusCode===200){
                       actions.resetForm({
                         values: {
                           // the type of `values` inferred to be Blog
@@ -123,16 +154,18 @@ function Expenses() {
                           debts_period: '',
                           other_expense: '',
                         },
+                     })
+                     navigate("/")
+                    }
+                    
 
-                        // you can also set the other form states here
-                      });
-                    }, 500);
+                      //   // you can also set the other form states here
+                      // });
                   }}
                 >
                   {({ values, isSubmitting }) => {
                     setTotalExpense(
                       Number(values.monthly_rent) +
-                        Number(values.monthly_debts) +
                         Number(totalPrice)
                     );
                     return (
@@ -156,42 +189,9 @@ function Expenses() {
                               className="text-sm font-medium text-red-600"
                             />
                           </div>
-                          <div className="mb-5">
-                            <label
-                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                              htmlFor="monthlyDebts"
-                            >
-                              Monthly Debts
-                            </label>
-                            <Field
-                              type="number"
-                              name="monthly_debts"
-                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                            />
-                            <ErrorMessage
-                              name="monthly_debts"
-                              component="div"
-                              className="text-sm font-medium text-red-600"
-                            />
-                          </div>
-                          <div className="mb-5">
-                            <label
-                              className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                              htmlFor="periodOfDebt"
-                            >
-                              Period of Debt (in time)
-                            </label>
-                            <Field
-                              type="number"
-                              name="debts_period"
-                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                            />
-                            <ErrorMessage
-                              name="debts_period"
-                              component="div"
-                              className="text-sm font-medium text-red-600"
-                            />
-                          </div>
+                        
+                        
+                        
                           <div className="mb-5 flex justify-end">
                             <div>
                               <svg
@@ -254,7 +254,7 @@ function Expenses() {
                                                 </td>
 
                                                 <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                  {`${item?.price}$`}
+                                                  {`${item?.price}RON`}
                                                 </td>
                                                 <td className="py-4 px-6 text-sm font-medium text-right whitespace-nowrap">
                                                   <svg
@@ -314,10 +314,10 @@ function Expenses() {
                             </div>
                           </div>
                           <button
-                            disabled={incomes?.length === 0}
+                            disabled={expenses?.length === 0}
                             type="submit"
                             className={`text-white ${
-                              incomes && incomes.length === 0
+                              expenses && expenses.length === 0
                                 ? 'bg-[#756fe7]'
                                 : 'bg-[#4F46E5] hover:bg-[#433BCB]'
                             }  rounded-lg text-sm px-4 lg:px-5 py-3 lg:py-3.5 focus:outline-none font-extrabold w-full mt-3 shade mb-3 flex items-center justify-center`}
@@ -367,7 +367,7 @@ function Expenses() {
         </main>
       </div>
     </div>
-  );
+  
 }
 
 export default Expenses;

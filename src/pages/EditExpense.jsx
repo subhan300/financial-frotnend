@@ -4,7 +4,7 @@ import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
-import { createExpense, editExpense } from '../redux/features/expense/expense.reducer';
+import { createExpense, editExpense, getExpense } from '../redux/features/expense/expense.reducer';
 import { getUserId } from '../utils/Utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
@@ -35,7 +35,7 @@ function EditExpenses() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   // Reducer function to calculate the total price
-  const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
+  const totalPriceReducer = (accumulator, currentValue) => accumulator + Number(currentValue.price);
   // Calculate the total price using the reducer
   let totalPrice = expense?.reduce(totalPriceReducer, 0);
   const handleOpenModal = () => {
@@ -45,10 +45,18 @@ function EditExpenses() {
     setIsOpen(false);
   };
   useEffect(() => {
+    Promise.all([dispatch(getExpense(UserId))]).catch((error) => {
+      console.error('Error fetching data:', error);
+    });
+  }, [dispatch, UserId]);
+  useEffect(() => {
     const res = expenses?.filter((item) => item?._id === router.id);
     setInitialValues(res);
     setAddExpense(res[0]?.other_expense);
-  }, [router.id]);
+    setTotalExpense(res[0].total_expense)
+    console.log("exp Res===",res)
+  }, [router.id, expenses]);
+  console.log("expense",expense,"total exp",total_expense,"total price",totalPrice)
   useEffect(() => {
     if (isError) {
       dispatch(clearState());
@@ -91,9 +99,9 @@ function EditExpenses() {
                     </div>
 
                     <div class="flex flex-col flex-grow ml-4">
-                      <div class="text-sm text-gray-500">Monthly Expenses</div>
+                      <div class="text-sm text-gray-500">Fixed Expenses</div>
                       <div class="font-bold text-lg">
-                        $<span id="yearly-cost-result">{total_expense || 0}</span>
+                        <span id="yearly-cost-result">{total_expense || 0} RON</span>
                       </div>
                     </div>
                   </div>
@@ -115,7 +123,6 @@ function EditExpenses() {
                     onSubmit={(values, actions) => {
                       setTimeout(() => {
                         const { monthly_rent, monthly_debts, debts_period, other_expense } = values;
-
                         // Remove _id field from other_expense array
                         const expenseWithoutId = other_expense.map((expense) => {
                           const { _id, ...rest } = expense;
@@ -128,8 +135,9 @@ function EditExpenses() {
                           other_expense: expenseWithoutId,
                           total_expense: total_expense, // Assuming total_expense is defined elsewhere
                           fixed_expense: Number(monthly_rent) + Number(monthly_debts),
+                          expenseId: initialValues[0]._id,
                         };
-                        dispatch(editExpense({ UserId, data }));
+                        dispatch(editExpense({ UserId, ...data }));
                         navigate('/');
                         actions.resetForm({
                           values: {
@@ -148,10 +156,9 @@ function EditExpenses() {
                     {({ values, isSubmitting }) => {
                       setTotalExpense(
                         Number(values.monthly_rent) +
-                          Number(values.monthly_debts) +
                           Number(totalPrice)
                       );
-                      console.log(values, 'Edit expense');
+
                       return (
                         <>
                           <Form className="mt-5">
@@ -173,42 +180,7 @@ function EditExpenses() {
                                 className="text-sm font-medium text-red-600"
                               />
                             </div>
-                            <div className="mb-5">
-                              <label
-                                className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                                htmlFor="monthlyDebts"
-                              >
-                                Monthly Debts
-                              </label>
-                              <Field
-                                type="number"
-                                name="monthly_debts"
-                                className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                              />
-                              <ErrorMessage
-                                name="monthly_debts"
-                                component="div"
-                                className="text-sm font-medium text-red-600"
-                              />
-                            </div>
-                            <div className="mb-5">
-                              <label
-                                className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                                htmlFor="periodOfDebt"
-                              >
-                                Period of Debt (in time)
-                              </label>
-                              <Field
-                                type="number"
-                                name="debts_period"
-                                className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                              />
-                              <ErrorMessage
-                                name="debts_period"
-                                component="div"
-                                className="text-sm font-medium text-red-600"
-                              />
-                            </div>
+
                             <div className="mb-5 flex justify-end">
                               <div>
                                 <svg
@@ -276,7 +248,7 @@ function EditExpenses() {
                                                     </td>
 
                                                     <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
-                                                      {`${item?.price}$`}
+                                                      {`${item?.price} RON`}
                                                     </td>
                                                     <td className="py-4 px-6 text-sm font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                                       <span>
@@ -306,18 +278,14 @@ function EditExpenses() {
                                                       <span>
                                                         <svg
                                                           onClick={() => {
-                                                            console.log(item, 'item');
                                                             const updatedIncome =
-                                                              values?.other_expense?.filter(
+                                                              values?.other
+                                                              _expense?.filter(
                                                                 (incomeItem) =>
                                                                   incomeItem._id !== item._id
                                                               );
                                                             // Update the state with the new array without the deleted item
                                                             setAddExpense(updatedIncome);
-                                                            console.log(
-                                                              updatedIncome,
-                                                              'updatedIncome'
-                                                            );
                                                           }}
                                                           class="w-6 h-6 ml-2 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
                                                           aria-hidden="true"

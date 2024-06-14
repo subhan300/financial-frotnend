@@ -52,7 +52,7 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {`$${item?.monthly_rent}`}
+                              {`RON ${item?.monthly_rent}`}
                             </a>
                           </div>
                           <div>
@@ -60,7 +60,7 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {item?.monthly_rent}
+                              RON {item?.monthly_rent}
                             </a>
                           </div>
                           <div>
@@ -68,7 +68,7 @@ function ExpenseGrid() {
                               className="text-center font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {`${item?.other_expense[0]?.expense_name}`}
+                              {`${item?.other_expense[0]?.expense_name || 0}`}
                             </a>
                           </div>
                           <div>
@@ -76,7 +76,7 @@ function ExpenseGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              {`${item?.other_expense[0]?.price}`}
+                              {`RON ${item?.other_expense[0]?.price || 0}`}
                             </a>
                           </div>
                           <div className="flex items-center ml-2">
@@ -101,7 +101,7 @@ function ExpenseGrid() {
                                 d="m14.304 4.844 2.852 2.852M7 7H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-4.5m2.409-9.91a2.017 2.017 0 0 1 0 2.853l-6.844 6.844L8 14l.713-3.565 6.844-6.844a2.015 2.015 0 0 1 2.852 0Z"
                               />
                             </svg>
-                            <svg
+                            {/* <svg
                               onClick={() => setModalOpen(true)}
                               class="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white"
                               aria-hidden="true"
@@ -116,11 +116,11 @@ function ExpenseGrid() {
                                 d="M2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10S2 17.523 2 12Zm7.707-3.707a1 1 0 0 0-1.414 1.414L10.586 12l-2.293 2.293a1 1 0 1 0 1.414 1.414L12 13.414l2.293 2.293a1 1 0 0 0 1.414-1.414L13.414 12l2.293-2.293a1 1 0 0 0-1.414-1.414L12 10.586 9.707 8.293Z"
                                 clip-rule="evenodd"
                               />
-                            </svg>
+                            </svg> */}
                             <ConfirmModal
                               modalOpen={modalOpen}
                               setModalOpen={setModalOpen}
-                              value={expenses[0]._id}
+                              value={item._id}
                               valueType={'expense'}
                             />
                           </div>

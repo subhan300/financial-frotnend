@@ -6,8 +6,8 @@ import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
 import IncomeModal from '../components/IncomeModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { createIncome, editIncome } from '../redux/features/income/income.reducer';
-import { getUserId } from '../utils/Utils';
+import { createIncome, editIncome, getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
+import { dateFormat, getUserId } from '../utils/Utils';
 import { clearState, clearSuccess } from '../redux/features/income/income.slice';
 import { useParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
@@ -22,7 +22,10 @@ const validationSchema = Yup.object().shape({
 function EditIncome() {
   const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState('');
-  const { incomes, isSucess, isLoading, isError } = useSelector((state) => state.income);
+  const { incomes, isSucess, isLoading, isError } = useSelector((state) => {
+    console.log("state= income",state.income)
+    return state.income
+  });
   const router = useParams();
   const [editItem, setEditingItem] = useState();
   const UserId = getUserId();
@@ -32,21 +35,37 @@ function EditIncome() {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const totalPriceReducer = (accumulator, currentValue) =>
-    accumulator + Number(currentValue.price) + Number(initialValues[0].total_income);
-
+    accumulator + Number(currentValue.price);
+   
   // Calculate the total price using the reducer
   let totalPrice = income?.reduce(totalPriceReducer, 0);
   useEffect(() => {
+    // setLoader(true)
+    Promise.all([
+      dispatch(getIncome(UserId)),
+      dispatch(getIncomeLastDate(UserId))
+    ]).catch((error) => {
+      console.error('Error fetching data:', error);
+    })
+  
+  }, [dispatch, UserId]);
+  useEffect(() => {
     const res = incomes?.filter((item) => item?._id === router.id);
-    res && setInitialValues(res);
-    setIncome(res[0]?.extra_income);
-    console.log(res, 'res');
-  }, [router.id]);
+    if(res){
+      setInitialValues(res);
+      setTotalIncome(res[0]?.total_income)
+      setIncome(res[0]?.extra_income);
+      
+    }
+
+   
+  }, [router.id,incomes]);
   useEffect(() => {
     if (isError) {
       dispatch(clearState());
     }
   }, [isError]);
+console.log("totla incomes==",totalIncome,"extra income",income)
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -82,7 +101,7 @@ function EditIncome() {
                   <div class="flex flex-col flex-grow ml-4">
                     <div class="text-sm text-gray-500">Monthly Income</div>
                     <div class="font-bold text-lg">
-                      $<span id="yearly-cost-result">{totalIncome}</span>
+                      RON<span id="yearly-cost-result">{totalIncome}</span>
                     </div>
                   </div>
                 </div>
@@ -105,20 +124,19 @@ function EditIncome() {
                     setTimeout(() => {
                       let data = {
                         monthly_income: values.monthly_income,
-                        date: values?.date,
+                        date: dateFormat(values?.date),
                         total_income: totalIncome,
                         extra_income: incomeWithoutId,
+                        incomeId:initialValues[0]._id
                       };
 
                       dispatch(editIncome({ UserId, data }));
                       actions.resetForm({
                         values: {
-                          // the type of `values` inferred to be Blog
                           monthly_income: '',
                           date: '',
                           extra_income: {},
                         },
-                        // you can also set the other form states here
                       });
                       navigate('/');
                       dispatch(clearSuccess());
@@ -126,7 +144,6 @@ function EditIncome() {
                   }}
                 >
                   {({ values, isSubmitting }) => {
-                    console.log(values, 'valuesssssss');
                     setTotalIncome(Number(values.monthly_income) + Number(totalPrice));
                     return (
                       <>

@@ -5,27 +5,8 @@ import { useSelector, useDispatch } from 'react-redux';
 import { deleteIncome } from '../redux/features/income/income.reducer';
 import { deleteGoal } from '../redux/features/goal.reducer';
 
-function ConfirmModal({ modalOpen, setModalOpen, value, valueType,date }) {
-  const modalContent = useRef(null);
-
-
-  const dispatch = useDispatch();
-  const handleDeleteExpense = (id,date) => {
-    // if (valueType === 'expense') {
-    //   dispatch(deleteExpense(id));
-    //   setModalOpen(false);
-    // } else 
-    if (valueType === 'income') {
-      // debugger
-      dispatch(deleteIncome(id));
-      dispatch(deleteExpense(date));
-      setModalOpen(false);
-    } else {
-      console.log(id, 'valueType === income');
-      dispatch(deleteGoal(id));
-      setModalOpen(false);
-    }
-  };
+function GoalModal({ modalOpen, setModalOpen ,text}) {
+ 
   return (
     <>
       {/* Modal backdrop */}
@@ -54,7 +35,7 @@ function ConfirmModal({ modalOpen, setModalOpen, value, valueType,date }) {
         leaveEnd="opacity-0 translate-y-4"
       >
         <div
-          ref={modalContent}
+          // ref={modalContent}
           className="bg-white dark:bg-slate-800 border border-transparent dark:border-slate-700 overflow-auto max-w-xl w-full max-h-full rounded shadow-lg p-5"
         >
           <div className="flex items-center justify-center flex-shrink-0 h-24 w-24 rounded-xl bg-red-100 text-red-500 mx-auto">
@@ -73,25 +54,17 @@ function ConfirmModal({ modalOpen, setModalOpen, value, valueType,date }) {
               ></path>
             </svg>
           </div>
-          <h1 className="text-xl text-center mt-5 font-bold text-slate-800 dark:text-slate-100">
-            Are you sure?
-          </h1>
+        
           <p className="text-sm text-center mx-auto justify-center max-w-sm mt-3 text-gray-500">
-            This action cannot be undone, All values associated with this field will be lost.
+            {text}
+        
           </p>
-          <button
-            onClick={() => {
-              handleDeleteExpense(value,date);
-            }}
-            className="w-full py-2 bg-[#4F46E5] hover:bg-[#433BCB] text-white rounded-md mt-5"
-          >
-            Delete
-          </button>
+        
           <button
             onClick={() => setModalOpen(false)}
             className="w-full py-2 border border-gray-700 rounded-md mt-2"
           >
-            Cancel
+            Ok
           </button>
         </div>
       </Transition>
@@ -99,4 +72,4 @@ function ConfirmModal({ modalOpen, setModalOpen, value, valueType,date }) {
   );
 }
 
-export default ConfirmModal;
+export default GoalModal;

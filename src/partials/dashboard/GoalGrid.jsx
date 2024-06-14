@@ -70,7 +70,7 @@ function GoalGrid() {
                               className="text-center font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              ${item?.monthly_saving}
+                              RON {item?.monthly_saving}
                             </a>
                           </div>
                           <div>
@@ -78,7 +78,7 @@ function GoalGrid() {
                               className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                               href="#0"
                             >
-                              ${item?.price}
+                              RON {item?.price}
                             </a>
                           </div>
                           <div className="flex items-center ml-2">

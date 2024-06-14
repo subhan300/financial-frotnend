@@ -24,7 +24,6 @@ const AppRoutes = () => {
   const { auth } = useSelector((state) => state.auth);
 
   return (
-    <BrowserRouter>
       <Routes>
         <Route
           path="/"
@@ -97,7 +96,7 @@ const AppRoutes = () => {
         <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
         <Route path="/emailverification" element={<VerificationMessage />} />
       </Routes>
-    </BrowserRouter>
+
   );
 };
 

@@ -53,7 +53,7 @@ function FinanceGrid() {
                             className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                             href="#0"
                           >
-                            {`$${item?.monthly_income}`}
+                            {`RON ${item?.monthly_income}`}
                           </a>
                         </div>
                         <div>
@@ -69,11 +69,7 @@ function FinanceGrid() {
                             className="text-center font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                             href="#0"
                           >
-                            {`${
-                              item?.extra_income[0]?.income_name
-                                ? item.extra_income[0].income_name
-                                : 'N/A'
-                            }`}
+                            {`${item?.extra_income[0]?.income_name || 0}`}
                           </a>
                         </div>
                         <div>
@@ -81,7 +77,7 @@ function FinanceGrid() {
                             className="font-medium text-slate-800 hover:text-slate-900 dark:text-slate-100 dark:hover:text-white"
                             href="#0"
                           >
-                            {`${item?.extra_income[0]?.price ? item.extra_income[0].price : 'N/A'}`}
+                            {`RON ${item?.extra_income[0]?.price || 0}`}
                           </a>
                         </div>
                         <div className="flex items-center ml-2">
@@ -126,6 +122,7 @@ function FinanceGrid() {
                             modalOpen={modalOpen}
                             setModalOpen={setModalOpen}
                             value={incomes[0]._id}
+                            date={incomes[0].date}
                             valueType={'income'}
                           />
                         </div>

@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { logout, userRegister, userlogin } from './auth.reducer';
 import { toast } from 'react-toastify';
 const initialState = {
-  auth: [],
+  auth:JSON.parse(localStorage.getItem("user"))?? [],
   isLoading: false,
   isSuccess: false,
   isError: false,
@@ -30,7 +30,8 @@ export const authSlice = createSlice({
       state.isLoading = false;
       state.isError = false;
       state.isSuccess = true;
-      state.auth = action.payload;
+      state.auth = action.payload.data;
+      localStorage.setItem("user",JSON.stringify(action.payload.data))
       toast.success('Login has been succesfull', {
         position: toast.BOTTOM_RIGHT,
       });
