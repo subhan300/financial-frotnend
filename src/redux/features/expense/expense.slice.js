@@ -100,7 +100,6 @@ export const expenseSlice = createSlice({
     builder.addCase(deleteExpense.fulfilled, (state, action) => {
       state.isLoading = false;
       state.isError = false;
-      debugger
       state.expenses = state.expenses.filter((item) => item?.date !== action.meta.arg);
       toast.success('Expense has been deleted', {
         position: toast.BOTTOM_RIGHT,

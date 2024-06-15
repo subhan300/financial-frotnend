@@ -3,14 +3,17 @@ import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import ExpenseModal from '../components/ExpenseModal';
 import IncomeModal from '../components/IncomeModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { createIncome, editIncome, getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
-import { dateFormat, getUserId } from '../utils/Utils';
+import { editIncome, getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
+import { dateFormat, getUserId, startListening, stopListening } from '../utils/Utils';
 import { clearState, clearSuccess } from '../redux/features/income/income.slice';
 import { useParams, useNavigate } from 'react-router-dom';
 import moment from 'moment';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import blackmic from '../images/black_mic.png';
+import redmic from '../images/red_mic.png';
+import '../css/style.css';
 
 const validationSchema = Yup.object().shape({
   monthly_income: Yup.number()
@@ -23,8 +26,7 @@ function EditIncome() {
   const navigate = useNavigate();
   const [initialValues, setInitialValues] = useState('');
   const { incomes, isSucess, isLoading, isError } = useSelector((state) => {
-    console.log("state= income",state.income)
-    return state.income
+    return state.income;
   });
   const router = useParams();
   const [editItem, setEditingItem] = useState();
@@ -34,38 +36,38 @@ function EditIncome() {
   const [income, setIncome] = useState([]);
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const totalPriceReducer = (accumulator, currentValue) =>
-    accumulator + Number(currentValue.price);
-   
+  const totalPriceReducer = (accumulator, currentValue) => accumulator + Number(currentValue.price);
+
   // Calculate the total price using the reducer
   let totalPrice = income?.reduce(totalPriceReducer, 0);
+
+  // Text to speech section
+  const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
   useEffect(() => {
     // setLoader(true)
-    Promise.all([
-      dispatch(getIncome(UserId)),
-      dispatch(getIncomeLastDate(UserId))
-    ]).catch((error) => {
-      console.error('Error fetching data:', error);
-    })
-  
+    Promise.all([dispatch(getIncome(UserId)), dispatch(getIncomeLastDate(UserId))]).catch(
+      (error) => {
+        console.error('Error fetching data:', error);
+      }
+    );
   }, [dispatch, UserId]);
   useEffect(() => {
     const res = incomes?.filter((item) => item?._id === router.id);
-    if(res){
+    if (res) {
       setInitialValues(res);
-      setTotalIncome(res[0]?.total_income)
+      setTotalIncome(res[0]?.total_income);
       setIncome(res[0]?.extra_income);
-      
     }
-
-   
-  }, [router.id,incomes]);
+  }, [router.id, incomes]);
   useEffect(() => {
     if (isError) {
       dispatch(clearState());
     }
   }, [isError]);
-console.log("totla incomes==",totalIncome,"extra income",income)
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -121,29 +123,35 @@ console.log("totla incomes==",totalIncome,"extra income",income)
                   validationSchema={validationSchema}
                   onSubmit={(values, actions) => {
                     let incomeWithoutId = values?.extra_income.map(({ _id, ...rest }) => rest);
-                    setTimeout(() => {
-                      let data = {
-                        monthly_income: values.monthly_income,
-                        date: dateFormat(values?.date),
-                        total_income: totalIncome,
-                        extra_income: incomeWithoutId,
-                        incomeId:initialValues[0]._id
-                      };
 
-                      dispatch(editIncome({ UserId, data }));
-                      actions.resetForm({
-                        values: {
-                          monthly_income: '',
-                          date: '',
-                          extra_income: {},
-                        },
-                      });
-                      navigate('/');
-                      dispatch(clearSuccess());
-                    }, 500);
+                    let data = {
+                      monthly_income: values.monthly_income,
+                      date: dateFormat(values?.date),
+                      total_income: totalIncome,
+                      extra_income: incomeWithoutId,
+                      incomeId: initialValues[0]._id,
+                    };
+
+                    dispatch(editIncome({ UserId, data }));
+                    stopListening();
+                    actions.resetForm({
+                      values: {
+                        monthly_income: '',
+                        date: '',
+                        extra_income: {},
+                      },
+                    });
+                    navigate('/');
+                    dispatch(clearSuccess());
                   }}
                 >
-                  {({ values, isSubmitting }) => {
+                  {({ values, setFieldValue }) => {
+                    console.log(values, 'values');
+                    useEffect(() => {
+                      if (transcript) {
+                        setFieldValue('monthly_income', transcript);
+                      }
+                    }, [transcript, setFieldValue]);
                     setTotalIncome(Number(values.monthly_income) + Number(totalPrice));
                     return (
                       <>
@@ -155,11 +163,46 @@ console.log("totla incomes==",totalIncome,"extra income",income)
                             >
                               Monthly Income
                             </label>
-                            <Field
-                              type="number"
-                              name="monthly_income"
-                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                            />
+                            <div className="relative mt-1 w-full sm:w-auto">
+                              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                {listening ? (
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      e.preventDefault();
+                                      stopListening();
+                                      resetTranscript();
+                                    }}
+                                    style={{
+                                      border: 'none',
+                                      background: 'transparent',
+                                      padding: 0,
+                                    }}
+                                    className="p-0 m-0 focus:outline-none"
+                                  >
+                                    <img src={redmic} width={20} height={20} alt="mic" />
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={startListening}
+                                    style={{
+                                      border: 'none',
+                                      background: 'transparent',
+                                      padding: 0,
+                                    }}
+                                    className="p-0 m-0 focus:outline-none"
+                                  >
+                                    <img src={blackmic} width={20} height={20} alt="mic" />
+                                  </button>
+                                )}
+                              </div>
+                              <Field
+                                type="number"
+                                name="monthly_income"
+                                className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
+                                placeholder={listening ? 'listening...' : 'Enter Monthly Income'}
+                              />
+                            </div>
                             <ErrorMessage
                               name="monthly_income"
                               component="div"

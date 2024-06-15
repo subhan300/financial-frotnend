@@ -49,3 +49,9 @@
     background: url('../images/loginbg1.svg') center top no-repeat;
     background-size: 100%;
 }
+ /* Hide the spinner controls in webkit browsers (Chrome, Safari, Edge) */
+  .monthly_income::-webkit-outer-spin-button,
+  .monthly_income::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}

@@ -3,16 +3,23 @@ import Sidebar from '../partials/Sidebar';
 import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
-import ExpenseModal from '../components/ExpenseModal';
 import IncomeModal from '../components/IncomeModal';
 import { useDispatch, useSelector } from 'react-redux';
-import { createIncome, getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
-import { dateFormat, getUserId } from '../utils/Utils';
+import {
+  createIncome,
+  getIncome,
+  getIncomeLastDate,
+} from '../redux/features/income/income.reducer';
+import { dateFormat, getUserId, startListening } from '../utils/Utils';
 import { useNavigate } from 'react-router-dom';
 import { clearState, clearSuccess } from '../redux/features/income/income.slice';
 import { useEffect } from 'react';
 import FormDisableComponent from '../components/FormDisableComponent';
 import dayjs from 'dayjs';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import blackmic from '../images/black_mic.png';
+import redmic from '../images/red_mic.png';
+import '../css/style.css';
 
 const validationSchema = Yup.object().shape({
   monthly_income: Yup.number()
@@ -24,8 +31,7 @@ const validationSchema = Yup.object().shape({
 function Income() {
   const navigate = useNavigate();
   const { isLoading, isSuccess, isError, incomeLastDate } = useSelector((state) => {
-    console.log("income==",state.income)
-    return state.income
+    return state.income;
   });
 
   const [disableForm, setDisableForm] = useState(false);
@@ -37,19 +43,31 @@ function Income() {
   const [expenseModalOpen, setExpenseModalOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [editItem, setEditingItem] = useState('');
+  // Text to speech section
+  const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
   // Reducer function to calculate the total price
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
   let totalPrice = income.reduce(totalPriceReducer, 0);
+
+  const stopListening = () => {
+    SpeechRecognition.stopListening();
+    resetTranscript();
+  };
+
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
   useEffect(() => {
-    setLoader(true)
-    Promise.all([
-      dispatch(getIncome(userId)),
-      dispatch(getIncomeLastDate(userId))
-    ]).catch((error) => {
-      console.error('Error fetching data:', error);
-    }).finally(e=>{setLoader(false)})
-  
+    setLoader(true);
+    Promise.all([dispatch(getIncome(userId)), dispatch(getIncomeLastDate(userId))])
+      .catch((error) => {
+        console.error('Error fetching data:', error);
+      })
+      .finally((e) => {
+        setLoader(false);
+      });
   }, [dispatch, userId]);
   useEffect(() => {
     if (isSuccess) {
@@ -67,12 +85,15 @@ function Income() {
     const days = dayjs(incomeLastDate).diff(dayjs(), 'day');
     if (!incomeLastDate || Math.abs(days) > 30) {
       setDisableForm(false);
-    }  else {
+    } else {
       setDisableForm(true);
     }
-  }, [incomeLastDate,isSuccess]);
+  }, [incomeLastDate, isSuccess]);
+  console.log(transcript, 'transcript');
   {
-    return loader?<h1>Loading....</h1> : disableForm ? (
+    return loader ? (
+      <h1>Loading....</h1>
+    ) : disableForm ? (
       <FormDisableComponent text="Hey , you can not add another income till next month" />
     ) : (
       <div className="flex h-screen overflow-hidden">
@@ -109,7 +130,7 @@ function Income() {
                     <div class="flex flex-col flex-grow ml-4">
                       <div class="text-sm text-gray-500">Monthly Income</div>
                       <div class="font-bold text-lg">
-                      RON <span id="yearly-cost-result">{totalIncome}</span>
+                        RON <span id="yearly-cost-result">{totalIncome}</span>
                       </div>
                     </div>
                   </div>
@@ -131,13 +152,13 @@ function Income() {
 
                       let data = {
                         UserId: String(userId),
-                        monthly_income: values.monthly_income,
+                        monthly_income: Number(values.monthly_income),
                         date: dateFormat(values.date),
                         total_income: totalIncome,
                         extra_income: incomeWithoutId,
                       };
                       const res = await dispatch(createIncome(data));
-                      console.log('res', res);
+
                       if (res.payload.statusCode) {
                         actions.resetForm({
                           values: {
@@ -148,13 +169,19 @@ function Income() {
                         });
                         dispatch(clearSuccess());
                         setIncome([]);
-                        navigate("/expenses")
+                        navigate('/expenses');
                       } else {
                         console.log('error', res);
                       }
                     }}
                   >
-                    {({ values, isSubmitting }) => {
+                    {({ values, setFieldValue, isSubmitting }) => {
+                      console.log(values, 'values');
+                      useEffect(() => {
+                        if (transcript) {
+                          setFieldValue('monthly_income', transcript);
+                        }
+                      }, [transcript, setFieldValue]);
                       setTotalIncome(Number(values.monthly_income) + Number(totalPrice));
                       return (
                         <>
@@ -166,11 +193,41 @@ function Income() {
                               >
                                 Monthly Income
                               </label>
-                              <Field
-                                type="number"
-                                name="monthly_income"
-                                className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                              />
+                              <div className="relative mt-1 w-full sm:w-auto">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                  {listening ? (
+                                    <button
+                                      onClick={stopListening}
+                                      style={{
+                                        border: 'none',
+                                        background: 'transparent',
+                                        padding: 0,
+                                      }}
+                                      className="p-0 m-0 focus:outline-none"
+                                    >
+                                      <img src={redmic} width={20} height={20} alt="mic" />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={startListening}
+                                      style={{
+                                        border: 'none',
+                                        background: 'transparent',
+                                        padding: 0,
+                                      }}
+                                      className="p-0 m-0 focus:outline-none"
+                                    >
+                                      <img src={blackmic} width={20} height={20} alt="mic" />
+                                    </button>
+                                  )}
+                                </div>
+                                <Field
+                                  type="number"
+                                  name="monthly_income"
+                                  className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
+                                  placeholder={listening ? 'listening...' : 'Enter Monthly Income'}
+                                />
+                              </div>
                               <ErrorMessage
                                 name="monthly_income"
                                 component="div"

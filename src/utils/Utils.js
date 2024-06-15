@@ -1,5 +1,6 @@
 import dayjs from 'dayjs';
 import resolveConfig from 'tailwindcss/resolveConfig';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 
 export const tailwindConfig = () => {
   // Tailwind config
@@ -76,7 +77,7 @@ export const calculateIsGoalComplete = (goal) => {
     // Calculate total savings from goal tracking entries
     goalTracking?.forEach(({ totalIncome, totalExpense }) => {
       // const savings = ((totalIncome - totalExpense) * percentage) / 100;
-      const savings = ((totalIncome) * percentage) / 100;
+      const savings = (totalIncome * percentage) / 100;
       totalSavings += savings;
     });
 
@@ -107,4 +108,10 @@ export const totalPrice = (items) => {
   return items.reduce((accumulator, currentValue) => {
     return accumulator + parseInt(currentValue.price);
   }, 0);
+};
+
+// Text to speech section
+export const startListening = () => SpeechRecognition.startListening({ continuous: true });
+export const stopListening = () => {
+  SpeechRecognition.stopListening();
 };

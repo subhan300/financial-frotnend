@@ -5,12 +5,16 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { getExpense } from '../redux/features/expense/expense.reducer';
-import { dateFormat, getUserId } from '../utils/Utils';
+import { dateFormat, getUserId, startListening, stopListening } from '../utils/Utils';
 import { getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
 import { createGoal, editGoal, getGoal } from '../redux/features/goal.reducer';
 import { data } from 'autoprefixer';
 import GoalModal from '../components/GoalModal';
 import dayjs from 'dayjs';
+import { useSpeechRecognition } from 'react-speech-recognition';
+import blackmic from '../images/black_mic.png';
+import redmic from '../images/red_mic.png';
+import '../css/style.css';
 import FormDisableComponent from '../components/FormDisableComponent';
 import { useNavigate } from 'react-router-dom';
 
@@ -30,7 +34,7 @@ function Goals() {
   const dispatch = useDispatch();
   const { incomes, isLoading, isSucess, incomeLastDate } = useSelector((state) => state.income);
   const { status, haveNotified } = useSelector((state) => {
-    return state.goal
+    return state.goal;
   });
   const { expenses } = useSelector((state) => state.expense);
   const navigate = useNavigate();
@@ -38,8 +42,14 @@ function Goals() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const totalIncome = incomes?.filter((val) => val.date === incomeLastDate)?.[0]?.total_income;
-  const totalExpense=expenses.filter(val=>val.date===incomeLastDate)?.[0]?.total_expense;
-  
+  const totalExpense = expenses.filter((val) => val.date === incomeLastDate)?.[0]?.total_expense;
+  const [monthsToGoal, setMonthsToGoal] = useState('');
+  // Text to speech section
+  const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
   function calculateMonthsToGoal(monthlyIncome, priceOfGoal, savingsPercentage, monthlyExpense) {
     // const savedAmount = monthlyIncome - monthlyExpense;
     const totalMonthlySavings = (monthlyIncome * savingsPercentage) / 100;
@@ -57,9 +67,7 @@ function Goals() {
     const monthsNeeded = Math.ceil(priceOfGoal / totalMonthlySavings);
 
     return monthsNeeded;
-    // }
   }
-  const [monthsToGoal, setMonthsToGoal] = useState('');
   useEffect(() => {
     // setLoader(true)
     Promise.all([
@@ -69,19 +77,16 @@ function Goals() {
       dispatch(getGoal(UserId)),
     ]).catch((error) => {
       console.error('Error fetching data:', error);
-    })
-  
+    });
   }, [dispatch, UserId]);
-  useEffect(()=>{
- 
+  useEffect(() => {
     // console.log("have",haveNotified)
     if (status === 'completed' && !haveNotified) {
       setModalOpen2(true);
-      dispatch(editGoal({haveNotified:true}));
+      dispatch(editGoal({ haveNotified: true }));
     }
-  },[status])
-  console.log("status",status)
-  return status==="notCompleted" ? (
+  }, [status]);
+  return status === 'notCompleted' ? (
     <FormDisableComponent text="Hey , you can not add another Goal till next month" />
   ) : (
     <>
@@ -158,23 +163,30 @@ function Goals() {
                         percentage: values.percentage,
                         timeto_take: monthsToGoal,
                         monthly_saving: monthlySaving,
-                        goalTracking: [{ totalIncome, totalExpense, date: dateFormat(incomeLastDate) }],
+                        goalTracking: [
+                          { totalIncome, totalExpense, date: dateFormat(incomeLastDate) },
+                        ],
                         status: 'notCompleted',
                       };
                       const res = await dispatch(createGoal(data));
                       if (res?.payload?.statusCode === 200) {
                         actions.resetForm({
                           values: {
-                            percentage:"",
-                            price:"",
-                            name:""
+                            percentage: '',
+                            price: '',
+                            name: '',
                           },
                         });
-                        navigate("/")
+                        navigate('/');
                       }
                     }}
                   >
-                    {({ values }) => {
+                    {({ values, setFieldValue }) => {
+                      useEffect(() => {
+                        if (transcript) {
+                          setFieldValue('price', transcript);
+                        }
+                      }, [transcript, setFieldValue]);
                       if (values.percentage !== tempPer) {
                         setTempPer(values.percentage);
                         const monthsToGoal = calculateMonthsToGoal(
@@ -185,7 +197,6 @@ function Goals() {
                         );
                         setMonthsToGoal(monthsToGoal);
                       }
-
                       return (
                         <>
                           <Form className="mt-5">
@@ -250,11 +261,46 @@ function Goals() {
                               >
                                 Price
                               </label>
-                              <Field
-                                type="number"
-                                name="price"
-                                className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                              />
+                              <div className="relative mt-1 w-full sm:w-auto">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                  {listening ? (
+                                    <button
+                                      onClick={(e) => {
+                                        stopListening();
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        resetTranscript();
+                                      }}
+                                      style={{
+                                        border: 'none',
+                                        background: 'transparent',
+                                        padding: 0,
+                                      }}
+                                      className="p-0 m-0 focus:outline-none"
+                                    >
+                                      <img src={redmic} width={20} height={20} alt="mic" />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={startListening}
+                                      style={{
+                                        border: 'none',
+                                        background: 'transparent',
+                                        padding: 0,
+                                      }}
+                                      className="p-0 m-0 focus:outline-none"
+                                    >
+                                      <img src={blackmic} width={20} height={20} alt="mic" />
+                                    </button>
+                                  )}
+                                </div>
+                                <Field
+                                  type="number"
+                                  name="price"
+                                  className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
+                                  placeholder={listening ? 'listening...' : 'Enter Monthly Income'}
+                                />
+                              </div>
                               <ErrorMessage
                                 name="price"
                                 component="div"
@@ -291,7 +337,11 @@ function Goals() {
                             <button
                               type="submit"
                               className={`${
-                                errorMessage || values.percentage < 0 || values.percentage > 100 || !totalExpense || !totalIncome 
+                                errorMessage ||
+                                values.percentage < 0 ||
+                                values.percentage > 100 ||
+                                !totalExpense ||
+                                !totalIncome
                                   ? 'bg-[#cac7ff] text-white px-6 py-2 text-sm font-medium rounded-md cursor-not-allowed'
                                   : 'bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md'
                               }`}

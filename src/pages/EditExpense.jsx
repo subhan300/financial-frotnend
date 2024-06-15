@@ -4,11 +4,15 @@ import Header from '../partials/Header';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
-import { createExpense, editExpense, getExpense } from '../redux/features/expense/expense.reducer';
-import { getUserId } from '../utils/Utils';
+import { editExpense, getExpense } from '../redux/features/expense/expense.reducer';
+import { getUserId, startListening, stopListening } from '../utils/Utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clearState, clearSuccess } from '../redux/features/expense/expense.slice';
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import blackmic from '../images/black_mic.png';
+import redmic from '../images/red_mic.png';
+import '../css/style.css';
 const validationSchema = Yup.object().shape({
   monthly_rent: Yup.number()
     .required('Monthly rent is required')
@@ -38,6 +42,13 @@ function EditExpenses() {
   const totalPriceReducer = (accumulator, currentValue) => accumulator + Number(currentValue.price);
   // Calculate the total price using the reducer
   let totalPrice = expense?.reduce(totalPriceReducer, 0);
+
+  // Text to speech section
+  const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
   const handleOpenModal = () => {
     setIsOpen(true);
   };
@@ -53,10 +64,10 @@ function EditExpenses() {
     const res = expenses?.filter((item) => item?._id === router.id);
     setInitialValues(res);
     setAddExpense(res[0]?.other_expense);
-    setTotalExpense(res[0].total_expense)
-    console.log("exp Res===",res)
+    setTotalExpense(res[0].total_expense);
+    console.log('exp Res===', res);
   }, [router.id, expenses]);
-  console.log("expense",expense,"total exp",total_expense,"total price",totalPrice)
+  console.log('expense', expense, 'total exp', total_expense, 'total price', totalPrice);
   useEffect(() => {
     if (isError) {
       dispatch(clearState());
@@ -138,6 +149,7 @@ function EditExpenses() {
                           expenseId: initialValues[0]._id,
                         };
                         dispatch(editExpense({ UserId, ...data }));
+                        stopListening();
                         navigate('/');
                         actions.resetForm({
                           values: {
@@ -153,11 +165,13 @@ function EditExpenses() {
                       }, 500);
                     }}
                   >
-                    {({ values, isSubmitting }) => {
-                      setTotalExpense(
-                        Number(values.monthly_rent) +
-                          Number(totalPrice)
-                      );
+                    {({ values, setFieldValue, isSubmitting }) => {
+                      useEffect(() => {
+                        if (transcript) {
+                          setFieldValue('monthly_rent', transcript);
+                        }
+                      }, [transcript, setFieldValue]);
+                      setTotalExpense(Number(values.monthly_rent) + Number(totalPrice));
 
                       return (
                         <>
@@ -169,11 +183,46 @@ function EditExpenses() {
                               >
                                 Monthly Rent
                               </label>
-                              <Field
-                                type="number"
-                                name="monthly_rent"
-                                className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                              />
+                              <div className="relative mt-1 w-full sm:w-auto">
+                                <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                  {listening ? (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                        stopListening();
+                                        resetTranscript();
+                                      }}
+                                      style={{
+                                        border: 'none',
+                                        background: 'transparent',
+                                        padding: 0,
+                                      }}
+                                      className="p-0 m-0 focus:outline-none"
+                                    >
+                                      <img src={redmic} width={20} height={20} alt="mic" />
+                                    </button>
+                                  ) : (
+                                    <button
+                                      onClick={startListening}
+                                      style={{
+                                        border: 'none',
+                                        background: 'transparent',
+                                        padding: 0,
+                                      }}
+                                      className="p-0 m-0 focus:outline-none"
+                                    >
+                                      <img src={blackmic} width={20} height={20} alt="mic" />
+                                    </button>
+                                  )}
+                                </div>
+                                <Field
+                                  type="number"
+                                  name="monthly_rent"
+                                  className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
+                                  placeholder={listening ? 'listening...' : 'Enter Monthly Rent'}
+                                />
+                              </div>
                               <ErrorMessage
                                 name="monthly_rent"
                                 component="div"
@@ -278,12 +327,11 @@ function EditExpenses() {
                                                       <span>
                                                         <svg
                                                           onClick={() => {
-                                                            const updatedIncome =
-                                                              values?.other
-                                                              _expense?.filter(
-                                                                (incomeItem) =>
-                                                                  incomeItem._id !== item._id
-                                                              );
+                                                            const updatedIncome = values?.other;
+                                                            _expense?.filter(
+                                                              (incomeItem) =>
+                                                                incomeItem._id !== item._id
+                                                            );
                                                             // Update the state with the new array without the deleted item
                                                             setAddExpense(updatedIncome);
                                                           }}

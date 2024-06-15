@@ -8,19 +8,20 @@ const initialState = {
   isSuccess: false,
   isError: false,
   error: null,
-  totalSavings:"",
-  remainingSavings:"",
-  monthsToGoal:"",
-  status:'pending',
-  haveNotified:false
+  totalSavings: '',
+  remainingSavings: '',
+  monthsToGoal: '',
+  status: 'pending',
+  haveNotified: false,
 };
 export const goalSlice = createSlice({
   name: 'goal',
   initialState,
   reducers: {
     clearState: () => initialState,
-    goalSet:(state,action)=>{
-      return {...state,...action.payload}},
+    goalSet: (state, action) => {
+      return { ...state, ...action.payload };
+    },
     clearSuccess: (state) => {
       return {
         ...state,
@@ -30,41 +31,31 @@ export const goalSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(getGoal.pending, (state) => {
-      console.log('getGoal.pending', state);
       state.isLoading = true;
       state.isError = false;
-      state.isSuccess = false;
     });
     builder.addCase(getGoal.fulfilled, (state, action) => {
-      console.log('getGoal.fulfilled', action);
-   
-      const item=getLatestItem(action?.payload?.data)
-
+      const item = getLatestItem(action?.payload?.data);
       state.isLoading = false;
       state.isError = false;
-      state.isSuccess = true;
       state.goal = action?.payload?.data;
-      state.status=item.status,
-      state.haveNotified=item.haveNotified
-      
+      (state.status = item.status), (state.haveNotified = item.haveNotified);
     });
     builder.addCase(getGoal.rejected, (state, action) => {
-      console.log('getGoal.rejected', action);
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
     });
     builder.addCase(createGoal.pending, (state) => {
-      console.log('createGoal.pending', state);
       state.isLoading = true;
       state.isError = false;
-      state.isSuccess = false;
     });
     builder.addCase(createGoal.fulfilled, (state, action) => {
       console.log('createGoal.fulfilled', action);
       state.isLoading = false;
       state.isError = false;
+      state.isSuccess = true;
       state.goal.unshift(action?.payload?.data);
       toast.success('Goal has been created', {
         position: toast.BOTTOM_RIGHT,
@@ -117,5 +108,5 @@ export const goalSlice = createSlice({
     });
   },
 });
-export const { clearState, clearSuccess,goalSet } = goalSlice.actions;
+export const { clearState, clearSuccess, goalSet } = goalSlice.actions;
 export default goalSlice.reducer;

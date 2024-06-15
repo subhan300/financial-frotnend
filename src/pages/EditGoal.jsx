@@ -5,14 +5,17 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { useDispatch, useSelector } from 'react-redux';
 import { getExpense } from '../redux/features/expense/expense.reducer';
-import { getUserId } from '../utils/Utils';
+import { getUserId, startListening, stopListening } from '../utils/Utils';
 import { getIncome, getIncomeLastDate } from '../redux/features/income/income.reducer';
-import { createGoal, editGoal, getGoal } from '../redux/features/goal.reducer';
+import { editGoal, getGoal } from '../redux/features/goal.reducer';
 import { data } from 'autoprefixer';
 import { useNavigate, useParams } from 'react-router-dom';
 import { clearState, clearSuccess } from '../redux/features/goal.slice';
 import GoalModal from '../components/GoalModal';
-
+import { useSpeechRecognition } from 'react-speech-recognition';
+import blackmic from '../images/black_mic.png';
+import redmic from '../images/red_mic.png';
+import '../css/style.css';
 const validationSchema = Yup.object().shape({
   name: Yup.string().required('Name is required'),
   price: Yup.number().required('Price is required').min(0, 'Price must be a positive number'),
@@ -22,13 +25,13 @@ const validationSchema = Yup.object().shape({
 });
 
 function EditGoal() {
+  const navigate = useNavigate();
   const router = useParams();
   const [initialValues, setInitialValues] = useState('');
   const [tempPer, setTempPer] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [modalOpen2, setModalOpen2] = useState(false);
   const UserId = getUserId();
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { goal, isLoading, isSuccess, isError, status, haveNotified } = useSelector(
     (state) => state.goal
@@ -38,7 +41,12 @@ function EditGoal() {
   const [monthlySaving, setMonthlySaving] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
+  // Text to speech section
+  const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+  if (!browserSupportsSpeechRecognition) {
+    return <span>Browser doesn't support speech recognition.</span>;
+  }
   function calculateMonthsToGoal(monthlyIncome, priceOfGoal, savingsPercentage, monthlyExpense) {
     // const savedAmount = monthlyIncome - monthlyExpense;
 
@@ -79,21 +87,24 @@ function EditGoal() {
     });
   }, [dispatch, UserId]);
   useEffect(() => {
-    const res = goal?.filter((item) => item?._id === router.id);
+    const res = goal?.filter((item) => item?._id === router?.id);
     setInitialValues(res);
   }, [router.id, goal]);
   useEffect(() => {
     if (isError) {
       clearState();
     }
+    if (isSuccess) {
+      navigate('/');
+    }
     return () => {
       dispatch(clearSuccess());
     };
-  }, [isError, dispatch]);
+  }, [isError, isSuccess, dispatch]);
   useEffect(() => {
     if (status === 'completed' && !haveNotified) {
       setModalOpen2(true);
-      dispatch(editGoal({ haveNotified: true }));
+      dispatch(editGoal({ UserId: UserId, haveNotified: true }));
     }
   }, [status]);
   return (
@@ -162,7 +173,6 @@ function EditGoal() {
                   }}
                   validationSchema={validationSchema}
                   onSubmit={(values) => {
-                    debugger
                     let data = {
                       UserId: UserId,
                       name: values.name,
@@ -173,12 +183,16 @@ function EditGoal() {
                       haveNotified: false,
                     };
                     dispatch(editGoal(data));
-                    // navigate('/');
+                    stopListening();
                   }}
                 >
-                  {({ values }) => {
+                  {({ values, setFieldValue }) => {
+                    useEffect(() => {
+                      if (transcript) {
+                        setFieldValue('price', transcript);
+                      }
+                    }, [transcript, setFieldValue]);
                     // if (values.percentage !== tempPer) {
-
                     const monthsToGoal = calculateMonthsToGoal(
                       incomes[0]?.total_income,
                       values?.price,
@@ -187,7 +201,6 @@ function EditGoal() {
                     );
                     setMonthsToGoal(monthsToGoal);
                     // }
-
                     return (
                       <>
                         <Form className="mt-5">
@@ -249,11 +262,46 @@ function EditGoal() {
                             >
                               Price
                             </label>
-                            <Field
-                              type="number"
-                              name="price"
-                              className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                            />
+                            <div className="relative mt-1 w-full sm:w-auto">
+                              <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                                {listening ? (
+                                  <button
+                                    onClick={(e) => {
+                                      stopListening();
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      resetTranscript();
+                                    }}
+                                    style={{
+                                      border: 'none',
+                                      background: 'transparent',
+                                      padding: 0,
+                                    }}
+                                    className="p-0 m-0 focus:outline-none"
+                                  >
+                                    <img src={redmic} width={20} height={20} alt="mic" />
+                                  </button>
+                                ) : (
+                                  <button
+                                    onClick={startListening}
+                                    style={{
+                                      border: 'none',
+                                      background: 'transparent',
+                                      padding: 0,
+                                    }}
+                                    className="p-0 m-0 focus:outline-none"
+                                  >
+                                    <img src={blackmic} width={20} height={20} alt="mic" />
+                                  </button>
+                                )}
+                              </div>
+                              <Field
+                                type="number"
+                                name="price"
+                                className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
+                                placeholder={listening ? 'listening...' : 'Enter Monthly Income'}
+                              />
+                            </div>
                             <ErrorMessage
                               name="price"
                               component="div"
