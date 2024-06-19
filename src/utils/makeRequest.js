@@ -29,7 +29,12 @@ export const makeRequest = async (url, method = 'get', data = null, customHeader
       },
     };
     const response = await apiClient.request(config);
-    return response.data;
+    if(response.data){
+return response.data;
+    }else{
+     return response
+    }
+  
   } catch (error) {
     console.error('Request Error:', error);
     throw error;
