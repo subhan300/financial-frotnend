@@ -120,7 +120,7 @@ function EditExpenses() {
                 </div>
                 <div className="flex flex-col w-full lg:w-[60%] bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-700 p-5">
                   <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">
-                    Add Monthly Expenses
+                    Edit Monthly Expenses
                   </h1>
                   <Formik
                     enableReinitialize

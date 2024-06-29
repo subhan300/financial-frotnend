@@ -165,7 +165,9 @@ function IncomeModal({ modalOpen, setModalOpen, setIncome, item, editItem }) {
                           </button>
                         ) : (
                           <button
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
                               startListening();
                             }}
                             style={{

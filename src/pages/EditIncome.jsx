@@ -110,7 +110,7 @@ function EditIncome() {
               </div>
               <div className="flex flex-col w-full lg:w-[60%] bg-white dark:bg-slate-800 shadow-lg rounded-md border border-slate-200 dark:border-slate-700 p-5">
                 <h1 className="text-xl md:text-2xl font-bold text-slate-800 dark:text-slate-100">
-                  Add Monthly Income
+                  Edit Monthly Income
                 </h1>
                 <Formik
                   enableReinitialize
@@ -202,7 +202,7 @@ function EditIncome() {
                               </div>
                               <Field
                                 type="number"
-                                name="monthly_rent"
+                                name="monthly_income"
                                 className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
                                 placeholder={listening ? 'listening...' : 'Enter Monthly Rent'}
                               />
