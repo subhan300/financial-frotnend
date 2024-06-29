@@ -36,7 +36,7 @@ function EditGoal() {
   const { goal, isLoading, isSuccess, isError, status, haveNotified } = useSelector(
     (state) => state.goal
   );
-  const { incomes } = useSelector((state) => state.income);
+  const { incomes,incomeLastDate } = useSelector((state) => state.income);
   const { expenses } = useSelector((state) => state.expense);
   const [monthlySaving, setMonthlySaving] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -74,6 +74,9 @@ function EditGoal() {
     return monthsNeeded;
     // }
   }
+  const totalIncome = incomes?.filter((val) => val.date === incomeLastDate)?.[0]?.total_income;
+  const totalExpense = expenses.filter((val) => val.date === incomeLastDate)?.[0]?.total_expense;
+  console.log("total",totalIncome)
   const [monthsToGoal, setMonthsToGoal] = useState('');
   useEffect(() => {
     // setLoader(true)
@@ -194,10 +197,12 @@ function EditGoal() {
                     }, [transcript, setFieldValue]);
                     // if (values.percentage !== tempPer) {
                     const monthsToGoal = calculateMonthsToGoal(
-                      incomes[0]?.total_income,
+                      // incomes[0]?.total_income,
+                      totalIncome,
                       values?.price,
                       values?.percentage,
-                      expenses[0]?.total_expense
+                      totalExpense
+                      // expenses[0]?.total_expense
                     );
                     setMonthsToGoal(monthsToGoal);
                     // }
@@ -213,7 +218,7 @@ function EditGoal() {
                             </label>
                             <input
                               name="username"
-                              value={incomes[0]?.total_income}
+                              value={totalIncome}
                               type="text"
                               disabled={true}
                               autocomplete="off"
@@ -230,7 +235,7 @@ function EditGoal() {
                             </label>
                             <input
                               name="username"
-                              value={expenses[0]?.total_expense}
+                              value={totalExpense}
                               type="text"
                               disabled={true}
                               autocomplete="off"

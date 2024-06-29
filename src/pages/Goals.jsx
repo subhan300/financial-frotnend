@@ -41,8 +41,10 @@ function Goals() {
   const [monthlySaving, setMonthlySaving] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  console.log("incomelast=======",incomeLastDate,"date===")
   const totalIncome = incomes?.filter((val) => val.date === incomeLastDate)?.[0]?.total_income;
   const totalExpense = expenses.filter((val) => val.date === incomeLastDate)?.[0]?.total_expense;
+
   const [monthsToGoal, setMonthsToGoal] = useState('');
   // Text to speech section
   const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
