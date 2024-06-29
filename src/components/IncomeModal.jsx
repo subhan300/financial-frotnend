@@ -4,7 +4,11 @@ import Transition from '../utils/Transition';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { generateRandomId } from '../utils/generateRandomId';
-
+//Speech to text
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import blackmic from '../images/black_mic.png';
+import redmic from '../images/red_mic.png';
+import '../css/style.css';
 const validationSchema = Yup.object().shape({
   income_name: Yup.string().required('Expense title is required'),
   price: Yup.number()
@@ -13,12 +17,19 @@ const validationSchema = Yup.object().shape({
 });
 
 function IncomeModal({ modalOpen, setModalOpen, setIncome, item, editItem }) {
+  // Text to speech section
+  const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+  const startListening = () => SpeechRecognition.startListening({ continuous: true });
+  const stopListening = () => {
+    SpeechRecognition.stopListening();
+  };
   const [initialValues, setInitialValues] = useState({
     _id: generateRandomId(),
     income_name: '',
     price: '',
   });
-  const handleSubmit = (values, { setSubmitting }) => {
+  const handleSubmit = (values, actions) => {
     if (editItem) {
       // If editing an existing item, update it in the array
       const updatedIncome = item?.map((incomeItem) =>
@@ -34,7 +45,14 @@ function IncomeModal({ modalOpen, setModalOpen, setIncome, item, editItem }) {
       };
       setIncome((prevIncome) => [...prevIncome, newIncome]);
     }
-    setSubmitting(false);
+    actions.resetForm({
+      values: {
+        income_name: '',
+        price: '',
+        _id: '',
+      },
+    });
+
     setModalOpen(false);
   };
   const modalContent = useRef(null);
@@ -93,53 +111,96 @@ function IncomeModal({ modalOpen, setModalOpen, setIncome, item, editItem }) {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ isSubmitting }) => (
-              <Form className="mt-5">
-                <div className="mb-5">
-                  <label
-                    className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                    htmlFor="expenseName"
+            {({ setFieldValue, isSubmitting }) => {
+              useEffect(() => {
+                if (transcript) {
+                  setFieldValue('price', transcript);
+                }
+              }, [transcript, setFieldValue]);
+              return (
+                <Form className="mt-5">
+                  <div className="mb-5">
+                    <label
+                      className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                      htmlFor="expenseName"
+                    >
+                      Name
+                    </label>
+                    <Field
+                      type="text"
+                      name="income_name"
+                      className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                    />
+                    <ErrorMessage
+                      name="income_name"
+                      component="div"
+                      className="text-sm font-medium text-red-600"
+                    />
+                  </div>
+                  <div className="mb-5">
+                    <label
+                      className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                      htmlFor="expenseValue"
+                    >
+                      Price
+                    </label>
+                    <div className="relative mt-1 w-full sm:w-auto">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                        {listening ? (
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              stopListening();
+                              resetTranscript();
+                            }}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              padding: 0,
+                            }}
+                            className="p-0 m-0 focus:outline-none"
+                          >
+                            <img src={redmic} width={20} height={20} alt="mic" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              startListening();
+                            }}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              padding: 0,
+                            }}
+                            className="p-0 m-0 focus:outline-none"
+                          >
+                            <img src={blackmic} width={20} height={20} alt="mic" />
+                          </button>
+                        )}
+                      </div>
+                      <Field
+                        type="number"
+                        name="price"
+                        className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
+                        placeholder={listening ? 'listening...' : 'Enter Price'}
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="price"
+                      component="div"
+                      className="text-sm font-medium text-red-600"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
                   >
-                    Name
-                  </label>
-                  <Field
-                    type="text"
-                    name="income_name"
-                    className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                  />
-                  <ErrorMessage
-                    name="income_name"
-                    component="div"
-                    className="text-sm font-medium text-red-600"
-                  />
-                </div>
-                <div className="mb-5">
-                  <label
-                    className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                    htmlFor="expenseValue"
-                  >
-                    Price
-                  </label>
-                  <Field
-                    type="number"
-                    name="price"
-                    className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                  />
-                  <ErrorMessage
-                    name="price"
-                    component="div"
-                    className="text-sm font-medium text-red-600"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
-                  disabled={isSubmitting}
-                >
-                  Submit
-                </button>
-              </Form>
-            )}
+                    Submit
+                  </button>
+                </Form>
+              );
+            }}
           </Formik>
         </div>
       </Transition>

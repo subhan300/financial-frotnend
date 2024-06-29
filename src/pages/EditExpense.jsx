@@ -5,7 +5,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import ExpenseModal from '../components/ExpenseModal';
 import { editExpense, getExpense } from '../redux/features/expense/expense.reducer';
-import { getUserId, startListening, stopListening } from '../utils/Utils';
+import { getUserId } from '../utils/Utils';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate } from 'react-router-dom';
 import { clearState, clearSuccess } from '../redux/features/expense/expense.slice';
@@ -26,6 +26,8 @@ const validationSchema = Yup.object().shape({
 });
 
 function EditExpenses() {
+  const startListening = () => SpeechRecognition.startListening({ continuous: true });
+  const stopListening = () => SpeechRecognition.stopListening();
   const navigate = useNavigate();
   const { expenses, isError, isSuccess, isLoading } = useSelector((state) => state.expense);
   const [isOpen, setIsOpen] = useState(false);
@@ -64,8 +66,7 @@ function EditExpenses() {
     const res = expenses?.filter((item) => item?._id === router.id);
     setInitialValues(res);
     setAddExpense(res[0]?.other_expense);
-    setTotalExpense(res[0].total_expense);
-    console.log('exp Res===', res);
+    setTotalExpense(res[0]?.total_expense);
   }, [router.id, expenses]);
   console.log('expense', expense, 'total exp', total_expense, 'total price', totalPrice);
   useEffect(() => {
@@ -204,7 +205,11 @@ function EditExpenses() {
                                     </button>
                                   ) : (
                                     <button
-                                      onClick={startListening}
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        startListening();
+                                      }}
                                       style={{
                                         border: 'none',
                                         background: 'transparent',
@@ -229,34 +234,6 @@ function EditExpenses() {
                                 className="text-sm font-medium text-red-600"
                               />
                             </div>
-
-                            <div className="mb-5 flex justify-end">
-                              <div>
-                                <svg
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setExpenseModalOpen(true);
-                                    setEditingItem(item);
-                                  }}
-                                  class="w-6 h-6 text-gray-800 dark:text-white"
-                                  aria-hidden="true"
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  width="24"
-                                  height="24"
-                                  fill="none"
-                                  viewBox="0 0 24 24"
-                                >
-                                  <path
-                                    stroke="currentColor"
-                                    strokeLinecap="round"
-                                    strokeLinejoin="round"
-                                    strokeWidth="2"
-                                    d="M12 7.757v8.486M7.757 12h8.486M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                                  />
-                                </svg>
-                              </div>
-                            </div>
-
                             <div className="max-w-2xl mx-auto mb-5">
                               <div className="flex flex-col">
                                 <div className="overflow-x-auto shadow-md sm:rounded-lg">
@@ -328,7 +305,7 @@ function EditExpenses() {
                                                         <svg
                                                           onClick={() => {
                                                             const updatedIncome = values?.other;
-                                                            _expense?.filter(
+                                                            expense?.filter(
                                                               (incomeItem) =>
                                                                 incomeItem._id !== item._id
                                                             );

@@ -10,12 +10,13 @@ import {
   getIncome,
   getIncomeLastDate,
 } from '../redux/features/income/income.reducer';
-import { dateFormat, getUserId, startListening } from '../utils/Utils';
+import { dateFormat, getUserId } from '../utils/Utils';
 import { useNavigate } from 'react-router-dom';
 import { clearState, clearSuccess } from '../redux/features/income/income.slice';
 import { useEffect } from 'react';
 import FormDisableComponent from '../components/FormDisableComponent';
 import dayjs from 'dayjs';
+//Speech to text
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
 import blackmic from '../images/black_mic.png';
 import redmic from '../images/red_mic.png';
@@ -50,12 +51,10 @@ function Income() {
   const totalPriceReducer = (accumulator, currentValue) => accumulator + currentValue.price;
   // Calculate the total price using the reducer
   let totalPrice = income.reduce(totalPriceReducer, 0);
-
   const stopListening = () => {
     SpeechRecognition.stopListening();
-    resetTranscript();
   };
-
+  const startListening = () => SpeechRecognition.startListening({ continuous: true });
   if (!browserSupportsSpeechRecognition) {
     return <span>Browser doesn't support speech recognition.</span>;
   }
@@ -176,7 +175,6 @@ function Income() {
                     }}
                   >
                     {({ values, setFieldValue, isSubmitting }) => {
-                      console.log(values, 'values');
                       useEffect(() => {
                         if (transcript) {
                           setFieldValue('monthly_income', transcript);
@@ -197,7 +195,9 @@ function Income() {
                                 <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                                   {listening ? (
                                     <button
-                                      onClick={stopListening}
+                                      onClick={() => {
+                                        stopListening();
+                                      }}
                                       style={{
                                         border: 'none',
                                         background: 'transparent',
@@ -209,7 +209,9 @@ function Income() {
                                     </button>
                                   ) : (
                                     <button
-                                      onClick={startListening}
+                                      onClick={() => {
+                                        startListening();
+                                      }}
                                       style={{
                                         border: 'none',
                                         background: 'transparent',
@@ -319,8 +321,8 @@ function Income() {
                                                     onClick={(e) => {
                                                       e.stopPropagation();
                                                       console.log(item, 'item');
-                                                      setExpenseModalOpen(true);
                                                       setEditingItem(item); // Pass the item to be edited to the modal
+                                                      setExpenseModalOpen(true);
                                                     }}
                                                     className="w-6 h-6 text-gray-800 hover:text-[#4F46E5] cursor-pointer dark:text-white ml-2" // Added ml-2 for margin
                                                     aria-hidden="true"

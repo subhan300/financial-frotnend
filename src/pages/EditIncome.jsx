@@ -184,7 +184,11 @@ function EditIncome() {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={startListening}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      e.stopPropagation();
+                                      startListening();
+                                    }}
                                     style={{
                                       border: 'none',
                                       background: 'transparent',
@@ -198,9 +202,9 @@ function EditIncome() {
                               </div>
                               <Field
                                 type="number"
-                                name="monthly_income"
+                                name="monthly_rent"
                                 className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
-                                placeholder={listening ? 'listening...' : 'Enter Monthly Income'}
+                                placeholder={listening ? 'listening...' : 'Enter Monthly Rent'}
                               />
                             </div>
                             <ErrorMessage

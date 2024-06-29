@@ -5,8 +5,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { deleteIncome } from '../redux/features/income/income.reducer';
 import { deleteGoal } from '../redux/features/goal.reducer';
 
-function GoalModal({ modalOpen, setModalOpen ,text}) {
- 
+function GoalModal({ modalOpen, setModalOpen, text }) {
   return (
     <>
       {/* Modal backdrop */}
@@ -54,12 +53,10 @@ function GoalModal({ modalOpen, setModalOpen ,text}) {
               ></path>
             </svg>
           </div>
-        
+
           <p className="text-sm text-center mx-auto justify-center max-w-sm mt-3 text-gray-500">
             {text}
-        
           </p>
-        
           <button
             onClick={() => setModalOpen(false)}
             className="w-full py-2 border border-gray-700 rounded-md mt-2"

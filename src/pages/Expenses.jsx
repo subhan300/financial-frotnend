@@ -51,13 +51,11 @@ function Expenses() {
   // Text to speech section
   const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
     useSpeechRecognition();
-
   const startListening = () => SpeechRecognition.startListening({ continuous: true });
   const stopListening = () => {
     SpeechRecognition.stopListening();
     resetTranscript();
   };
-
   if (!browserSupportsSpeechRecognition) {
     return <span>Browser doesn't support speech recognition.</span>;
   }
@@ -206,7 +204,9 @@ function Expenses() {
                               <div className="absolute inset-y-0 left-0 flex items-center pl-3">
                                 {listening ? (
                                   <button
-                                    onClick={stopListening}
+                                    onClick={() => {
+                                      stopListening();
+                                    }}
                                     style={{
                                       border: 'none',
                                       background: 'transparent',
@@ -218,7 +218,9 @@ function Expenses() {
                                   </button>
                                 ) : (
                                   <button
-                                    onClick={startListening}
+                                    onClick={() => {
+                                      startListening();
+                                    }}
                                     style={{
                                       border: 'none',
                                       background: 'transparent',

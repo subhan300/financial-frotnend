@@ -4,7 +4,10 @@ import Transition from '../utils/Transition';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import { generateRandomId } from '../utils/generateRandomId';
-
+//Speech to text
+import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition';
+import blackmic from '../images/black_mic.png';
+import redmic from '../images/red_mic.png';
 const validationSchema = Yup.object().shape({
   expense_name: Yup.string().required('Expense title is required'),
   price: Yup.number()
@@ -18,6 +21,13 @@ function ExpenseModal({ modalOpen, setModalOpen, setAddExpense, expense, editIte
     expense_name: '',
     price: '',
   });
+  // Text to speech section
+  const { transcript, resetTranscript, listening, browserSupportsSpeechRecognition } =
+    useSpeechRecognition();
+  const startListening = () => SpeechRecognition.startListening({ continuous: true });
+  const stopListening = () => {
+    SpeechRecognition.stopListening();
+  };
   const handleSubmit = (values, { setSubmitting }) => {
     if (editItem) {
       // If editing an existing item, update it in the array
@@ -41,24 +51,24 @@ function ExpenseModal({ modalOpen, setModalOpen, setAddExpense, expense, editIte
   };
   const modalContent = useRef(null);
   // close on click outside
-  useEffect(() => {
-    const clickHandler = ({ target }) => {
-      if (!modalOpen || modalContent.current.contains(target)) return;
-      setModalOpen(false);
-    };
-    document.addEventListener('click', clickHandler);
-    return () => document.removeEventListener('click', clickHandler);
-  });
+  // useEffect(() => {
+  //   const clickHandler = ({ target }) => {
+  //     if (!modalOpen || modalContent.current.contains(target)) return;
+  //     setModalOpen(false);
+  //   };
+  //   document.addEventListener('click', clickHandler);
+  //   return () => document.removeEventListener('click', clickHandler);
+  // });
 
   // close if the esc key is pressed
-  useEffect(() => {
-    const keyHandler = ({ keyCode }) => {
-      if (!modalOpen || keyCode !== 27) return;
-      setModalOpen(false);
-    };
-    document.addEventListener('keydown', keyHandler);
-    return () => document.removeEventListener('keydown', keyHandler);
-  });
+  // useEffect(() => {
+  //   const keyHandler = ({ keyCode }) => {
+  //     if (!modalOpen || keyCode !== 27) return;
+  //     setModalOpen(false);
+  //   };
+  //   document.addEventListener('keydown', keyHandler);
+  //   return () => document.removeEventListener('keydown', keyHandler);
+  // });
   useEffect(() => {
     if (editItem) {
       setInitialValues(editItem);
@@ -67,6 +77,7 @@ function ExpenseModal({ modalOpen, setModalOpen, setAddExpense, expense, editIte
   if (!initialValues) {
     return null; // You can return a loading indicator or just null
   }
+
   return (
     <>
       {/* Modal backdrop */}
@@ -107,53 +118,93 @@ function ExpenseModal({ modalOpen, setModalOpen, setAddExpense, expense, editIte
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ isSubmitting }) => (
-              <Form className="mt-5">
-                <div className="mb-5">
-                  <label
-                    className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                    htmlFor="expenseName"
+            {({ setFieldValue, isSubmitting }) => {
+              useEffect(() => {
+                if (transcript) {
+                  setFieldValue('price', transcript);
+                }
+              }, [transcript, setFieldValue]);
+              return (
+                <Form className="mt-5">
+                  <div className="mb-5">
+                    <label
+                      className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                      htmlFor="expenseName"
+                    >
+                      Expense Name
+                    </label>
+                    <Field
+                      type="text"
+                      name="expense_name"
+                      className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
+                    />
+                    <ErrorMessage
+                      name="expense_name"
+                      component="div"
+                      className="text-sm font-medium text-red-600"
+                    />
+                  </div>
+                  <div className="mb-5">
+                    <label
+                      className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
+                      htmlFor="expenseValue"
+                    >
+                      Expense Value
+                    </label>
+                    <div className="relative mt-1 w-full sm:w-auto">
+                      <div className="absolute inset-y-0 left-0 flex items-center pl-3">
+                        {listening ? (
+                          <button
+                            onClick={() => {
+                              stopListening();
+                            }}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              padding: 0,
+                            }}
+                            className="p-0 m-0 focus:outline-none"
+                          >
+                            <img src={redmic} width={20} height={20} alt="mic" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              startListening();
+                            }}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              padding: 0,
+                            }}
+                            className="p-0 m-0 focus:outline-none"
+                          >
+                            <img src={blackmic} width={20} height={20} alt="mic" />
+                          </button>
+                        )}
+                      </div>
+                      <Field
+                        type="number"
+                        name="price"
+                        className="monthly_income rounded w-full text-slate-800 dark:text-slate-100 bg-transparent pl-12" // Adjust padding-left as needed
+                        placeholder={listening ? 'listening...' : 'Enter Price'}
+                      />
+                    </div>
+                    <ErrorMessage
+                      name="price"
+                      component="div"
+                      className="text-sm font-medium text-red-600"
+                    />
+                  </div>
+                  <button
+                    className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
+                    disabled={isSubmitting}
                   >
-                    Expense Name
-                  </label>
-                  <Field
-                    type="text"
-                    name="expense_name"
-                    className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                  />
-                  <ErrorMessage
-                    name="expense_name"
-                    component="div"
-                    className="text-sm font-medium text-red-600"
-                  />
-                </div>
-                <div className="mb-5">
-                  <label
-                    className="block text-sm font-bold mb-1 text-slate-800 dark:text-slate-100"
-                    htmlFor="expenseValue"
-                  >
-                    Expense Value
-                  </label>
-                  <Field
-                    type="number"
-                    name="price"
-                    className="rounded w-full text-slate-800 dark:text-slate-100 bg-transparent"
-                  />
-                  <ErrorMessage
-                    name="price"
-                    component="div"
-                    className="text-sm font-medium text-red-600"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="bg-[#4F46E5] hover:bg-[#433BCB] text-white px-6 py-2 text-sm font-medium rounded-md"
-                  disabled={isSubmitting}
-                >
-                  Submit
-                </button>
-              </Form>
-            )}
+                    Submit
+                  </button>
+                </Form>
+              );
+            }}
           </Formik>
         </div>
       </Transition>

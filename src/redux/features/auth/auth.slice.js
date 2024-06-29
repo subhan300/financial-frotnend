@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { logout, userRegister, userlogin } from './auth.reducer';
 import { toast } from 'react-toastify';
 const initialState = {
-  auth:JSON.parse(localStorage.getItem("user"))?? [],
+  auth: JSON.parse(localStorage.getItem('user')) ?? [],
   isLoading: false,
   isSuccess: false,
   isError: false,
@@ -31,20 +31,23 @@ export const authSlice = createSlice({
       state.isError = false;
       state.isSuccess = true;
       state.auth = action.payload.data;
-      localStorage.setItem("user",JSON.stringify(action.payload.data))
+      localStorage.setItem('user', JSON.stringify(action.payload.data));
       toast.success('Login has been succesfull', {
         position: toast.BOTTOM_RIGHT,
       });
     });
     builder.addCase(userlogin.rejected, (state, action) => {
-      //const response = JSON.parse(action?.payload?.request?.response);
+      console.log(action?.payload, 'action?.payload');
       state.isLoading = false;
       state.isError = true;
       state.isSuccess = false;
       state.error = action.error;
-      toast.error('Something went wrong', {
-        position: toast.BOTTOM_RIGHT,
-      });
+      toast.error(
+        action.payload.data.message ? action.payload.data.message : 'Something went wrong',
+        {
+          position: toast.BOTTOM_RIGHT,
+        }
+      );
     });
     builder.addCase(userRegister.pending, (state) => {
       console.log('userRegister.rejected', state);

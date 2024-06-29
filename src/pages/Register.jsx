@@ -57,6 +57,7 @@ function Register() {
       {({ values, touched, errors, isSubmitting, handleBlur, handleChange }) => {
         setEmail(values.email);
         return (
+          //SignUp form design
           <Form>
             <div className="h-screen px-2 overflow-hidden w-full bg-[#FAFBFC] relative flex justify-center items-center">
               <div className="flex justify-between items-center px-5 py-6 absolute top-0 w-full">
